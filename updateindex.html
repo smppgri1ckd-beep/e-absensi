@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-  <title>E-Presensi Siswa QR Code - Cloud Serverless Edition</title>
+  <title>E-Presensi Siswa QR Code - SMP PGRI 1 CIKADU</title>
 
   <!-- PWA Manifest via Data URI -->
-  <link href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22E-Presensi%20Siswa%20QR%22%2C%22short_name%22%3A%22PresensiQR%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%232563eb%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F2856%2F2856000.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D" rel="manifest"/>
+  <link href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22E-Presensi%20SMP%20PGRI%201%20CIKADU%22%2C%22short_name%22%3A%22PresensiQR%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%232563eb%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F2856%2F2856000.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D" rel="manifest"/>
   <meta content="#2563eb" name="theme-color"/>
   <meta content="yes" name="apple-mobile-web-app-capable"/>
   <meta content="default" name="apple-mobile-web-app-status-bar-style"/>
@@ -55,7 +55,7 @@
   </script>
 
   <style>
-    /* Full Viewport Isolation & Clean Light Theme */
+    /* Full Viewport Isolation & Clean Corporate White Theme */
     html, body {
       margin: 0 !important;
       padding: 0 !important;
@@ -68,7 +68,7 @@
       overflow-x: hidden;
     }
 
-    /* Isolasi Penuh dari Template Blogger */
+    /* Isolasi Total dari Template Blogger */
     .navbar, .header, .sidebar, .footer, .blog-pager, .post-feeds, #header, #footer, #sidebar, .post-title, .feed-links, .comments {
       display: none !important;
     }
@@ -79,12 +79,19 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    /* Glassmorphism Classes */
+    /* Glassmorphism Styles */
     .glass-panel {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.90);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     /* ID CARD 6.5 x 10 cm & KERTAS F4 (215 x 330 mm) - 9 KARTU (3x3) */
@@ -140,6 +147,7 @@
       body.printing-idcard aside,
       body.printing-idcard header,
       body.printing-idcard nav,
+      body.printing-idcard #welcomeHeroScreen,
       body.printing-idcard main > *:not(#view-cetakQr),
       body.printing-idcard #view-cetakQr > div:first-child,
       body.printing-idcard #view-cetakQr > div:nth-child(2) {
@@ -156,6 +164,46 @@
 <body class="bg-slate-50 text-slate-800 flex h-screen w-screen overflow-hidden antialiased select-none">
 
   <!-- ========================================== -->
+  <!-- LAYAR SAMBUTAN (WELCOME HERO SCREEN)       -->
+  <!-- ========================================== -->
+  <div id="welcomeHeroScreen" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-500">
+    <div class="glass-panel max-w-lg w-full rounded-3xl p-6 sm:p-8 text-center shadow-2xl border border-white/60 space-y-6 animate-fade-in relative overflow-hidden">
+      <!-- Background Glow Accent -->
+      <div class="absolute -top-16 -right-16 w-36 h-36 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -left-16 w-36 h-36 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+      <!-- School Logo Container -->
+      <div class="relative mx-auto w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white p-2.5 shadow-lg border border-slate-100 flex items-center justify-center">
+        <img id="welcomeLogoImg" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" class="w-full h-full object-contain" alt="Logo Sekolah"/>
+      </div>
+
+      <!-- Welcome Text Block -->
+      <div class="space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          Sistem Presensi Realtime
+        </div>
+        <h2 id="welcomeHeroTitle" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+          Selamat Datang Di E-Absensi<br/><span class="text-blue-600">SMP PGRI 1 CIKADU</span>
+        </h2>
+        <p id="welcomeHeroSubtitle" class="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium max-w-md mx-auto">
+          Portal presensi digital berbasis QR Code, pencatatan otomatis, rekapitulasi data akurat, dan cetak kartu siswa presisi.
+        </p>
+      </div>
+
+      <!-- Action Button to Main Application -->
+      <div class="pt-2">
+        <button onclick="enterApplicationFromWelcome()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-2xl text-xs sm:text-sm font-bold shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2.5 mx-auto transition-transform active:scale-95">
+          <span>Buka Sistem Presensi</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <p class="text-[10px] text-slate-400 font-medium">SMP PGRI 1 CIKADU • Disiplin, Karakter &amp; Berprestasi</p>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
   <!-- SIDEBAR DESKTOP (KHUSUS ADMIN)             -->
   <!-- ========================================== -->
   <aside id="sidebarDesktop" class="hidden w-64 bg-white border-r border-slate-200 flex-col justify-between shrink-0 z-30 transition-all duration-300">
@@ -164,7 +212,7 @@
       <div class="p-4 border-b border-slate-100 flex items-center gap-3">
         <img id="sidebarLogo" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" class="w-9 h-9 object-contain rounded-lg p-1 bg-blue-50 border border-blue-100" alt="Logo"/>
         <div class="truncate">
-          <h1 id="sidebarSchoolName" class="font-extrabold text-sm text-slate-900 leading-tight truncate">SMK N Digital</h1>
+          <h1 id="sidebarSchoolName" class="font-extrabold text-sm text-slate-900 leading-tight truncate">SMP PGRI 1 CIKADU</h1>
           <p class="text-[11px] text-blue-600 font-semibold tracking-wide flex items-center gap-1">
             <i class="fa-solid fa-circle-check text-[9px]"></i> Portal Admin
           </p>
@@ -187,7 +235,7 @@
           <span>Kelola Presensi</span>
         </button>
 
-        <div class="pt-3 pb-1 text-[10px] uppercase font-bold text-slate-400 px-3 tracking-wider">Penerbitan Kartu & QR</div>
+        <div class="pt-3 pb-1 text-[10px] uppercase font-bold text-slate-400 px-3 tracking-wider">Penerbitan Kartu &amp; QR</div>
         <button onclick="switchView('cetakQr')" id="navBtn-cetakQr" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
           <i class="fa-solid fa-id-card text-amber-600 text-sm"></i>
           <span>Cetak Kartu Siswa (F4)</span>
@@ -197,7 +245,7 @@
           <span>Download QR Siswa</span>
         </button>
 
-        <div class="pt-3 pb-1 text-[10px] uppercase font-bold text-slate-400 px-3 tracking-wider">Laporan & Kalender</div>
+        <div class="pt-3 pb-1 text-[10px] uppercase font-bold text-slate-400 px-3 tracking-wider">Laporan &amp; Kalender</div>
         <button onclick="switchView('kalenderHeb')" id="navBtn-kalenderHeb" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
           <i class="fa-solid fa-calendar-days text-purple-600 text-sm"></i>
           <span>Kalender HEB</span>
@@ -210,7 +258,7 @@
         <div class="pt-3 pb-1 text-[10px] uppercase font-bold text-slate-400 px-3 tracking-wider">Sistem</div>
         <button onclick="switchView('pengaturan')" id="navBtn-pengaturan" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
           <i class="fa-solid fa-sliders text-cyan-600 text-sm"></i>
-          <span>Pengaturan &amp; Piket</span>
+          <span>Pengaturan &amp; Pemeliharaan</span>
         </button>
       </nav>
 
@@ -244,12 +292,17 @@
       <div class="flex items-center gap-3">
         <img id="topNavLogo" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" class="w-8 h-8 object-contain rounded-lg p-0.5 bg-blue-50 border border-blue-100" alt="Logo"/>
         <div>
-          <h2 id="topNavSchoolName" class="text-xs md:text-sm font-black text-slate-900 leading-tight">SMK Negeri Digital Nusantara</h2>
-          <p id="topNavNpsn" class="text-[10px] text-slate-500 font-medium hidden sm:block">NPSN: 69876543 • Presensi Digital Realtime</p>
+          <h2 id="topNavSchoolName" class="text-xs md:text-sm font-black text-slate-900 leading-tight">SMP PGRI 1 CIKADU</h2>
+          <p id="topNavNpsn" class="text-[10px] text-slate-500 font-medium hidden sm:block">NPSN: 20203878 • Presensi Digital Realtime</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2.5">
+        <!-- Tombol Tampilkan Layar Sambutan -->
+        <button onclick="showWelcomeScreen()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-1.5 transition" title="Tampilkan Layar Sambutan">
+          <i class="fa-solid fa-house"></i> <span class="hidden lg:inline">Beranda</span>
+        </button>
+
         <!-- Realtime Clock -->
         <div class="text-right border-r border-slate-200 pr-3 mr-1 hidden sm:block">
           <p id="realtimeClock" class="font-mono text-xs font-bold text-blue-600">--:--:-- WIB</p>
@@ -306,8 +359,8 @@
               <span id="badgeHariPiket" class="text-[10px] px-2 py-0.5 bg-blue-50 text-blue-700 font-extrabold rounded-md border border-blue-100">SENIN</span>
             </div>
             <div class="my-2">
-              <p id="namaPiketHariIni" class="text-sm font-bold text-slate-900 truncate">Bambang Sudarsono, S.Pd</p>
-              <p id="nipPiketHariIni" class="text-[11px] text-slate-500 font-mono">NIP: 19800312 200501 1 009</p>
+              <p id="namaPiketHariIni" class="text-sm font-bold text-slate-900 truncate">Guru Piket Senin, S.Pd</p>
+              <p id="nipPiketHariIni" class="text-[11px] text-slate-500 font-mono">NIP: 19800101 200501 1 001</p>
             </div>
             <div class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1.5 pt-1">
               <i class="fa-solid fa-circle-check"></i> Siap Melayani Presensi
@@ -446,11 +499,15 @@
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <h3 class="text-base font-bold text-slate-900">Master Database Siswa</h3>
-              <p class="text-xs text-slate-500">Kelola data biodata siswa, pas foto otomatis terkompresi, dan ekspor/impor Excel.</p>
+              <p class="text-xs text-slate-500">Kelola biodata siswa, pas foto otomatis terkompresi, dan ekspor/impor Excel.</p>
             </div>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap items-center gap-2">
               <button onclick="openStudentModal('ADD')" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-user-plus"></i> Tambah Siswa
+              </button>
+              <!-- TOMBOL HAPUS MASSAL SISWA TERPILIH -->
+              <button onclick="deleteSelectedStudents()" id="btnDeleteSelectedStudents" class="hidden px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-trash-can"></i> Hapus Siswa Terpilih (<span id="countSelectedStudents">0</span>)
               </button>
               <label class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
                 <i class="fa-solid fa-file-excel"></i> Impor Excel
@@ -477,11 +534,14 @@
             </div>
           </div>
 
-          <!-- Tabel Siswa -->
+          <!-- Tabel Siswa dengan Kotak Centang (Checklist) -->
           <div class="overflow-x-auto rounded-xl border border-slate-200">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                 <tr>
+                  <th class="p-3 w-10 text-center">
+                    <input type="checkbox" id="checkAllStudents" onchange="toggleCheckAllStudents(this)" class="w-4 h-4 text-blue-600 rounded cursor-pointer"/>
+                  </th>
                   <th class="p-3 w-14">Foto</th>
                   <th class="p-3 w-28">NISN</th>
                   <th class="p-3">Nama Lengkap</th>
@@ -491,7 +551,7 @@
                 </tr>
               </thead>
               <tbody id="studentTableBody" class="divide-y divide-slate-100 text-slate-700">
-                <tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Memuat data siswa...</td></tr>
+                <tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada data siswa. Tambahkan melalui tombol Tambah Siswa atau Impor Excel.</td></tr>
               </tbody>
             </table>
           </div>
@@ -506,14 +566,18 @@
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <h3 class="text-base font-bold text-slate-900">Kelola Catatan Presensi (Realtime Database)</h3>
-              <p class="text-xs text-slate-500">Filter, edit riwayat kehadiran, dan entri kehadiran manual.</p>
+              <p class="text-xs text-slate-500">Filter, edit riwayat kehadiran, dan bersihkan log kehadiran.</p>
             </div>
             <div class="flex flex-wrap gap-2">
               <button onclick="openAttendanceModal('ADD')" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-plus"></i> Input Presensi Manual
               </button>
+              <!-- TOMBOL HAPUS MASSAL PRESENSI TERPILIH -->
+              <button onclick="deleteSelectedAttendance()" id="btnDeleteSelectedAttendance" class="hidden px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-trash-can"></i> Hapus Presensi Terpilih (<span id="countSelectedAttendance">0</span>)
+              </button>
               <button onclick="confirmDeleteFilteredAttendance()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
-                <i class="fa-solid fa-trash-can"></i> Hapus Riwayat Terfilter
+                <i class="fa-solid fa-filter-circle-xmark"></i> Hapus Riwayat Terfilter
               </button>
             </div>
           </div>
@@ -549,11 +613,14 @@
             </div>
           </div>
 
-          <!-- Tabel Riwayat Presensi -->
+          <!-- Tabel Riwayat Presensi dengan Kotak Centang -->
           <div class="overflow-x-auto rounded-xl border border-slate-200">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                 <tr>
+                  <th class="p-3 w-10 text-center">
+                    <input type="checkbox" id="checkAllAttendance" onchange="toggleCheckAllAttendance(this)" class="w-4 h-4 text-blue-600 rounded cursor-pointer"/>
+                  </th>
                   <th class="p-3">Tanggal</th>
                   <th class="p-3">Waktu</th>
                   <th class="p-3">NISN</th>
@@ -565,7 +632,7 @@
                 </tr>
               </thead>
               <tbody id="attendanceManagementTableBody" class="divide-y divide-slate-100 text-slate-700">
-                <tr><td colspan="8" class="p-4 text-center text-slate-400 italic">Memuat riwayat presensi...</td></tr>
+                <tr><td colspan="9" class="p-4 text-center text-slate-400 italic">Belum ada catatan presensi.</td></tr>
               </tbody>
             </table>
           </div>
@@ -611,7 +678,7 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 5: DOWNLOAD QR SISWA (FITUR BARU)     -->
+      <!-- VIEW 5: DOWNLOAD QR SISWA                  -->
       <!-- ========================================== -->
       <section id="view-downloadQr" class="hidden space-y-4 max-w-7xl mx-auto">
         <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
@@ -776,9 +843,9 @@
                 <img id="rekapKopLogo" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" class="w-20 h-20 object-contain" alt="Logo Sekolah" crossorigin="anonymous"/>
                 <div class="flex-1 text-center">
                   <h3 class="text-xs font-bold uppercase tracking-widest text-slate-700">PEMERINTAH DAERAH PROVINSI / DINAS PENDIDIKAN</h3>
-                  <h2 id="rekapKopNama" class="text-xl font-black uppercase text-slate-900 tracking-tight">SMK NEGERI DIGITAL NUSANTARA</h2>
-                  <p id="rekapKopAlamat" class="text-[11px] text-slate-700 font-medium">Jl. Pendidikan Karakter No. 101, Kota Pendidikan, Indonesia</p>
-                  <p id="rekapKopNpsn" class="text-[11px] text-slate-600 font-bold">NPSN: 69876543 • E-Presensi Siswa Berbasis Cloud Serverless</p>
+                  <h2 id="rekapKopNama" class="text-xl font-black uppercase text-slate-900 tracking-tight">SMP PGRI 1 CIKADU</h2>
+                  <p id="rekapKopAlamat" class="text-[11px] text-slate-700 font-medium">Jl. Raya Cikadu, Kec. Cikadu, Kab. Cianjur, Jawa Barat</p>
+                  <p id="rekapKopNpsn" class="text-[11px] text-slate-600 font-bold">NPSN: 20203878 • E-Presensi Siswa Berbasis Cloud Serverless</p>
                 </div>
               </div>
 
@@ -819,15 +886,15 @@
                     <p class="font-medium text-slate-700 invisible">Spasi</p>
                     <p class="font-bold text-slate-900">Mengetahui,<br/>Kepala Sekolah</p>
                     <div class="h-16"></div>
-                    <p id="ttdNamaKepsek" class="font-bold text-slate-900 underline">Drs. H. Rahmat Hidayat, M.Pd</p>
-                    <p id="ttdNipKepsek" class="text-[11px] text-slate-600 font-mono">NIP: 19720415 199803 1 004</p>
+                    <p id="ttdNamaKepsek" class="font-bold text-slate-900 underline">Nama Kepala Sekolah, S.Pd</p>
+                    <p id="ttdNipKepsek" class="text-[11px] text-slate-600 font-mono">NIP: 19750101 200001 1 001</p>
                   </div>
                   <div class="text-center w-56">
                     <p id="ttdKotaTanggal" class="font-medium text-slate-700">Cianjur, 20 September 2026</p>
                     <p id="ttdJabatanPiket" class="font-bold text-slate-900">Guru Piket</p>
                     <div class="h-16"></div>
-                    <p id="ttdNamaPiket" class="font-bold text-slate-900 underline">Bambang Sudarsono, S.Pd</p>
-                    <p id="ttdNipPiket" class="text-[11px] text-slate-600 font-mono">NIP: 19800312 200501 1 009</p>
+                    <p id="ttdNamaPiket" class="font-bold text-slate-900 underline">Guru Piket Senin, S.Pd</p>
+                    <p id="ttdNipPiket" class="text-[11px] text-slate-600 font-mono">NIP: 19800101 200501 1 001</p>
                   </div>
                 </div>
               </div>
@@ -837,7 +904,7 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 8: PENGATURAN & PIKET (ADMIN ONLY)    -->
+      <!-- VIEW 8: PENGATURAN & PEMELIHARAAN          -->
       <!-- ========================================== -->
       <section id="view-pengaturan" class="hidden space-y-4 max-w-7xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -871,7 +938,7 @@
                   <img id="cfgLogoPreview" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" class="w-14 h-14 object-contain bg-white rounded-xl p-1.5 border border-slate-200 shrink-0" alt="Logo Preview"/>
                   <div class="flex-1 space-y-1">
                     <input type="file" id="cfgLogoFile" accept="image/*" onchange="previewSchoolLogo(event)" class="w-full text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"/>
-                    <p class="text-[10px] text-slate-400">Otomatis dioptimasi ke WebP/PNG compact.</p>
+                    <p class="text-[10px] text-slate-400">Otomatis dioptimasi ke format compact.</p>
                   </div>
                 </div>
               </div>
@@ -893,87 +960,117 @@
           </div>
 
           <div class="space-y-4">
+            <!-- PENGATURAN KHUSUS LAYAR SAMBUTAN (WELCOME SCREEN) -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+                <i class="fa-solid fa-desktop text-indigo-600"></i> Kustomisasi Layar Sambutan
+              </h3>
+              <form onsubmit="saveWelcomeSettings(event)" class="space-y-3 text-xs">
+                <div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                  <span class="font-bold text-slate-700">Tampilkan Layar Sambutan saat Dibuka</span>
+                  <input type="checkbox" id="cfgWelcomeShow" class="w-4 h-4 text-blue-600 rounded cursor-pointer"/>
+                </div>
+                <div>
+                  <label class="block text-slate-600 font-bold mb-1">Judul Sambutan</label>
+                  <input type="text" id="cfgWelcomeTitle" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"/>
+                </div>
+                <div>
+                  <label class="block text-slate-600 font-bold mb-1">Sub-judul / Keterangan Sambutan</label>
+                  <textarea id="cfgWelcomeSubtitle" rows="2" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"></textarea>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition shadow-sm">
+                  Simpan Tampilan Sambutan
+                </button>
+              </form>
+            </div>
+
             <!-- Jadwal Guru Piket -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
               <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
                 <i class="fa-solid fa-calendar-week text-emerald-600"></i> Rotasi Jadwal Guru Piket
               </h3>
-              <p class="text-xs text-slate-500">Nama petugas ini otomatis muncul di layar kiosk dan lembar tanda tangan laporan.</p>
-              <form onsubmit="saveJadwalPiket(event)" class="space-y-2.5 text-xs">
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                  <span class="font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-circle text-[8px]"></i> Guru Piket Senin</span>
+              <form onsubmit="saveJadwalPiket(event)" class="space-y-2 text-xs">
+                <div class="p-2 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                  <span class="font-bold text-blue-700 flex items-center gap-1"><i class="fa-solid fa-circle text-[7px]"></i> Guru Piket Senin</span>
                   <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="piketSeninNama" placeholder="Nama Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg"/>
-                    <input type="text" id="piketSeninNip" placeholder="NIP Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg"/>
+                    <input type="text" id="piketSeninNama" placeholder="Nama Guru Piket" class="px-2 py-1.5 bg-white border border-slate-200 rounded-lg"/>
+                    <input type="text" id="piketSeninNip" placeholder="NIP Guru Piket" class="px-2 py-1.5 bg-white border border-slate-200 rounded-lg"/>
                   </div>
                 </div>
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                  <span class="font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-circle text-[8px]"></i> Guru Piket Selasa</span>
+                <div class="p-2 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                  <span class="font-bold text-blue-700 flex items-center gap-1"><i class="fa-solid fa-circle text-[7px]"></i> Guru Piket Selasa</span>
                   <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="piketSelasaNama" placeholder="Nama Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg"/>
-                    <input type="text" id="piketSelasaNip" placeholder="NIP Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg"/>
+                    <input type="text" id="piketSelasaNama" placeholder="Nama Guru Piket" class="px-2 py-1.5 bg-white border border-slate-200 rounded-lg"/>
+                    <input type="text" id="piketSelasaNip" placeholder="NIP Guru Piket" class="px-2 py-1.5 bg-white border border-slate-200 rounded-lg"/>
                   </div>
                 </div>
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                  <span class="font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-circle text-[8px]"></i> Guru Piket Rabu</span>
+                <div class="p-2 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                  <span class="font-bold text-blue-700 flex items-center gap-1"><i class="fa-solid fa-circle text-[7px]"></i> Guru Piket Rabu</span>
                   <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="piketRabuNama" placeholder="Nama Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg"/>
-                    <input type="text" id="piketRabuNip" placeholder="NIP Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg"/>
+                    <input type="text" id="piketRabuNama" placeholder="Nama Guru Piket" class="px-2 py-1.5 bg-white border border-slate-200 rounded-lg"/>
+                    <input type="text" id="piketRabuNip" placeholder="NIP Guru Piket" class="px-2 py-1.5 bg-white border border-slate-200 rounded-lg"/>
                   </div>
                 </div>
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                  <span class="font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-circle text-[8px]"></i> Guru Piket Kamis</span>
+                <div class="p-2 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                  <span class="font-bold text-blue-700 flex items-center gap-1"><i class="fa-solid fa-circle text-[7px]"></i> Guru Piket Kamis</span>
                   <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="piketKamisNama" placeholder="Nama Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg"/>
-                    <input type="text" id="piketKamisNip" placeholder="NIP Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg"/>
+                    <input type="text" id="piketKamisNama" placeholder="Nama Guru Piket" class="px-2 py-1.5 bg-white border border-slate-200 rounded-lg"/>
+                    <input type="text" id="piketKamisNip" placeholder="NIP Guru Piket" class="px-2 py-1.5 bg-white border border-slate-200 rounded-lg"/>
                   </div>
                 </div>
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                  <span class="font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-circle text-[8px]"></i> Guru Piket Jum'at</span>
+                <div class="p-2 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                  <span class="font-bold text-blue-700 flex items-center gap-1"><i class="fa-solid fa-circle text-[7px]"></i> Guru Piket Jum'at</span>
                   <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="piketJumatNama" placeholder="Nama Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg"/>
-                    <input type="text" id="piketJumatNip" placeholder="NIP Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg"/>
+                    <input type="text" id="piketJumatNama" placeholder="Nama Guru Piket" class="px-2 py-1.5 bg-white border border-slate-200 rounded-lg"/>
+                    <input type="text" id="piketJumatNip" placeholder="NIP Guru Piket" class="px-2 py-1.5 bg-white border border-slate-200 rounded-lg"/>
                   </div>
                 </div>
-                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition shadow-sm">
+                <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition shadow-sm">
                   Simpan Jadwal Guru Piket
                 </button>
               </form>
             </div>
 
-            <!-- MODUL PEMELIHARAAN & RESET DATA SEMESTER -->
-            <div class="bg-white border border-rose-200 rounded-2xl p-5 shadow-sm space-y-4">
-              <div class="flex items-center gap-2 border-b border-rose-100 pb-3">
-                <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-sm">
-                  <i class="fa-solid fa-box-archive"></i>
+            <!-- MODUL PEMELIHARAAN BASIS DATA (DIPISAH TEGAS: CADANGKAN & BERSIHKAN) -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+              <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm">
+                  <i class="fa-solid fa-server text-blue-600"></i>
                 </div>
                 <div>
-                  <h3 class="text-sm font-bold text-slate-900">Pemeliharaan &amp; Reset Data Semester</h3>
-                  <p class="text-[11px] text-slate-500">Arsipkan dan bersihkan log presensi lama agar database tetap ringkas.</p>
+                  <h3 class="text-sm font-bold text-slate-900">Pemeliharaan Basis Data Semester</h3>
+                  <p class="text-[11px] text-slate-500">Tombol cadangan dan pembersihan log presensi dipisahkan secara aman.</p>
                 </div>
               </div>
-              <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-800 space-y-1">
-                <p class="font-bold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> Informasi Penting:</p>
-                <p>Fitur ini hanya menghapus koleksi <strong>riwayat presensi</strong>. Data master siswa, profil sekolah, dan kalender KBM tetap 100% aman.</p>
-              </div>
-              <div class="space-y-2.5 text-xs">
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                    <label class="block text-[10px] font-bold text-slate-600 mb-1">Tahun Ajaran</label>
-                    <input type="number" id="maintenanceYear" value="2026" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg"/>
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-slate-600 mb-1">Pilih Semester</label>
-                    <select id="maintenanceSemester" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg font-medium">
-                      <option value="ganjil">Semester Ganjil (Jul - Des)</option>
-                      <option value="genap">Semester Genap (Jan - Jun)</option>
-                    </select>
-                  </div>
+
+              <!-- Parameter Semester & Tahun -->
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-1">Tahun Ajaran</label>
+                  <input type="number" id="maintenanceYear" value="2026" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg"/>
                 </div>
-                <button onclick="executeSemesterPurge()" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-                  <i class="fa-solid fa-file-excel"></i> Unduh Cadangan Excel &amp; Bersihkan Semester
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-1">Pilih Semester</label>
+                  <select id="maintenanceSemester" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg font-medium">
+                    <option value="ganjil">Semester Ganjil (Jul - Des)</option>
+                    <option value="genap">Semester Genap (Jan - Jun)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- 2 Tombol Terpisah Sesuai Instruksi -->
+              <div class="space-y-2 pt-1">
+                <!-- Tombol 1: HANYA CADANGKAN EXCEL (TIDAK MENGHAPUS) -->
+                <button onclick="downloadBackupExcelOnly()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-sm">
+                  <i class="fa-solid fa-file-excel text-sm"></i> 1. Unduh Cadangan Excel (.xlsx) Saja
+                </button>
+
+                <!-- Tombol 2: HANYA BERSIHKAN / RESET DATA SEMESTER -->
+                <button onclick="purgeSemesterAttendanceOnly()" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-trash-can text-sm"></i> 2. Bersihkan / Reset Presensi Semester
                 </button>
               </div>
+              <p class="text-[10px] text-slate-400 italic text-center">Catatan: Pembersihan hanya menghapus data presensi, master data siswa tetap 100% aman.</p>
             </div>
           </div>
         </div>
@@ -1069,7 +1166,7 @@
           </div>
           <div>
             <label class="block text-slate-600 font-bold mb-1">Kelas</label>
-            <input type="text" id="formKelas" placeholder="XII-RPL-1" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"/>
+            <input type="text" id="formKelas" placeholder="VII-A" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"/>
           </div>
         </div>
         <div>
@@ -1186,7 +1283,7 @@
     const IS_PREVIEW = false; // Mode produksi terhubung ke Firebase
 
     const firebaseConfig = {
-  apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
+apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
   authDomain: "presensi-siswa-digital-a24ca.firebaseapp.com",
   projectId: "presensi-siswa-digital-a24ca",
   storageBucket: "presensi-siswa-digital-a24ca.firebasestorage.app",
@@ -1214,6 +1311,11 @@
     let attendanceChartInstance = null;
     let deferredPrompt = null;
 
+    // STATE BERSIH (MURNI KOSONG BEBAS DATA DUMMY)
+    let listSiswa = [];
+    let listAbsensi = [];
+    let kalenderHebData = {};
+
     let appConfig = {
       namaSekolah: "SMP PGRI 1 CIKADU",
       npsn: "20203878",
@@ -1223,6 +1325,11 @@
       nipKepsek: "19750101 200001 1 001",
       logoUrl: "https://cdn-icons-png.flaticon.com/512/2856/2856000.png",
       sistemHariSekolah: "5",
+      welcomeScreen: {
+        show: true,
+        title: "Selamat Datang Di E-Absensi\nSMP PGRI 1 CIKADU",
+        subtitle: "Portal presensi digital berbasis QR Code, pencatatan otomatis, rekapitulasi data akurat, dan cetak kartu siswa presisi."
+      },
       jadwalPiket: {
         senin: { nama: "Guru Piket Senin, S.Pd", nip: "19800101 200501 1 001" },
         selasa: { nama: "Guru Piket Selasa, S.Pd", nip: "19820202 200602 2 002" },
@@ -1231,21 +1338,6 @@
         jumat: { nama: "Guru Piket Jum'at, S.Pd", nip: "19880505 200905 1 005" }
       }
     };
-
-    let listSiswa = [
-      { nisn: "1001", nama: "Ahmad Fauzi", jk: "L", kelas: "VII-A", fotoUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop" },
-      { nisn: "1002", nama: "Siti Rahmawati", jk: "P", kelas: "VII-A", fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" },
-      { nisn: "1003", nama: "Budi Pratama", jk: "L", kelas: "VIII-B", fotoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" },
-      { nisn: "1004", nama: "Dewi Lestari", jk: "P", kelas: "IX-C", fotoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" }
-    ];
-
-    let listAbsensi = [
-      { id: "ABS-01", tanggal: getTodayISO(), waktu: "06:45:10", nisn: "1001", nama: "Ahmad Fauzi", kelas: "VII-A", sesi: "Pagi", status: "Hadir Tepat Waktu" },
-      { id: "ABS-02", tanggal: getTodayISO(), waktu: "06:50:22", nisn: "1002", nama: "Siti Rahmawati", kelas: "VII-A", sesi: "Pagi", status: "Hadir Tepat Waktu" },
-      { id: "ABS-03", tanggal: getTodayISO(), waktu: "07:05:00", nisn: "1003", nama: "Budi Pratama", kelas: "VIII-B", sesi: "Pagi", status: "Terlambat" }
-    ];
-
-    let kalenderHebData = {};
 
     function getTodayISO() {
       const now = new Date();
@@ -1264,6 +1356,55 @@
       return map[d.getDay()] || "senin";
     }
 
+    // WELCOME SCREEN CONTROLLERS
+    window.enterApplicationFromWelcome = function() {
+      const screen = document.getElementById('welcomeHeroScreen');
+      screen.classList.add('opacity-0', 'pointer-events-none');
+      setTimeout(() => screen.classList.add('hidden'), 500);
+    };
+
+    window.showWelcomeScreen = function() {
+      const screen = document.getElementById('welcomeHeroScreen');
+      screen.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+    };
+
+    function applyWelcomeUI() {
+      const w = appConfig.welcomeScreen || {};
+      if (w.show === false) {
+        document.getElementById('welcomeHeroScreen').classList.add('hidden');
+      }
+      document.getElementById('welcomeLogoImg').src = appConfig.logoUrl;
+      document.getElementById('welcomeHeroTitle').innerHTML = (w.title || "Selamat Datang Di E-Absensi\nSMP PGRI 1 CIKADU").replace(/\n/g, '<br/>');
+      document.getElementById('welcomeHeroSubtitle').innerText = w.subtitle || "Portal presensi digital berbasis QR Code.";
+      
+      // Sync ke form pengaturan
+      const chk = document.getElementById('cfgWelcomeShow');
+      if (chk) chk.checked = w.show !== false;
+      const t = document.getElementById('cfgWelcomeTitle');
+      if (t) t.value = w.title || "Selamat Datang Di E-Absensi\nSMP PGRI 1 CIKADU";
+      const sub = document.getElementById('cfgWelcomeSubtitle');
+      if (sub) sub.value = w.subtitle || "";
+    }
+
+    window.saveWelcomeSettings = async function(e) {
+      e.preventDefault();
+      appConfig.welcomeScreen = {
+        show: document.getElementById('cfgWelcomeShow').checked,
+        title: document.getElementById('cfgWelcomeTitle').value.trim(),
+        subtitle: document.getElementById('cfgWelcomeSubtitle').value.trim()
+      };
+
+      if (!IS_PREVIEW && db) {
+        try {
+          await setDoc(doc(db, "pengaturan", "identitas_sekolah"), appConfig);
+        } catch (err) {}
+      }
+
+      applyWelcomeUI();
+      showNotice("Tersimpan", "Pengaturan Layar Sambutan berhasil diperbarui!", "success");
+    };
+
+    // MODAL HELPER
     window.showNotice = function(title, message, iconType = 'info') {
       document.getElementById('noticeTitle').innerText = title;
       document.getElementById('noticeMessage').innerText = message;
@@ -1309,7 +1450,7 @@
       } catch (e) {}
     }
 
-    // AUTO SETUP DATABASE CLOUD FIRESTORE
+    // AUTO SETUP DATABASE CLOUD FIRESTORE (HANYA PENGATURAN & AKUN PETUGAS, TANPA DUMMY SISWA/LOG)
     async function autoSetupDatabase() {
       if (IS_PREVIEW || !db) return;
       try {
@@ -1325,8 +1466,6 @@
             role: "PESERTA",
             nama: "Petugas Piket Harian"
           });
-          listSiswa.forEach(s => batch.set(doc(db, "siswa", s.nisn), s));
-          listAbsensi.forEach(a => batch.set(doc(db, "presensi", a.id), a));
 
           await batch.commit();
           console.log("Auto-setup database selesai!");
@@ -1343,15 +1482,13 @@
       onSnapshot(collection(db, "siswa"), (snapshot) => {
         const arr = [];
         snapshot.forEach(d => arr.push(d.data()));
-        if (arr.length > 0) {
-          listSiswa = arr;
-          populateClassDropdowns();
-          renderStudentsTable();
-          renderIdCardsForPrint();
-          renderDownloadQrGrid();
-          updateDashboardStats();
-          generateRekapView();
-        }
+        listSiswa = arr;
+        populateClassDropdowns();
+        renderStudentsTable();
+        renderIdCardsForPrint();
+        renderDownloadQrGrid();
+        updateDashboardStats();
+        generateRekapView();
       });
 
       onSnapshot(collection(db, "presensi"), (snapshot) => {
@@ -1370,6 +1507,7 @@
           appConfig = d.data();
           applySchoolIdentityUI();
           updatePiketBannerToday();
+          applyWelcomeUI();
         }
       });
     }
@@ -1412,7 +1550,7 @@
       });
     }
 
-    // MANAJEMEN ROLE & NAVIGASI STRICT
+    // MANAJEMEN ROLE & NAVIGASI
     window.openLoginModal = function() {
       document.getElementById('loginUsername').value = "";
       document.getElementById('loginPassword').value = "";
@@ -1543,7 +1681,9 @@
       if (viewKey === 'rekapPdf') generateRekapView();
     };
 
-    // MODUL 1: MASTER DATA SISWA
+    // ==========================================
+    // MODUL 1: MASTER DATA SISWA & CHECKLIST
+    // ==========================================
     window.renderStudentsTable = function() {
       const search = (document.getElementById('searchStudentInput')?.value || '').toLowerCase();
       const filterKelas = document.getElementById('filterStudentKelas')?.value || 'ALL';
@@ -1556,15 +1696,19 @@
       if (search) filtered = filtered.filter(s => s.nama.toLowerCase().includes(search) || String(s.nisn).includes(search));
 
       document.getElementById('studentCountBadge').innerText = `${filtered.length} Siswa`;
+      updateSelectedStudentsCount();
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Tidak ada siswa ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada data siswa. Tambahkan melalui tombol Tambah Siswa atau Impor Excel.</td></tr>`;
         return;
       }
 
       filtered.forEach(s => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
+          <td class="p-3 text-center">
+            <input type="checkbox" value="${s.nisn}" class="student-row-checkbox w-4 h-4 text-blue-600 rounded cursor-pointer" onchange="updateSelectedStudentsCount()"/>
+          </td>
           <td class="p-3">
             <img src="${s.fotoUrl}" class="w-8 h-8 rounded-full object-cover border border-slate-200" onerror="this.src='https://placehold.co/100x100/e2e8f0/64748b?text=Foto'"/>
           </td>
@@ -1579,6 +1723,56 @@
         `;
         tbody.appendChild(tr);
       });
+    };
+
+    window.toggleCheckAllStudents = function(masterCheckbox) {
+      const checkboxes = document.querySelectorAll('.student-row-checkbox');
+      checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+      updateSelectedStudentsCount();
+    };
+
+    window.updateSelectedStudentsCount = function() {
+      const selected = document.querySelectorAll('.student-row-checkbox:checked');
+      const btn = document.getElementById('btnDeleteSelectedStudents');
+      const badge = document.getElementById('countSelectedStudents');
+      if (badge) badge.innerText = selected.length;
+      if (btn) {
+        if (selected.length > 0) btn.classList.remove('hidden');
+        else btn.classList.add('hidden');
+      }
+    };
+
+    window.deleteSelectedStudents = function() {
+      const selected = Array.from(document.querySelectorAll('.student-row-checkbox:checked')).map(cb => cb.value);
+      if (selected.length === 0) return;
+
+      showConfirm(
+        "Hapus Siswa Terpilih",
+        `Hapus ${selected.length} data siswa yang dipilih secara permanen dari database?`,
+        async () => {
+          showNotice("Menghapus Data", `Menghapus ${selected.length} data siswa...`, "info");
+          if (!IS_PREVIEW && db) {
+            try {
+              const chunkSize = 400;
+              for (let i = 0; i < selected.length; i += chunkSize) {
+                const chunk = selected.slice(i, i + chunkSize);
+                const batch = writeBatch(db);
+                chunk.forEach(nisn => batch.delete(doc(db, "siswa", nisn)));
+                await batch.commit();
+              }
+            } catch (e) {}
+          }
+
+          listSiswa = listSiswa.filter(s => !selected.includes(String(s.nisn)));
+          populateClassDropdowns();
+          renderStudentsTable();
+          renderIdCardsForPrint();
+          renderDownloadQrGrid();
+          updateDashboardStats();
+          closeNoticeModal();
+          showNotice("Sukses", `${selected.length} data siswa berhasil dihapus!`, "success");
+        }
+      );
     };
 
     window.openStudentModal = function(mode = 'ADD', nisn = '') {
@@ -1776,7 +1970,9 @@
       });
     };
 
-    // MODUL 2: KELOLA PRESENSI & PENGHAPUSAN TERFILTER
+    // ==========================================
+    // MODUL 2: KELOLA PRESENSI & CHECKLIST HAPUS
+    // ==========================================
     window.renderAttendanceManagementTable = function() {
       const tglAwal = document.getElementById('filterAbsensiTglAwal')?.value;
       const tglAkhir = document.getElementById('filterAbsensiTglAkhir')?.value;
@@ -1791,8 +1987,10 @@
       if (kelas !== 'ALL') filtered = filtered.filter(a => a.kelas === kelas);
       if (sesi !== 'ALL') filtered = filtered.filter(a => a.sesi === sesi);
 
+      updateSelectedAttendanceCount();
+
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 italic">Tidak ada catatan presensi sesuai kriteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400 italic">Belum ada catatan presensi sesuai kriteria.</td></tr>`;
         return;
       }
 
@@ -1800,6 +1998,9 @@
         const tr = document.createElement('tr');
         const badgeColor = a.sesi === 'Pagi' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100';
         tr.innerHTML = `
+          <td class="p-3 text-center">
+            <input type="checkbox" value="${a.id}" class="attendance-row-checkbox w-4 h-4 text-blue-600 rounded cursor-pointer" onchange="updateSelectedAttendanceCount()"/>
+          </td>
           <td class="p-3 font-mono text-slate-500">${a.tanggal}</td>
           <td class="p-3 font-mono font-bold text-slate-900">${a.waktu}</td>
           <td class="p-3 font-mono">${a.nisn}</td>
@@ -1816,6 +2017,55 @@
       });
     };
 
+    window.toggleCheckAllAttendance = function(masterCheckbox) {
+      const checkboxes = document.querySelectorAll('.attendance-row-checkbox');
+      checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+      updateSelectedAttendanceCount();
+    };
+
+    window.updateSelectedAttendanceCount = function() {
+      const selected = document.querySelectorAll('.attendance-row-checkbox:checked');
+      const btn = document.getElementById('btnDeleteSelectedAttendance');
+      const badge = document.getElementById('countSelectedAttendance');
+      if (badge) badge.innerText = selected.length;
+      if (btn) {
+        if (selected.length > 0) btn.classList.remove('hidden');
+        else btn.classList.add('hidden');
+      }
+    };
+
+    window.deleteSelectedAttendance = function() {
+      const selected = Array.from(document.querySelectorAll('.attendance-row-checkbox:checked')).map(cb => cb.value);
+      if (selected.length === 0) return;
+
+      showConfirm(
+        "Hapus Presensi Terpilih",
+        `Hapus ${selected.length} data presensi yang dicentang secara permanen?`,
+        async () => {
+          showNotice("Menghapus Presensi", `Menghapus ${selected.length} data presensi...`, "info");
+          if (!IS_PREVIEW && db) {
+            try {
+              const chunkSize = 400;
+              for (let i = 0; i < selected.length; i += chunkSize) {
+                const chunk = selected.slice(i, i + chunkSize);
+                const batch = writeBatch(db);
+                chunk.forEach(id => batch.delete(doc(db, "presensi", id)));
+                await batch.commit();
+              }
+            } catch (e) {}
+          }
+
+          listAbsensi = listAbsensi.filter(a => !selected.includes(a.id));
+          renderAttendanceManagementTable();
+          renderTodayLogs();
+          updateDashboardStats();
+          generateRekapView();
+          closeNoticeModal();
+          showNotice("Sukses", `${selected.length} data presensi berhasil dihapus!`, "success");
+        }
+      );
+    };
+
     window.resetAttendanceFilter = function() {
       const ym = getCurYearMonth();
       document.getElementById('filterAbsensiTglAwal').value = `${ym}-01`;
@@ -1825,7 +2075,6 @@
       renderAttendanceManagementTable();
     };
 
-    // FITUR HAPUS RIWAYAT PRESENSI TERFILTER
     window.confirmDeleteFilteredAttendance = function() {
       const tglAwal = document.getElementById('filterAbsensiTglAwal')?.value;
       const tglAkhir = document.getElementById('filterAbsensiTglAkhir')?.value;
@@ -1881,6 +2130,11 @@
 
       const selSiswa = document.getElementById('attSelectSiswa');
       selSiswa.innerHTML = '';
+      if (listSiswa.length === 0) {
+        showNotice("Data Siswa Kosong", "Tambahkan master siswa terlebih dahulu sebelum input presensi!", "warning");
+        return;
+      }
+
       listSiswa.forEach(s => {
         const opt = document.createElement('option');
         opt.value = s.nisn;
@@ -1965,7 +2219,9 @@
       });
     };
 
+    // ==========================================
     // MODUL 3: CETAK KARTU F4 (215 x 330 mm)
+    // ==========================================
     window.renderIdCardsForPrint = function() {
       const filterKelas = document.getElementById('filterCetakKelas')?.value || 'ALL';
       const filterNisn = document.getElementById('filterCetakSiswa')?.value || 'ALL';
@@ -2122,7 +2378,9 @@
       }
     };
 
+    // ==========================================
     // MODUL 4: DOWNLOAD QR SISWA
+    // ==========================================
     window.renderDownloadQrGrid = function() {
       const search = (document.getElementById('searchQrInput')?.value || '').toLowerCase();
       const filterKelas = document.getElementById('filterQrKelas')?.value || 'ALL';
@@ -2260,7 +2518,9 @@
       });
     };
 
+    // ==========================================
     // MODUL 5: KALENDER HEB
+    // ==========================================
     function getSemesterMonths() {
       const sem = document.getElementById('hebSelectSemester')?.value || 'ganjil';
       const curYear = new Date().getFullYear();
@@ -2412,7 +2672,9 @@
       return Math.max(1, count);
     }
 
+    // ==========================================
     // MODUL 6: REKAPITULASI & LAPORAN RESMI (A4)
+    // ==========================================
     function formatIndoDate(dateStr) {
       if (!dateStr) return "--";
       const parts = dateStr.split('-');
@@ -2491,7 +2753,7 @@
       tbody.innerHTML = '';
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 italic">Tidak ada siswa terdaftar.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 italic">Belum ada siswa terdaftar.</td></tr>`;
         return;
       }
 
@@ -2616,7 +2878,9 @@
       html2pdf().set(opt).from(clone).save();
     };
 
-    // MODUL 7: PENGATURAN, PIKET, & RESET DATA SEMESTER
+    // ==========================================
+    // MODUL 7: PENGATURAN & PEMELIHARAAN TERPISAH
+    // ==========================================
     window.previewSchoolLogo = async function(e) {
       const file = e.target.files && e.target.files[0];
       if (file) {
@@ -2643,6 +2907,7 @@
 
       applySchoolIdentityUI();
       renderIdCardsForPrint();
+      applyWelcomeUI();
       showNotice("Tersimpan", "Identitas instansi sekolah berhasil diperbarui!", "success");
     };
 
@@ -2694,46 +2959,60 @@
       document.getElementById('piketJumatNip').value = appConfig.jadwalPiket.jumat?.nip || '';
     }
 
-    // FITUR BERSIHKAN & CADANGKAN EXCEL SEMESTER LAMA
-    window.executeSemesterPurge = function() {
+    // PEMISAHAN TOMBOL 1: HANYA UNDUH CADANGAN EXCEL (TIDAK MENGHAPUS DATA)
+    window.downloadBackupExcelOnly = function() {
       const year = parseInt(document.getElementById('maintenanceYear').value) || 2026;
       const sem = document.getElementById('maintenanceSemester').value;
 
-      let startIso, endIso;
-      if (sem === 'ganjil') {
-        startIso = `${year}-07-01`;
-        endIso = `${year}-12-31`;
-      } else {
-        startIso = `${year}-01-01`;
-        endIso = `${year}-06-30`;
-      }
+      let startIso = sem === 'ganjil' ? `${year}-07-01` : `${year}-01-01`;
+      let endIso = sem === 'ganjil' ? `${year}-12-31` : `${year}-06-30`;
 
       const targets = listAbsensi.filter(a => a.tanggal >= startIso && a.tanggal <= endIso);
       if (targets.length === 0) {
-        showNotice("Tidak Ada Data", `Tidak ditemukan log presensi pada Semester ${sem.toUpperCase()} ${year}.`, "info");
+        showNotice("Data Kosong", `Tidak ditemukan log presensi pada Semester ${sem.toUpperCase()} ${year} untuk dicadangkan.`, "warning");
+        return;
+      }
+
+      showNotice("Mencadangkan Data", "Menyiapkan berkas cadangan Excel...", "info");
+      const rows = [
+        ["ARSIP CADANGAN PRESENSI SEMESTER"],
+        [appConfig.namaSekolah],
+        [`Periode: ${startIso} s/d ${endIso} (Semester ${sem.toUpperCase()} ${year})`],
+        [],
+        ["ID", "TANGGAL", "WAKTU", "NISN", "NAMA", "KELAS", "SESI", "STATUS"]
+      ];
+      targets.forEach(t => rows.push([t.id, t.tanggal, t.waktu, t.nisn, t.nama, t.kelas, t.sesi, t.status]));
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, "ARSIP_PRESENSI");
+      XLSX.writeFile(wb, `Cadangan_Presensi_${sem.toUpperCase()}_${year}.xlsx`);
+
+      closeNoticeModal();
+      showNotice("Cadangan Berhasil", `${targets.length} catatan presensi berhasil diunduh ke Excel! Data di database tetap aman dan tidak dihapus.`, "success");
+    };
+
+    // PEMISAHAN TOMBOL 2: HANYA BERSIHKAN / RESET PRESENSI SEMESTER
+    window.purgeSemesterAttendanceOnly = function() {
+      const year = parseInt(document.getElementById('maintenanceYear').value) || 2026;
+      const sem = document.getElementById('maintenanceSemester').value;
+
+      let startIso = sem === 'ganjil' ? `${year}-07-01` : `${year}-01-01`;
+      let endIso = sem === 'ganjil' ? `${year}-12-31` : `${year}-06-30`;
+
+      const targets = listAbsensi.filter(a => a.tanggal >= startIso && a.tanggal <= endIso);
+      if (targets.length === 0) {
+        showNotice("Data Kosong", `Tidak ada log presensi pada Semester ${sem.toUpperCase()} ${year} untuk dibersihkan.`, "info");
         return;
       }
 
       showConfirm(
-        "Konfirmasi Reset Semester",
-        `Ditemukan ${targets.length} data presensi periode ${startIso} s/d ${endIso}. Sistem akan otomatis mengunduh CADANGAN EXCEL terlebih dahulu sebelum menghapus data dari Firestore. Lanjutkan?`,
+        "Konfirmasi Pembersihan Semester",
+        `PERINGATAN: Anda akan menghapus ${targets.length} data presensi periode ${startIso} s/d ${endIso} secara permanen. Pastikan Anda sudah mengunduh cadangan Excel terlebih dahulu. Lanjutkan penghapusan?`,
         async () => {
-          showNotice("Mencadangkan Data", "Mengunduh arsip cadangan Excel sebelum pembersihan...", "info");
-          const rows = [
-            ["ARSIP CADANGAN PRESENSI SEMESTER LAMA"],
-            [appConfig.namaSekolah],
-            [`Periode: ${startIso} s/d ${endIso} (Semester ${sem.toUpperCase()} ${year})`],
-            [],
-            ["ID", "TANGGAL", "WAKTU", "NISN", "NAMA", "KELAS", "SESI", "STATUS"]
-          ];
-          targets.forEach(t => rows.push([t.id, t.tanggal, t.waktu, t.nisn, t.nama, t.kelas, t.sesi, t.status]));
-
-          const wb = XLSX.utils.book_new();
-          const ws = XLSX.utils.aoa_to_sheet(rows);
-          XLSX.utils.book_append_sheet(wb, ws, "ARSIP_PRESENSI");
-          XLSX.writeFile(wb, `Cadangan_Presensi_${sem.toUpperCase()}_${year}.xlsx`);
-
+          showNotice("Menghapus Data", `Menghapus ${targets.length} data presensi semester lama...`, "info");
           const targetIds = targets.map(t => t.id);
+
           if (!IS_PREVIEW && db) {
             try {
               const chunkSize = 400;
@@ -2754,12 +3033,14 @@
           updateDashboardStats();
           generateRekapView();
           closeNoticeModal();
-          showNotice("Pembersihan Sukses", `Cadangan Excel berhasil disimpan dan ${targetIds.length} data presensi semester lama telah dibersihkan!`, "success");
+          showNotice("Pembersihan Sukses", `${targetIds.length} data presensi semester lama berhasil dibersihkan!`, "success");
         }
       );
     };
 
+    // ==========================================
     // MODUL 8: SCANNER & KIOSK LOGIC
+    // ==========================================
     function detectSessionAuto() {
       if (manualSessionOverride) return manualSessionOverride;
       const now = new Date();
@@ -3033,6 +3314,7 @@
       initRekapDefaultDates();
       applySchoolIdentityUI();
       updatePiketBannerToday();
+      applyWelcomeUI();
       populateClassDropdowns();
 
       updateDashboardStats();
