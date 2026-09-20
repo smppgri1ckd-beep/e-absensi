@@ -68,7 +68,7 @@
       overflow-x: hidden;
     }
 
-    /* Total Viewport Takeover (Isolasi dari Blogger jika disematkan) */
+    /* Isolasi Penuh dari Template Blogger */
     .navbar, .header, .sidebar, .footer, .blog-pager, .post-feeds, #header, #footer, #sidebar, .post-title, .feed-links, .comments {
       display: none !important;
     }
@@ -156,7 +156,7 @@
 <body class="bg-slate-50 text-slate-800 flex h-screen w-screen overflow-hidden antialiased select-none">
 
   <!-- ========================================== -->
-  <!-- SIDEBAR DESKTOP (TAMPIL HANYA JIKA LOGIN ADMIN) -->
+  <!-- SIDEBAR DESKTOP (KHUSUS ADMIN)             -->
   <!-- ========================================== -->
   <aside id="sidebarDesktop" class="hidden w-64 bg-white border-r border-slate-200 flex-col justify-between shrink-0 z-30 transition-all duration-300">
     <div class="flex flex-col h-full">
@@ -261,7 +261,7 @@
           <i class="fa-solid fa-download"></i> <span class="hidden md:inline">Install App</span>
         </button>
 
-        <!-- Auth Button -->
+        <!-- Auth Button Container -->
         <div id="authNavContainer">
           <button onclick="openLoginModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition active:scale-95">
             <i class="fa-solid fa-arrow-right-to-bracket"></i> <span>Login</span>
@@ -512,7 +512,6 @@
               <button onclick="openAttendanceModal('ADD')" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-plus"></i> Input Presensi Manual
               </button>
-              <!-- TOMBOL PEMBERSIHAN TERFILTER -->
               <button onclick="confirmDeleteFilteredAttendance()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
                 <i class="fa-solid fa-trash-can"></i> Hapus Riwayat Terfilter
               </button>
@@ -612,7 +611,7 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 5: DOWNLOAD QR SISWA                  -->
+      <!-- VIEW 5: DOWNLOAD QR SISWA (FITUR BARU)     -->
       <!-- ========================================== -->
       <section id="view-downloadQr" class="hidden space-y-4 max-w-7xl mx-auto">
         <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
@@ -942,7 +941,7 @@
               </form>
             </div>
 
-            <!-- MODUL PEMELIHARAAN & RESET DATA SEMESTER (BARU) -->
+            <!-- MODUL PEMELIHARAAN & RESET DATA SEMESTER -->
             <div class="bg-white border border-rose-200 rounded-2xl p-5 shadow-sm space-y-4">
               <div class="flex items-center gap-2 border-b border-rose-100 pb-3">
                 <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-sm">
@@ -1182,12 +1181,12 @@
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     // ==========================================
-    // SAKLAR & KONFIGURASI FIREBASE
+    // SAKLAR & KONFIGURASI FIREBASE AKTIF
     // ==========================================
-    const IS_PREVIEW = false;
+    const IS_PREVIEW = false; // Mode produksi terhubung ke Firebase
 
     const firebaseConfig = {
-      apiKey: "AIzaSy...",
+      apiKey: "AIzaSy...", // Ganti dengan apiKey asli Anda dari Firebase Console
       authDomain: "presensi-siswa-digital-a24ca.firebaseapp.com",
       projectId: "presensi-siswa-digital-a24ca",
       storageBucket: "presensi-siswa-digital-a24ca.appspot.com",
@@ -1216,34 +1215,34 @@
     let deferredPrompt = null;
 
     let appConfig = {
-      namaSekolah: "SMK Negeri Digital Nusantara",
-      npsn: "69876543",
-      alamat: "Jl. Pendidikan Karakter No. 101, Kota Pendidikan, Indonesia",
+      namaSekolah: "SMP PGRI 1 CIKADU",
+      npsn: "20203878",
+      alamat: "Jl. Raya Cikadu, Kec. Cikadu, Kab. Cianjur, Jawa Barat",
       kota: "Cianjur",
-      namaKepsek: "Drs. H. Rahmat Hidayat, M.Pd",
-      nipKepsek: "19720415 199803 1 004",
+      namaKepsek: "Nama Kepala Sekolah, S.Pd",
+      nipKepsek: "19750101 200001 1 001",
       logoUrl: "https://cdn-icons-png.flaticon.com/512/2856/2856000.png",
       sistemHariSekolah: "5",
       jadwalPiket: {
-        senin: { nama: "Bambang Sudarsono, S.Pd", nip: "19800312 200501 1 009" },
-        selasa: { nama: "Ratna Kusuma Wardani, S.Pd", nip: "19840510 200801 2 015" },
-        rabu: { nama: "Hendro Wibowo, S.Kom", nip: "19881120 201201 1 007" },
-        kamis: { nama: "Nur Hidayati, M.Pd", nip: "19820718 200604 2 011" },
-        jumat: { nama: "Dewi Sartika, S.Pd", nip: "19850612 201001 2 018" }
+        senin: { nama: "Guru Piket Senin, S.Pd", nip: "19800101 200501 1 001" },
+        selasa: { nama: "Guru Piket Selasa, S.Pd", nip: "19820202 200602 2 002" },
+        rabu: { nama: "Guru Piket Rabu, S.Pd", nip: "19840303 200703 1 003" },
+        kamis: { nama: "Guru Piket Kamis, S.Pd", nip: "19860404 200804 2 004" },
+        jumat: { nama: "Guru Piket Jum'at, S.Pd", nip: "19880505 200905 1 005" }
       }
     };
 
     let listSiswa = [
-      { nisn: "1001", nama: "Ahmad Fauzi", jk: "L", kelas: "XII-RPL-1", fotoUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop" },
-      { nisn: "1002", nama: "Siti Rahmawati", jk: "P", kelas: "XII-RPL-1", fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" },
-      { nisn: "1003", nama: "Budi Pratama", jk: "L", kelas: "XII-TKJ-2", fotoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" },
-      { nisn: "1004", nama: "Dewi Lestari", jk: "P", kelas: "XI-MM-1", fotoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" }
+      { nisn: "1001", nama: "Ahmad Fauzi", jk: "L", kelas: "VII-A", fotoUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop" },
+      { nisn: "1002", nama: "Siti Rahmawati", jk: "P", kelas: "VII-A", fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" },
+      { nisn: "1003", nama: "Budi Pratama", jk: "L", kelas: "VIII-B", fotoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" },
+      { nisn: "1004", nama: "Dewi Lestari", jk: "P", kelas: "IX-C", fotoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" }
     ];
 
     let listAbsensi = [
-      { id: "ABS-01", tanggal: getTodayISO(), waktu: "06:45:10", nisn: "1001", nama: "Ahmad Fauzi", kelas: "XII-RPL-1", sesi: "Pagi", status: "Hadir Tepat Waktu" },
-      { id: "ABS-02", tanggal: getTodayISO(), waktu: "06:50:22", nisn: "1002", nama: "Siti Rahmawati", kelas: "XII-RPL-1", sesi: "Pagi", status: "Hadir Tepat Waktu" },
-      { id: "ABS-03", tanggal: getTodayISO(), waktu: "07:05:00", nisn: "1003", nama: "Budi Pratama", kelas: "XII-TKJ-2", sesi: "Pagi", status: "Terlambat" }
+      { id: "ABS-01", tanggal: getTodayISO(), waktu: "06:45:10", nisn: "1001", nama: "Ahmad Fauzi", kelas: "VII-A", sesi: "Pagi", status: "Hadir Tepat Waktu" },
+      { id: "ABS-02", tanggal: getTodayISO(), waktu: "06:50:22", nisn: "1002", nama: "Siti Rahmawati", kelas: "VII-A", sesi: "Pagi", status: "Hadir Tepat Waktu" },
+      { id: "ABS-03", tanggal: getTodayISO(), waktu: "07:05:00", nisn: "1003", nama: "Budi Pratama", kelas: "VIII-B", sesi: "Pagi", status: "Terlambat" }
     ];
 
     let kalenderHebData = {};
@@ -1852,7 +1851,6 @@
 
           if (!IS_PREVIEW && db) {
             try {
-              // Hapus per batch (maks 500 dokumen per batch Firestore)
               const chunkSize = 400;
               for (let i = 0; i < targetIds.length; i += chunkSize) {
                 const chunk = targetIds.slice(i, i + chunkSize);
@@ -2720,7 +2718,6 @@
         "Konfirmasi Reset Semester",
         `Ditemukan ${targets.length} data presensi periode ${startIso} s/d ${endIso}. Sistem akan otomatis mengunduh CADANGAN EXCEL terlebih dahulu sebelum menghapus data dari Firestore. Lanjutkan?`,
         async () => {
-          // 1. Unduh Cadangan Excel Otomatis
           showNotice("Mencadangkan Data", "Mengunduh arsip cadangan Excel sebelum pembersihan...", "info");
           const rows = [
             ["ARSIP CADANGAN PRESENSI SEMESTER LAMA"],
@@ -2736,7 +2733,6 @@
           XLSX.utils.book_append_sheet(wb, ws, "ARSIP_PRESENSI");
           XLSX.writeFile(wb, `Cadangan_Presensi_${sem.toUpperCase()}_${year}.xlsx`);
 
-          // 2. Hapus Data dari Firestore
           const targetIds = targets.map(t => t.id);
           if (!IS_PREVIEW && db) {
             try {
