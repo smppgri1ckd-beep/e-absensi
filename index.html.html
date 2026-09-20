@@ -1,0 +1,3392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>E-Absensi Siswa QR Code - Sistem Presensi Digital Cloud</title>
+
+  <!-- PWA Manifest Data URI -->
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22E-Absensi%20Siswa%20QR%20Code%22%2C%22short_name%22%3A%22E-Absensi%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%232563eb%22%7D"/>
+  <meta name="theme-color" content="#2563eb"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <!-- External Libraries: QR, Zip, Excel, Chart, Tone, Canvas, PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Firebase App & Services (Compat CDN untuk eksekusi 1 file di Blogger) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    /* ==========================================================================
+       ISOLASI LENGKAP TEMPLATE BLOGGER & RESET DASAR
+       ========================================================================== */
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background-color: #f8fafc !important;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
+    }
+
+    /* Sembunyikan elemen bawaan blogspot */
+    .navbar, .header, .sidebar, .footer, .blog-pager, .post-feeds, 
+    #header, #footer, #sidebar, .post-title, .feed-links, .comments,
+    .quickedit, .widget {
+      display: none !important;
+    }
+
+    /* Glassmorphism & UI Accents */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+    }
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(226, 232, 240, 0.85);
+    }
+    .glass-sidebar {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-right: 1px solid rgba(226, 232, 240, 0.85);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* ==========================================================================
+       ID CARD 6.5 x 10 cm PADA KERTAS F4 (FOLIO 215 x 330 mm) - 3x3 (9 KARTU)
+       ========================================================================== */
+    .id-card-page {
+      width: 215mm !important;
+      height: 330mm !important;
+      max-height: 330mm !important;
+      margin: 0 auto 24px auto !important;
+      padding: 10mm 5mm !important;
+      box-sizing: border-box !important;
+      display: grid !important;
+      grid-template-columns: repeat(3, 65mm) !important;
+      grid-template-rows: repeat(3, 100mm) !important;
+      column-gap: 5mm !important;
+      row-gap: 5mm !important;
+      justify-content: center !important;
+      align-content: start !important;
+      background: #ffffff !important;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      page-break-after: always !important;
+      break-after: page !important;
+      overflow: hidden !important;
+    }
+
+    .id-card-page:last-child,
+    .id-card-page:last-of-type {
+      page-break-after: avoid !important;
+      break-after: avoid !important;
+      margin-bottom: 0 !important;
+    }
+
+    .id-card-portrait {
+      width: 65mm !important;
+      height: 100mm !important;
+      max-width: 65mm !important;
+      max-height: 100mm !important;
+      box-sizing: border-box !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      position: relative !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+      background-image: radial-gradient(circle at 100% 0%, rgba(239, 246, 255, 0.8) 0%, rgba(255, 255, 255, 1) 60%),
+                        radial-gradient(circle at 0% 100%, rgba(254, 243, 199, 0.4) 0%, rgba(255, 255, 255, 1) 50%) !important;
+      border: 1px dashed #94a3b8 !important;
+      border-radius: 4mm !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Print Rules */
+    @media print {
+      @page {
+        size: 215mm 330mm portrait;
+        margin: 0 !important;
+      }
+      body {
+        background: #ffffff !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      #appContainer {
+        position: static !important;
+        overflow: visible !important;
+        height: auto !important;
+      }
+      aside, nav, header, #viewKiosk, #viewMasterSiswa, #viewKelolaAbsensi, #viewKalenderHeb, #viewPengaturan, #viewRekapLaporan, #viewDownloadQr,
+      #modalLogin, #modalStudent, #modalAttendance, #noticeModal, #confirmModal,
+      .no-print {
+        display: none !important;
+      }
+      #viewCetakKartu > div > div:first-child,
+      #viewCetakKartu > div > div:nth-child(2) {
+        display: none !important;
+      }
+      .id-card-page {
+        box-shadow: none !important;
+        margin: 0 auto !important;
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+      .id-card-page:last-child,
+      .id-card-page:last-of-type {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased">
+  <!-- Container Aplikasi Full Viewport -->
+  <div id="appContainer" class="w-screen h-screen flex overflow-hidden bg-slate-50">
+
+    <!-- SIDEBAR DESKTOP (Hanya Tampil Jika Admin Login) -->
+    <aside id="desktopSidebar" class="hidden flex-col w-64 glass-sidebar border-r border-slate-200 shrink-0 z-30 justify-between">
+      <div class="flex flex-col h-full">
+        <!-- Logo & Nama Sekolah -->
+        <div class="p-5 border-b border-slate-100 flex items-center gap-3">
+          <img id="sidebarLogo" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" alt="Logo" class="w-10 h-10 object-contain rounded-xl p-1 bg-blue-50 border border-blue-100 shadow-sm"/>
+          <div class="overflow-hidden">
+            <h1 id="sidebarSchoolName" class="text-xs font-black uppercase text-slate-900 leading-tight truncate">SMK Digital Nusantara</h1>
+            <p id="sidebarSchoolNpsn" class="text-[10px] text-blue-600 font-semibold tracking-wide">NPSN: 69876543</p>
+          </div>
+        </div>
+
+        <!-- Menu List (Admin Portal) -->
+        <nav class="flex-1 p-3.5 space-y-1.5 overflow-y-auto">
+          <div class="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400">Portal Utama</div>
+          <button onclick="switchView('kiosk')" id="navBtn-kiosk" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-blue-600 bg-blue-50/80 transition shadow-xs">
+            <i class="fa-solid fa-qrcode text-sm w-4 text-center"></i>
+            <span>Gerbang Scanner QR</span>
+          </button>
+
+          <div class="pt-2 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400">Menu Administratif</div>
+          <button onclick="switchView('masterSiswa')" id="navBtn-masterSiswa" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100/70 hover:text-slate-900 transition">
+            <i class="fa-solid fa-users text-sm w-4 text-center"></i>
+            <span>Master Siswa</span>
+          </button>
+          <button onclick="switchView('kelolaAbsensi')" id="navBtn-kelolaAbsensi" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100/70 hover:text-slate-900 transition">
+            <i class="fa-solid fa-clipboard-check text-sm w-4 text-center"></i>
+            <span>Kelola Presensi</span>
+          </button>
+          <button onclick="switchView('cetakKartu')" id="navBtn-cetakKartu" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100/70 hover:text-slate-900 transition">
+            <i class="fa-solid fa-id-card text-sm w-4 text-center"></i>
+            <span>Cetak Kartu F4</span>
+          </button>
+          <button onclick="switchView('downloadQr')" id="navBtn-downloadQr" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100/70 hover:text-slate-900 transition">
+            <i class="fa-solid fa-qrcode text-sm w-4 text-center text-amber-500"></i>
+            <span>Download QR Siswa</span>
+          </button>
+          <button onclick="switchView('kalenderHeb')" id="navBtn-kalenderHeb" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100/70 hover:text-slate-900 transition">
+            <i class="fa-solid fa-calendar-days text-sm w-4 text-center"></i>
+            <span>Kalender HEB</span>
+          </button>
+          <button onclick="switchView('rekapLaporan')" id="navBtn-rekapLaporan" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100/70 hover:text-slate-900 transition">
+            <i class="fa-solid fa-file-invoice text-sm w-4 text-center"></i>
+            <span>Rekap & Laporan</span>
+          </button>
+          <button onclick="switchView('pengaturan')" id="navBtn-pengaturan" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100/70 hover:text-slate-900 transition">
+            <i class="fa-solid fa-sliders text-sm w-4 text-center"></i>
+            <span>Pengaturan & Piket</span>
+          </button>
+        </nav>
+
+        <!-- User Status & Auth Footer -->
+        <div class="p-3.5 border-t border-slate-100 bg-slate-50/50">
+          <div id="desktopAuthStatus" class="flex items-center justify-between">
+            <div class="flex items-center gap-2 overflow-hidden">
+              <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs" id="desktopUserAvatar">A</div>
+              <div class="truncate">
+                <p class="text-xs font-bold text-slate-900 truncate" id="desktopUserName">Administrator</p>
+                <p class="text-[10px] text-indigo-600 font-medium" id="desktopUserRole">Admin Master</p>
+              </div>
+            </div>
+            <button onclick="logoutSession()" class="p-2 text-rose-500 hover:text-rose-700 rounded-lg hover:bg-rose-50 transition" title="Keluar Akun Admin">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- KONTEN UTAMA (RESPONSIF) -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+
+      <!-- TOPBAR KORPORAT -->
+      <header class="h-16 border-b border-slate-200 glass-card px-4 md:px-6 flex items-center justify-between shrink-0 z-20">
+        <div class="flex items-center gap-3">
+          <!-- Logo & Nama Sekolah -->
+          <div class="flex items-center gap-2.5">
+            <img id="topbarLogo" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" alt="Logo" class="w-9 h-9 object-contain rounded-xl p-1 bg-blue-50 border border-blue-100 shadow-xs"/>
+            <div>
+              <h2 id="topbarSchoolName" class="text-xs md:text-sm font-black text-slate-900 leading-tight truncate max-w-[190px] sm:max-w-xs md:max-w-md">SMK Negeri Digital Nusantara</h2>
+              <p class="text-[10px] text-blue-600 font-semibold" id="topbarSchoolNpsn">NPSN: 69876543 • Presensi Digital Realtime</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2.5 sm:gap-4">
+          <!-- Jam Realtime -->
+          <div class="hidden sm:flex flex-col text-right justify-center">
+            <span id="realtimeClock" class="text-xs font-black font-mono text-blue-600 leading-none">--:--:-- WIB</span>
+            <span id="realtimeDate" class="text-[10px] text-slate-500 font-medium mt-0.5">--</span>
+          </div>
+
+          <!-- Tombol Install PWA -->
+          <button id="btnInstallPwa" onclick="triggerPwaInstall()" class="hidden px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold items-center gap-1.5 shadow-xs transition">
+            <i class="fa-solid fa-download text-[11px]"></i>
+            <span class="hidden md:inline">Install PWA</span>
+          </button>
+
+          <!-- Auth Status Bar (Publik vs Admin/Petugas) -->
+          <div id="topbarAuthArea">
+            <!-- Tombol Login untuk Publik -->
+            <button id="btnTopLogin" onclick="openLoginModal()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs transition">
+              <i class="fa-solid fa-lock text-xs"></i>
+              <span>Login Portal</span>
+            </button>
+
+            <!-- Badge Status & Tombol Logout jika Admin / Peserta Login -->
+            <div id="badgeUserLoggedIn" class="hidden items-center gap-2">
+              <div class="hidden md:flex flex-col text-right">
+                <span id="userLoggedName" class="text-xs font-bold text-slate-800 truncate max-w-[140px]">Admin</span>
+                <span id="userLoggedBadge" class="text-[9px] font-black text-emerald-600 uppercase">Administrator</span>
+              </div>
+              <button onclick="logoutSession()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="hidden sm:inline">Keluar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEWPORT HALAMAN (SCROLLABLE AREA) -->
+      <main class="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6">
+
+        <!-- ===================================================================
+             1. VIEW KIOSK SCANNER QR (TAMPILAN PUBLIK / GURU PIKET)
+             =================================================================== -->
+        <section id="viewKiosk" class="space-y-6">
+          <!-- Banner Pengumuman & Guru Piket Hari Ini -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="lg:col-span-2 rounded-2xl p-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-sm flex items-start gap-4">
+              <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center shrink-0 text-xl shadow-inner">
+                <i class="fa-solid fa-bullhorn text-amber-300 animate-bounce"></i>
+              </div>
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-white/20 uppercase tracking-wider">Presensi Digital Otomatis</span>
+                  <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-400 text-slate-900 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-check text-[8px]"></i> Sinkron Realtime
+                  </span>
+                </div>
+                <h2 class="text-base md:text-lg font-bold">Portal Presensi Siswa Realtime QR Code</h2>
+                <p class="text-xs text-blue-100 leading-relaxed">
+                  Pagi: <strong>06:00 - 07:00 WIB</strong> | Siang: <strong>13:45 - 15:00 WIB</strong>. Hadapkan QR ID Card siswa di depan kamera.
+                </p>
+              </div>
+            </div>
+
+            <!-- Petugas Guru Piket Hari Ini -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col justify-between">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <i class="fa-solid fa-user-tie text-blue-600"></i> Guru Piket Hari Ini
+                </span>
+                <span id="badgeHariPiket" class="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 font-extrabold rounded-md uppercase">SENIN</span>
+              </div>
+              <div class="my-3">
+                <p id="namaPiketHariIni" class="text-sm font-black text-slate-900 truncate">Bambang Sudarsono, S.Pd</p>
+                <p id="nipPiketHariIni" class="text-[11px] text-slate-500 font-mono">NIP: 19800312 200501 1 009</p>
+              </div>
+              <div class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-circle-check"></i> Siap Melayani Presensi Siswa
+              </div>
+            </div>
+          </div>
+
+          <!-- Scanner & Statistik Presensi -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Kolom Pemindai QR (Kiri) -->
+            <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
+                  <h3 class="text-sm font-bold text-slate-900">Kamera Pemindai QR</h3>
+                </div>
+                <div class="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+                  <span class="text-[11px] text-slate-600 font-medium">Sesi:</span>
+                  <span id="kioskSessionBadge" class="text-xs font-black text-blue-600">PAGI</span>
+                  <button onclick="toggleSessionManual()" class="text-[10px] text-slate-500 hover:text-slate-800 ml-1" title="Ganti Sesi Manual">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Viewport Video Pemindai -->
+              <div class="relative bg-slate-900 rounded-xl overflow-hidden aspect-square flex flex-col items-center justify-center border border-slate-200 shadow-inner">
+                <div id="reader" class="w-full h-full"></div>
+                <div id="scannerOverlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-6 text-center bg-slate-900/40 backdrop-blur-xs">
+                  <div class="w-48 h-48 border-2 border-blue-400 rounded-2xl border-dashed animate-pulse flex items-center justify-center">
+                    <i class="fa-solid fa-qrcode text-5xl text-white/50"></i>
+                  </div>
+                  <p class="text-[11px] text-slate-200 mt-3 font-medium">Dekatkan QR ID Card Siswa ke Depan Kamera</p>
+                </div>
+              </div>
+
+              <!-- Tombol Kontrol Scanner -->
+              <div class="flex gap-2">
+                <button id="btnStartScanner" onclick="startScanner()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                  <i class="fa-solid fa-camera"></i> Aktifkan Kamera
+                </button>
+                <button id="btnSwitchCamera" onclick="switchCamera()" class="hidden flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-camera-rotate"></i> Putar Lensa
+                </button>
+                <button id="btnStopScanner" onclick="stopScanner()" class="hidden py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-rose-600 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-power-off"></i> Stop
+                </button>
+              </div>
+
+              <!-- Log Pindai Terakhir -->
+              <div id="lastScanBox" class="hidden p-3.5 rounded-xl bg-blue-50/70 border border-blue-200 text-xs space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-blue-700">Hasil Pindai Terakhir</span>
+                  <span id="scanStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">BERHASIL</span>
+                </div>
+                <div class="flex items-center gap-3 pt-1">
+                  <img id="scanSiswaFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" alt="Foto" class="w-12 h-12 rounded-xl object-cover border border-blue-200 bg-white shadow-xs shrink-0" crossorigin="anonymous"/>
+                  <div>
+                    <p id="scanSiswaNama" class="font-black text-sm text-slate-900">--</p>
+                    <p id="scanSiswaInfo" class="text-[11px] text-slate-600">--</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kolom Statistik & Log Presensi Realtime (Kanan) -->
+            <div class="lg:col-span-7 space-y-4">
+              <!-- Kartu Metrik Hari Ini -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs">
+                  <p class="text-[11px] text-slate-500 font-medium">Total Siswa</p>
+                  <h4 id="statTotalSiswa" class="text-xl font-black text-slate-900 mt-1">0</h4>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs">
+                  <p class="text-[11px] text-blue-600 font-medium">Hadir Pagi</p>
+                  <h4 id="statHadirPagi" class="text-xl font-black text-blue-600 mt-1">0</h4>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs">
+                  <p class="text-[11px] text-emerald-600 font-medium">Hadir Siang</p>
+                  <h4 id="statHadirSiang" class="text-xl font-black text-emerald-600 mt-1">0</h4>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs">
+                  <p class="text-[11px] text-amber-600 font-medium">Belum Hadir</p>
+                  <h4 id="statBelum" class="text-xl font-black text-amber-600 mt-1">0</h4>
+                </div>
+              </div>
+
+              <!-- Grafik Presensi Live -->
+              <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-simple text-blue-600"></i> Visualisasi Presensi Hari Ini
+                  </h4>
+                  <span class="text-[10px] text-emerald-600 font-mono font-bold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> REALTIME
+                  </span>
+                </div>
+                <div class="h-44">
+                  <canvas id="attendanceChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Tabel Log Presensi Masuk Hari Ini -->
+              <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+                <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                  <h4 class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-blue-600"></i> Log Presensi Hari Ini
+                  </h4>
+                  <span id="todayLogCount" class="text-[10px] text-slate-500 font-medium">0 Presensi Terdata</span>
+                </div>
+                <div class="overflow-y-auto max-h-48">
+                  <table class="w-full text-left text-xs">
+                    <thead class="text-slate-400 font-semibold border-b border-slate-100 sticky top-0 bg-white">
+                      <tr>
+                        <th class="py-2">Waktu</th>
+                        <th class="py-2">Nama Siswa</th>
+                        <th class="py-2">Kelas</th>
+                        <th class="py-2">Sesi</th>
+                        <th class="py-2">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="todayLogTbody" class="divide-y divide-slate-100 text-slate-600">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ===================================================================
+             2. VIEW MASTER SISWA (ADMIN ONLY)
+             =================================================================== -->
+        <section id="viewMasterSiswa" class="hidden space-y-4">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div>
+                <h3 class="text-base font-bold text-slate-900">Master Data Siswa</h3>
+                <p class="text-xs text-slate-500">Kelola biodata siswa, pas foto berukuran ringkas, impor Excel, dan arsip foto ZIP.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="openStudentModal('ADD')" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                  <i class="fa-solid fa-user-plus"></i> Tambah Siswa
+                </button>
+                <label class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
+                  <i class="fa-solid fa-file-excel"></i> Impor Excel
+                  <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="importStudentsFromExcel(event)"/>
+                </label>
+                <button onclick="exportStudentsToExcel()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-download"></i> Format Excel
+                </button>
+                <label class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
+                  <i class="fa-solid fa-file-zipper"></i> Unggah ZIP Foto
+                  <input type="file" id="zipFileInput" accept=".zip" class="hidden" onchange="uploadPhotoZip(event)"/>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input type="text" id="searchStudentInput" oninput="renderStudentsTable()" placeholder="Cari NISN atau Nama Siswa..." class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white"/>
+              <select id="filterStudentKelas" onchange="renderStudentsTable()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white">
+                <option value="ALL">Semua Kelas</option>
+              </select>
+              <div class="flex items-center justify-end text-xs text-slate-500 font-medium">
+                Total Siswa: <strong id="studentCountBadge" class="text-slate-900 ml-1">0 Siswa</strong>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                  <tr>
+                    <th class="p-3 w-14">Foto</th>
+                    <th class="p-3 w-28">NISN</th>
+                    <th class="p-3">Nama Lengkap</th>
+                    <th class="p-3 w-20">L/P</th>
+                    <th class="p-3 w-28">Kelas</th>
+                    <th class="p-3 w-28 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="studentTableBody" class="divide-y divide-slate-100 text-slate-700">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ===================================================================
+             3. VIEW KELOLA PRESENSI (ADMIN ONLY)
+             =================================================================== -->
+        <section id="viewKelolaAbsensi" class="hidden space-y-4">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div>
+                <h3 class="text-base font-bold text-slate-900">Kelola Catatan Presensi Realtime</h3>
+                <p class="text-xs text-slate-500">Filter riwayat kehadiran, koreksi presensi siswa, atau tambahkan presensi manual.</p>
+              </div>
+              <button onclick="openAttendanceModal('ADD')" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                <i class="fa-solid fa-plus"></i> Input Presensi Manual
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Tanggal Awal</label>
+                <input type="date" id="filterAbsensiTglAwal" onchange="renderAttendanceManagementTable()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800"/>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Tanggal Akhir</label>
+                <input type="date" id="filterAbsensiTglAkhir" onchange="renderAttendanceManagementTable()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800"/>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Kelas</label>
+                <select id="filterAbsensiKelas" onchange="renderAttendanceManagementTable()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800">
+                  <option value="ALL">Semua Kelas</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Sesi Presensi</label>
+                <select id="filterAbsensiSesi" onchange="renderAttendanceManagementTable()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800">
+                  <option value="ALL">Semua Sesi</option>
+                  <option value="Pagi">Sesi Pagi</option>
+                  <option value="Siang">Sesi Siang</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button onclick="resetAttendanceFilter()" class="w-full py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-arrows-rotate"></i> Reset Filter
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                  <tr>
+                    <th class="p-3">Tanggal</th>
+                    <th class="p-3">Waktu</th>
+                    <th class="p-3">NISN</th>
+                    <th class="p-3">Nama Siswa</th>
+                    <th class="p-3">Kelas</th>
+                    <th class="p-3">Sesi</th>
+                    <th class="p-3">Status Presensi</th>
+                    <th class="p-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="attendanceManagementTableBody" class="divide-y divide-slate-100 text-slate-700">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ===================================================================
+             4. VIEW CETAK ID CARD (ADMIN ONLY)
+             =================================================================== -->
+        <section id="viewCetakKartu" class="hidden space-y-4">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div>
+                <h3 class="text-base font-bold text-slate-900">Cetak & Unduh ID Card Siswa (6,5 x 10 cm - Kertas F4)</h3>
+                <p class="text-xs text-slate-500">Format pas 9 kartu per lembar F4 / Folio (3x3) lengkap dengan QR Code NISN siap scan.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <select id="filterCetakKelas" onchange="renderIdCardsForPrint()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800">
+                  <option value="ALL">Semua Kelas</option>
+                </select>
+                <select id="filterCetakSiswa" onchange="renderIdCardsForPrint()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800">
+                  <option value="ALL">Semua Siswa</option>
+                </select>
+                <button onclick="downloadIdCardsPDF()" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-xs">
+                  <i class="fa-solid fa-file-pdf"></i> Unduh PDF F4
+                </button>
+                <button onclick="printIdCards()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-xs">
+                  <i class="fa-solid fa-print"></i> Cetak Langsung
+                </button>
+              </div>
+            </div>
+
+            <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 flex items-center gap-2.5">
+              <i class="fa-solid fa-circle-info text-blue-600 text-sm shrink-0"></i>
+              <span><strong>Panduan Cetak F4:</strong> Pada printer dialog, pilih ukuran kertas <strong>Folio / F4 / Legal</strong>, margin <strong>None</strong> atau <strong>Minimum</strong>, dan centang opsi <strong>Background Graphics</strong>.</span>
+            </div>
+
+            <!-- Area Render Lembar F4 -->
+            <div class="p-6 bg-slate-100 rounded-2xl border border-slate-200 flex flex-col items-center overflow-x-auto">
+              <div id="printArea" class="w-full max-w-full space-y-6 flex flex-col items-center">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             4B. VIEW DOWNLOAD QR CODE SISWA (ADMIN ONLY)
+             =================================================================== -->
+        <section id="viewDownloadQr" class="hidden space-y-4">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div>
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <i class="fa-solid fa-qrcode text-amber-500"></i> Download QR Code Siswa Mandiri
+                </h3>
+                <p class="text-xs text-slate-500">Unduh file gambar QR Code (.PNG) per siswa atau seluruh kelas dalam bentuk arsip ZIP.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="downloadAllQrAsZip()" id="btnDownloadAllZip" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-xs">
+                  <i class="fa-solid fa-file-zipper"></i> Unduh ZIP Semua QR
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter Siswa -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Filter Kelas</label>
+                <select id="filterQrKelas" onchange="renderQrCodeGrid()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800">
+                  <option value="ALL">Semua Kelas</option>
+                </select>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Cari Siswa</label>
+                <input type="text" id="searchQrInput" oninput="renderQrCodeGrid()" placeholder="Ketik NISN atau Nama siswa..." class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800"/>
+              </div>
+            </div>
+
+            <!-- Grid Tampilan QR Code Siswa -->
+            <div id="qrCodeGridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ===================================================================
+             5. VIEW KALENDER HEB (ADMIN ONLY)
+             =================================================================== -->
+        <section id="viewKalenderHeb" class="hidden space-y-4">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div>
+                <h3 class="text-base font-bold text-slate-900">Kalender Hari Efektif Belajar (HEB)</h3>
+                <p class="text-xs text-slate-500">Klik tanggal untuk mengubah status Hari Efektif (Hijau) atau Libur (Abu-abu).</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <select id="hebSelectSemester" onchange="onHebSemesterChange()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-bold">
+                  <option value="ganjil">Semester Ganjil (Juli - Desember)</option>
+                  <option value="genap">Semester Genap (Januari - Juni)</option>
+                </select>
+                <button onclick="applyCalendarWeeklyPattern(5)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles text-blue-600"></i> Pola 5 Hari
+                </button>
+                <button onclick="applyCalendarWeeklyPattern(6)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i> Pola 6 Hari
+                </button>
+                <button onclick="saveKalenderHebToDatabase()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                  <i class="fa-solid fa-floppy-disk"></i> Simpan Kalender
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+              <div>
+                <p class="text-[11px] text-slate-500 font-medium">Hari Efektif KBM Semester</p>
+                <h4 id="hebTotalHariBadge" class="text-2xl font-black text-emerald-600 mt-0.5">0 Hari</h4>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-500 font-medium">Target Total Sesi (Pagi & Siang)</p>
+                <h4 id="hebTotalSesiBadge" class="text-2xl font-black text-blue-600 mt-0.5">0 Sesi</h4>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-500 font-medium">Hari Libur / Non-KBM</p>
+                <h4 id="hebTotalLiburBadge" class="text-2xl font-black text-rose-600 mt-0.5">0 Hari</h4>
+              </div>
+            </div>
+
+            <div id="hebCalendarGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ===================================================================
+             6. VIEW REKAPITULASI & LAPORAN RESMI (ADMIN ONLY)
+             =================================================================== -->
+        <section id="viewRekapLaporan" class="hidden space-y-4">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div>
+                <h3 class="text-base font-bold text-slate-900">Rekapitulasi Kehadiran & Laporan Resmi</h3>
+                <p class="text-xs text-slate-500">Laporan ber-Kop Surat standar dinas dengan kalkulasi persentase HEB, tanda tangan otomatis, cetak A4, dan export Excel.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="exportRekapToExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-xs">
+                  <i class="fa-solid fa-file-excel"></i> Export Excel
+                </button>
+                <button onclick="downloadRekapPDF()" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-xs">
+                  <i class="fa-solid fa-file-pdf"></i> Unduh PDF (A4)
+                </button>
+                <button onclick="printRekapSheet()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-xs">
+                  <i class="fa-solid fa-print"></i> Cetak Laporan
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Periode Laporan</label>
+                <select id="rekapPeriode" onchange="adjustRekapFields()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800">
+                  <option value="harian">Harian</option>
+                  <option value="mingguan">Mingguan (7 Hari)</option>
+                  <option value="bulanan" selected>Rentang Bulanan</option>
+                  <option value="semester">1 Semester</option>
+                  <option value="tahunan">1 Tahun Ajaran</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Pilih Kelas</label>
+                <select id="rekapKelas" onchange="generateRekapView()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800">
+                  <option value="ALL">Semua Kelas</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Tanggal Awal</label>
+                <input type="date" id="rekapTglAwal" onchange="generateRekapView()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800"/>
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Tanggal Akhir</label>
+                <input type="date" id="rekapTglAkhir" onchange="generateRekapView()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800"/>
+              </div>
+              <div class="flex items-end">
+                <button onclick="generateRekapView()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-magnifying-glass"></i> Refresh Laporan
+                </button>
+              </div>
+            </div>
+
+            <!-- Form Penandatanganan -->
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-1">Tanggal Dokumen Ditandatangani</label>
+                  <input type="date" id="rekapInputTglTtd" onchange="updateSignatureDisplay()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800"/>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-1">Petugas Piket Bertanda Tangan</label>
+                  <select id="rekapSelectPetugasPiket" onchange="updateSignatureDisplay()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800">
+                    <option value="AUTO">Otomatis Sesuai Hari Tanggal TTD</option>
+                    <option value="senin">Guru Piket Senin</option>
+                    <option value="selasa">Guru Piket Selasa</option>
+                    <option value="rabu">Guru Piket Rabu</option>
+                    <option value="kamis">Guru Piket Kamis</option>
+                    <option value="jumat">Guru Piket Jum'at</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-1">Kota Tempat Pengesahan</label>
+                  <input type="text" id="rekapInputKota" value="Cianjur" oninput="updateSignatureDisplay()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- LEMBAR RESMI KERTAS A4 BER-KOP SURAT -->
+            <div class="overflow-x-auto bg-slate-200 p-4 rounded-xl flex justify-center">
+              <div id="rekapSheetWrapper" class="w-[210mm] max-w-full bg-white text-slate-900 p-8 shadow-md rounded-sm box-border">
+                <!-- Kop Surat Resmi -->
+                <div class="border-b-4 border-double border-slate-900 pb-3 mb-4 flex items-center gap-5">
+                  <img id="rekapKopLogo" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" alt="Logo" class="w-20 h-20 object-contain"/>
+                  <div class="flex-1 text-center">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-700">PEMERINTAH DAERAH PROVINSI / DINAS PENDIDIKAN</h2>
+                    <h1 id="rekapKopNama" class="text-xl font-extrabold uppercase text-slate-900 tracking-tight">SMK NEGERI DIGITAL NUSANTARA</h1>
+                    <p id="rekapKopAlamat" class="text-[11px] text-slate-700 font-medium">Jl. Pendidikan Karakter No. 101, Kota Pendidikan, Indonesia</p>
+                    <p id="rekapKopNpsn" class="text-[11px] text-slate-600 font-bold">NPSN: 69876543 • E-Presensi Siswa Berbasis Cloud Serverless</p>
+                  </div>
+                </div>
+
+                <div class="text-center my-4 space-y-1">
+                  <h3 class="text-sm font-black uppercase underline tracking-wide">LAPORAN REKAPITULASI KEHADIRAN SISWA</h3>
+                  <p id="rekapSubJudul" class="text-xs text-slate-600 font-semibold">Periode: RENTANG BULANAN</p>
+                  <div class="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px]">
+                    <span id="rekapInfoTanggal" class="px-2.5 py-0.5 bg-blue-50 border border-blue-200 text-blue-900 rounded-md font-medium"></span>
+                    <span id="rekapInfoKelas" class="px-2.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-800 rounded-md font-medium"></span>
+                    <span id="rekapInfoHeb" class="px-2.5 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-md font-bold"></span>
+                  </div>
+                </div>
+
+                <div class="mt-4 w-full overflow-hidden">
+                  <table class="w-full border-collapse border border-slate-900 text-xs table-fixed">
+                    <thead class="bg-slate-100 text-slate-900 font-bold text-center">
+                      <tr>
+                        <th class="border border-slate-900 py-2 px-1 w-[5%]">No</th>
+                        <th class="border border-slate-900 py-2 px-1 w-[15%]">Tanggal</th>
+                        <th class="border border-slate-900 py-2 px-1 w-[11%]">NISN</th>
+                        <th class="border border-slate-900 py-2 px-2 text-left w-[25%]">Nama Siswa</th>
+                        <th class="border border-slate-900 py-2 px-1 w-[12%]">Kelas</th>
+                        <th class="border border-slate-900 py-2 px-1 w-[11%]">Presensi Pagi</th>
+                        <th class="border border-slate-900 py-2 px-1 w-[11%]">Presensi Siang</th>
+                        <th class="border border-slate-900 py-2 px-1 w-[10%]">Persentase</th>
+                      </tr>
+                    </thead>
+                    <tbody id="rekapTableBody" class="text-slate-800">
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Blok Tanda Tangan -->
+                <div class="signature-block mt-8 pt-3 text-xs">
+                  <div class="flex justify-between items-start">
+                    <div class="text-center w-56">
+                      <p class="font-medium text-slate-700 invisible">Spasi</p>
+                      <p class="font-bold text-slate-900">Mengetahui,<br/>Kepala Sekolah</p>
+                      <div class="h-16"></div>
+                      <p id="ttdNamaKepsek" class="font-bold text-slate-900 underline">Drs. H. Rahmat Hidayat, M.Pd</p>
+                      <p id="ttdNipKepsek" class="text-[11px] text-slate-600">NIP: 19720415 199803 1 004</p>
+                    </div>
+                    <div class="text-center w-56">
+                      <p id="ttdKotaTanggal" class="font-medium text-slate-700">Cianjur, 20 September 2026</p>
+                      <p id="ttdJabatanPiket" class="font-bold text-slate-900">Guru Piket</p>
+                      <div class="h-16"></div>
+                      <p id="ttdNamaPiket" class="font-bold text-slate-900 underline">Bambang Sudarsono, S.Pd</p>
+                      <p id="ttdNipPiket" class="text-[11px] text-slate-600">NIP: 19800312 200501 1 009</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ===================================================================
+             7. VIEW PENGATURAN IDENTITAS & JADWAL PIKET (ADMIN ONLY)
+             =================================================================== -->
+        <section id="viewPengaturan" class="hidden space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Identitas Instansi -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-school text-blue-600"></i> Identitas Sekolah & Kepala Sekolah
+              </h3>
+              <form onsubmit="saveSchoolIdentity(event)" class="space-y-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1">Nama Sekolah</label>
+                  <input type="text" id="cfgNamaSekolah" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800"/>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-semibold text-slate-600 mb-1">NPSN</label>
+                    <input type="text" id="cfgNpsn" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800"/>
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-600 mb-1">Kota / Kabupaten</label>
+                    <input type="text" id="cfgKota" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800"/>
+                  </div>
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1">Alamat Lengkap</label>
+                  <textarea id="cfgAlamat" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800"></textarea>
+                </div>
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <label class="block font-semibold text-slate-700 mb-1">Logo Sekolah</label>
+                  <div class="flex items-center gap-3">
+                    <img id="cfgLogoPreview" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" alt="Preview Logo" class="w-14 h-14 object-contain rounded-xl p-1 bg-white border border-slate-200 shrink-0 shadow-xs"/>
+                    <div class="flex-1 space-y-1">
+                      <input type="file" id="cfgLogoFile" accept="image/*" onchange="previewSchoolLogo(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"/>
+                      <p class="text-[10px] text-slate-400">Kompresi otomatis dilakukan ke ukuran ringan Firestore.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="border-t border-slate-100 pt-3 space-y-3">
+                  <span class="font-bold text-slate-800 block">Kepala Sekolah</span>
+                  <div>
+                    <label class="block font-semibold text-slate-600 mb-1">Nama Kepala Sekolah & Gelar</label>
+                    <input type="text" id="cfgNamaKepsek" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800"/>
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-600 mb-1">NIP Kepala Sekolah</label>
+                    <input type="text" id="cfgNipKepsek" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800"/>
+                  </div>
+                </div>
+                <button type="submit" id="btnSaveSchoolIdentity" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-xs">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Identitas Sekolah
+                </button>
+              </form>
+            </div>
+
+            <!-- Jadwal Petugas Guru Piket -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-calendar-week text-emerald-600"></i> Jadwal Guru Piket (Senin - Jum'at)
+              </h3>
+              <p class="text-xs text-slate-500">Nama petugas piket otomatis terintegrasi ke layar beranda dan lembar pengesahan laporan resmi.</p>
+
+              <form onsubmit="saveJadwalPiket(event)" class="space-y-3 text-xs">
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                  <span class="font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-circle text-[7px]"></i> Guru Piket Senin</span>
+                  <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="piketSeninNama" placeholder="Nama Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"/>
+                    <input type="text" id="piketSeninNip" placeholder="NIP Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"/>
+                  </div>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                  <span class="font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-circle text-[7px]"></i> Guru Piket Selasa</span>
+                  <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="piketSelasaNama" placeholder="Nama Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"/>
+                    <input type="text" id="piketSelasaNip" placeholder="NIP Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"/>
+                  </div>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                  <span class="font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-circle text-[7px]"></i> Guru Piket Rabu</span>
+                  <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="piketRabuNama" placeholder="Nama Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"/>
+                    <input type="text" id="piketRabuNip" placeholder="NIP Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"/>
+                  </div>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                  <span class="font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-circle text-[7px]"></i> Guru Piket Kamis</span>
+                  <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="piketKamisNama" placeholder="Nama Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"/>
+                    <input type="text" id="piketKamisNip" placeholder="NIP Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"/>
+                  </div>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                  <span class="font-bold text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-circle text-[7px]"></i> Guru Piket Jum'at</span>
+                  <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="piketJumatNama" placeholder="Nama Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"/>
+                    <input type="text" id="piketJumatNip" placeholder="NIP Guru Piket" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"/>
+                  </div>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition shadow-xs">
+                  Simpan Jadwal Guru Piket
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- FLOATING GLASSMORPHISM BOTTOM NAVIGATION BAR (MOBILE ONLY - ADMIN ONLY) -->
+      <nav id="mobileBottomNav" class="hidden fixed bottom-3 left-3 right-3 h-16 glass-nav rounded-2xl shadow-xl items-center justify-around px-2 z-40 border border-slate-200/80">
+        <button onclick="switchView('kiosk')" id="mobBtn-kiosk" class="flex flex-col items-center justify-center text-blue-600 w-12">
+          <i class="fa-solid fa-qrcode text-lg"></i>
+          <span class="text-[9px] font-bold mt-1">Kiosk</span>
+        </button>
+        <button onclick="switchView('masterSiswa')" id="mobBtn-masterSiswa" class="flex flex-col items-center justify-center text-slate-500 hover:text-slate-900 w-12">
+          <i class="fa-solid fa-users text-lg"></i>
+          <span class="text-[9px] font-medium mt-1">Siswa</span>
+        </button>
+        <button onclick="switchView('kelolaAbsensi')" id="mobBtn-kelolaAbsensi" class="flex flex-col items-center justify-center text-slate-500 hover:text-slate-900 w-12">
+          <i class="fa-solid fa-clipboard-check text-lg"></i>
+          <span class="text-[9px] font-medium mt-1">Presensi</span>
+        </button>
+        <button onclick="switchView('cetakKartu')" id="mobBtn-cetakKartu" class="flex flex-col items-center justify-center text-slate-500 hover:text-slate-900 w-12">
+          <i class="fa-solid fa-id-card text-lg"></i>
+          <span class="text-[9px] font-medium mt-1">Kartu</span>
+        </button>
+        <button onclick="switchView('downloadQr')" id="mobBtn-downloadQr" class="flex flex-col items-center justify-center text-slate-500 hover:text-slate-900 w-12">
+          <i class="fa-solid fa-qrcode text-lg"></i>
+          <span class="text-[9px] font-medium mt-1">QR Code</span>
+        </button>
+        <button onclick="switchView('rekapLaporan')" id="mobBtn-rekapLaporan" class="flex flex-col items-center justify-center text-slate-500 hover:text-slate-900 w-12">
+          <i class="fa-solid fa-file-invoice text-lg"></i>
+          <span class="text-[9px] font-medium mt-1">Rekap</span>
+        </button>
+        <button onclick="switchView('pengaturan')" id="mobBtn-pengaturan" class="flex flex-col items-center justify-center text-slate-500 hover:text-slate-900 w-12">
+          <i class="fa-solid fa-sliders text-lg"></i>
+          <span class="text-[9px] font-medium mt-1">Setelan</span>
+        </button>
+      </nav>
+
+    </div>
+  </div>
+
+
+  <!-- ===========================================================================
+       MODAL DIALOGS (LOGIN, SISWA, PRESENSI, NOTIFIKASI, KONFIRMASI)
+       =========================================================================== -->
+
+  <!-- MODAL: LOGIN HYBRID (ADMIN AUTH / PESERTA DOCUMENT) -->
+  <div id="modalLogin" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 text-slate-800 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-sm font-black flex items-center gap-2 text-slate-900">
+          <i class="fa-solid fa-shield-halved text-blue-600"></i> Masuk Akun Portal
+        </h3>
+        <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-700 p-1"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+      <form onsubmit="handleHybridLogin(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Email (Admin) / Username (Peserta)</label>
+          <input type="text" id="loginUsername" required placeholder="Masukkan email atau username" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-500 transition"/>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Kata Sandi (Password)</label>
+          <input type="password" id="loginPassword" required placeholder="Masukkan kata sandi" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-500 transition"/>
+        </div>
+        <button type="submit" id="btnLoginSubmit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-xs mt-2">
+          <span>Masuk Sekarang</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DATA SISWA -->
+  <div id="modalStudent" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 text-slate-800 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="modalStudentTitle" class="text-sm font-bold text-slate-900">Tambah Data Siswa</h3>
+        <button onclick="closeStudentModal()" class="text-slate-400 hover:text-slate-700 p-1"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+      <form onsubmit="handleSaveStudent(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="studentFormMode" value="ADD"/>
+        <input type="hidden" id="studentOldNisn" value=""/>
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">NISN (Nomor Induk Siswa Nasional)</label>
+          <input type="text" id="formNisn" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-mono focus:bg-white"/>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Nama Lengkap Siswa</label>
+          <input type="text" id="formNama" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white"/>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Jenis Kelamin</label>
+            <select id="formJk" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white">
+              <option value="L">Laki-laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Kelas</label>
+            <input type="text" id="formKelas" placeholder="XII-RPL-1" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white"/>
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Pas Foto Siswa</label>
+          <input type="file" id="formFotoFile" accept="image/*" class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-blue-600 file:text-white"/>
+          <p id="formFotoHint" class="text-[10px] text-slate-400 mt-1">Foto otomatis dikompresi agar hemat kuota Firestore.</p>
+        </div>
+        <button type="submit" id="btnSubmitStudent" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-xs">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data Siswa
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CATATAN PRESENSI MANUAL -->
+  <div id="modalAttendance" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 text-slate-800 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="modalAttendanceTitle" class="text-sm font-bold text-slate-900">Edit Catatan Presensi</h3>
+        <button onclick="closeAttendanceModal()" class="text-slate-400 hover:text-slate-700 p-1"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+      <form onsubmit="handleSaveAttendance(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="attFormMode" value="EDIT"/>
+        <input type="hidden" id="attRecordId" value=""/>
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Pilih Siswa</label>
+          <select id="attSelectSiswa" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800">
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Tanggal</label>
+            <input type="date" id="attInputTanggal" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800"/>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Waktu (JJ:MM:DD)</label>
+            <input type="text" id="attInputWaktu" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-mono"/>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Sesi Presensi</label>
+            <select id="attSelectSesi" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800">
+              <option value="Pagi">Sesi Pagi</option>
+              <option value="Siang">Sesi Siang</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Status Kehadiran</label>
+            <select id="attSelectStatus" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800">
+              <option value="Hadir Tepat Waktu">Hadir Tepat Waktu</option>
+              <option value="Terlambat">Terlambat</option>
+              <option value="Pulang Tepat Waktu">Pulang Tepat Waktu</option>
+              <option value="Pulang Mendahului">Pulang Mendahului</option>
+              <option value="Pulang Terlambat">Pulang Terlambat</option>
+              <option value="Izin">Izin</option>
+              <option value="Sakit">Sakit</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-xs">
+          Simpan Catatan Presensi
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NOTIFIKASI INFORMASI -->
+  <div id="noticeModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 text-slate-800 shadow-2xl space-y-3 text-center">
+      <div id="noticeIconContainer" class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-2xl bg-blue-50 text-blue-600">
+        <i id="noticeIcon" class="fa-solid fa-circle-info"></i>
+      </div>
+      <h3 id="noticeTitle" class="text-sm font-black text-slate-900">Pemberitahuan</h3>
+      <p id="noticeMessage" class="text-xs text-slate-600 leading-relaxed">Pesan sistem...</p>
+      <button onclick="closeNoticeModal()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs">
+        Mengerti
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: KONFIRMASI TINDAKAN -->
+  <div id="confirmModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 text-slate-800 shadow-2xl space-y-3 text-center">
+      <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-2xl bg-rose-50 text-rose-600">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 id="confirmTitle" class="text-sm font-black text-slate-900">Konfirmasi</h3>
+      <p id="confirmMessage" class="text-xs text-slate-600 leading-relaxed">Apakah Anda yakin?</p>
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeConfirmModal(false)" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+          Batal
+        </button>
+        <button onclick="closeConfirmModal(true)" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-xs">
+          Ya, Lanjutkan
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===========================================================================
+       LOGIKA JAVASCRIPT & INTEGRASI FIREBASE
+       =========================================================================== -->
+  <script>
+    // ==========================================
+    // KONFIGURASI APLIKASI
+    // ==========================================
+    const IS_PREVIEW = false; // Set false JIKA SUDAH TERHUBUNG KE FIREBASE
+    
+    // PASTE FIREBASE CONFIG ANDA DI SINI
+    const firebaseConfig = {
+	apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
+	authDomain: "presensi-siswa-digital-a24ca.firebaseapp.com",
+	projectId: "presensi-siswa-digital-a24ca",
+	storageBucket: "presensi-siswa-digital-a24ca.firebasestorage.app",
+	messagingSenderId: "696200452974",
+	appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
+    };
+
+    // Variabel Global Runtime
+    let db = null;
+    let auth = null;
+    let currentUser = null; // { role: 'ADMIN' | 'PESERTA', name: string }
+    let onConfirmCallback = null;
+    let cameraMode = "environment";
+    let html5QrScanner = null;
+    let isScannerRunning = false;
+    let manualSessionOverride = null;
+    let attendanceChartInstance = null;
+    let deferredPrompt = null;
+    let realtimeUnsubscribers = [];
+
+    // State Data Aplikasi
+    let appConfig = {
+      namaSekolah: "SMK Negeri Digital Nusantara",
+      npsn: "69876543",
+      alamat: "Jl. Pendidikan Karakter No. 101, Kota Pendidikan, Indonesia",
+      kota: "Cianjur",
+      namaKepsek: "Drs. H. Rahmat Hidayat, M.Pd",
+      nipKepsek: "19720415 199803 1 004",
+      logoUrl: "https://cdn-icons-png.flaticon.com/512/2856/2856000.png",
+      sistemHariSekolah: "5",
+      jadwalPiket: {
+        senin: { nama: "Bambang Sudarsono, S.Pd", nip: "19800312 200501 1 009" },
+        selasa: { nama: "Ratna Kusuma Wardani, S.Pd", nip: "19840510 200801 2 015" },
+        rabu: { nama: "Hendro Wibowo, S.Kom", nip: "19881120 201201 1 007" },
+        kamis: { nama: "Nur Hidayati, M.Pd", nip: "19820718 200604 2 011" },
+        jumat: { nama: "Dewi Sartika, S.Pd", nip: "19850612 201001 2 018" }
+      }
+    };
+
+    let listSiswa = [
+      { nisn: "1001", nama: "Ahmad Fauzi", jk: "L", kelas: "XII-RPL-1", fotoUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop" },
+      { nisn: "1002", nama: "Siti Rahmawati", jk: "P", kelas: "XII-RPL-1", fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" },
+      { nisn: "1003", nama: "Budi Pratama", jk: "L", kelas: "XII-TKJ-2", fotoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" },
+      { nisn: "1004", nama: "Dewi Lestari", jk: "P", kelas: "XI-MM-1", fotoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" }
+    ];
+
+    function getTodayISO() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    let listAbsensi = [
+      { id: "ABS_001", tanggal: getTodayISO(), waktu: "06:45:10", nisn: "1001", nama: "Ahmad Fauzi", kelas: "XII-RPL-1", sesi: "Pagi", status: "Hadir Tepat Waktu" },
+      { id: "ABS_002", tanggal: getTodayISO(), waktu: "14:02:22", nisn: "1001", nama: "Ahmad Fauzi", kelas: "XII-RPL-1", sesi: "Siang", status: "Pulang Tepat Waktu" },
+      { id: "ABS_003", tanggal: getTodayISO(), waktu: "07:08:15", nisn: "1002", nama: "Siti Rahmawati", kelas: "XII-RPL-1", sesi: "Pagi", status: "Terlambat" },
+      { id: "ABS_004", tanggal: getTodayISO(), waktu: "06:52:00", nisn: "1003", nama: "Budi Pratama", kelas: "XII-TKJ-2", sesi: "Pagi", status: "Hadir Tepat Waktu" }
+    ];
+
+    let kalenderHebData = {};
+
+    // ==========================================
+    // INISIALISASI & SETUP DATABASE OTOMATIS
+    // ==========================================
+    async function initFirebaseApp() {
+      if (!IS_PREVIEW) {
+        try {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+          }
+          auth = firebase.auth();
+          db = firebase.firestore();
+
+          // Monitor Status Auth Admin
+          auth.onAuthStateChanged(user => {
+            if (user) {
+              setSessionState("ADMIN", user.email || "Administrator");
+            }
+          });
+
+          // Jalankan Auto-Setup Database
+          await autoSetupDatabase();
+
+          // Pasang Realtime Firestore Listener
+          attachFirestoreListeners();
+        } catch (err) {
+          console.error("Firebase init error:", err);
+          showNotice("Koneksi Firebase", "Gagal menghubungkan ke Firebase. Menjalankan mode offline.", "warning");
+        }
+      }
+    }
+
+    async function autoSetupDatabase() {
+      if (!db) return;
+      try {
+        const cfgDoc = await db.collection("pengaturan").doc("sekolah_config").get();
+        if (!cfgDoc.exists) {
+          await db.collection("pengaturan").doc("sekolah_config").set(appConfig);
+        }
+
+        const userPesertaDoc = await db.collection("users_peserta").doc("peserta").get();
+        if (!userPesertaDoc.exists) {
+          await db.collection("users_peserta").doc("peserta").set({
+            username: "peserta",
+            password: "edudigital",
+            nama: "Petugas Piket Terpadu",
+            role: "PESERTA",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+
+        const siswaSnapshot = await db.collection("siswa").limit(1).get();
+        if (siswaSnapshot.empty) {
+          const batch = db.batch();
+          listSiswa.forEach(s => {
+            const docRef = db.collection("siswa").doc(s.nisn);
+            batch.set(docRef, { ...s, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+          });
+          await batch.commit();
+        }
+
+        const curYear = new Date().getFullYear();
+        const semDoc = await db.collection("kalender_heb").doc(`${curYear}_ganjil`).get();
+        if (!semDoc.exists) {
+          initDefaultCalendarHeb();
+          await db.collection("kalender_heb").doc(`${curYear}_ganjil`).set({
+            semKey: `${curYear}_ganjil`,
+            dates: kalenderHebData,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      } catch (e) {
+        console.error("Error autoSetupDatabase:", e);
+      }
+    }
+
+    function attachFirestoreListeners() {
+      if (!db) return;
+
+      realtimeUnsubscribers.forEach(unsub => unsub());
+      realtimeUnsubscribers = [];
+
+      const unsubConfig = db.collection("pengaturan").doc("sekolah_config").onSnapshot(doc => {
+        if (doc.exists) {
+          appConfig = doc.data();
+          applySchoolIdentityUI();
+        }
+      });
+      realtimeUnsubscribers.push(unsubConfig);
+
+      const unsubSiswa = db.collection("siswa").onSnapshot(snapshot => {
+        listSiswa = [];
+        snapshot.forEach(d => listSiswa.push(d.data()));
+        populateClassDropdowns();
+        renderStudentsTable();
+        renderIdCardsForPrint();
+        updateDashboardStats();
+        generateRekapView();
+      });
+      realtimeUnsubscribers.push(unsubSiswa);
+
+      const unsubPresensi = db.collection("presensi")
+        .where("tanggal", "==", getTodayISO())
+        .onSnapshot(snapshot => {
+          listAbsensi = [];
+          snapshot.forEach(d => listAbsensi.push({ id: d.id, ...d.data() }));
+          updateDashboardStats();
+          renderTodayLogs();
+          renderAttendanceManagementTable();
+          generateRekapView();
+        });
+      realtimeUnsubscribers.push(unsubPresensi);
+    }
+
+    // ==========================================
+    // UTILS: KOMPRESI FOTO CANVAS
+    // ==========================================
+    function compressImageFile(file, maxWidth = 320, maxHeight = 400, quality = 0.75) {
+      return new Promise((resolve, reject) => {
+        if (!file) return resolve(null);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width;
+            let h = img.height;
+
+            if (w > h) {
+              if (w > maxWidth) {
+                h = Math.round((h * maxWidth) / w);
+                w = maxWidth;
+              }
+            } else {
+              if (h > maxHeight) {
+                w = Math.round((h * maxHeight) / h);
+                h = maxHeight;
+              }
+            }
+
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressedBase64);
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ==========================================
+    // SISTEM HYBRID LOGIN & KONTROL HAK AKSES
+    // ==========================================
+    function openLoginModal() {
+      // Pastikan form bersih saat dibuka
+      const uField = document.getElementById('loginUsername');
+      const pField = document.getElementById('loginPassword');
+      if (uField) uField.value = '';
+      if (pField) pField.value = '';
+      document.getElementById('modalLogin').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('modalLogin').classList.add('hidden');
+    }
+
+    async function handleHybridLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('loginUsername').value.trim();
+      const pass = document.getElementById('loginPassword').value.trim();
+      const btn = document.getElementById('btnLoginSubmit');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-rotate animate-spin mr-1"></i> Memverifikasi...`;
+
+      if (IS_PREVIEW) {
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = `Masuk Sekarang`;
+          if (user === "admin@absensi.id" && pass === "edudigital") {
+            setSessionState("ADMIN", "Administrator Master");
+            closeLoginModal();
+            showNotice("Login Berhasil", "Selamat datang Admin! Seluruh menu administratif aktif.", "success");
+          } else if (user === "peserta" && pass === "edudigital") {
+            setSessionState("PESERTA", "Petugas Piket Harian");
+            closeLoginModal();
+            showNotice("Login Berhasil", "Selamat datang Petugas Piket! Mode Presensi aktif.", "success");
+          } else {
+            showNotice("Gagal Masuk", "Username atau kata sandi salah.", "warning");
+          }
+        }, 500);
+        return;
+      }
+
+      try {
+        if (user.includes("@")) {
+          const userCred = await auth.signInWithEmailAndPassword(user, pass);
+          setSessionState("ADMIN", userCred.user.email || "Administrator");
+          closeLoginModal();
+          showNotice("Login Admin Berhasil", "Otentikasi Firebase Auth valid!", "success");
+          return;
+        }
+
+        const userDoc = await db.collection("users_peserta").doc(user).get();
+        if (userDoc.exists && userDoc.data().password === pass) {
+          const uData = userDoc.data();
+          setSessionState("PESERTA", uData.nama || user);
+          closeLoginModal();
+          showNotice("Login Petugas Berhasil", `Selamat bertugas, ${uData.nama}!`, "success");
+        } else {
+          showNotice("Gagal Masuk", "Kredensial pengguna tidak ditemukan di database.", "warning");
+        }
+      } catch (error) {
+        showNotice("Gagal Masuk", error.message || "Terjadi kesalahan saat otentikasi.", "warning");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `Masuk Sekarang`;
+      }
+    }
+
+    function setSessionState(role, displayName) {
+      currentUser = { role, name: displayName };
+      updateAccessControlUI();
+
+      if (role === "ADMIN") {
+        switchView('masterSiswa');
+      } else {
+        switchView('kiosk');
+      }
+    }
+
+    function logoutSession() {
+      if (auth && currentUser?.role === "ADMIN") {
+        auth.signOut();
+      }
+      currentUser = null;
+      updateAccessControlUI();
+      switchView('kiosk');
+      showNotice("Keluar Sesi", "Anda telah kembali ke tampilan publik Kiosk Presensi.", "info");
+    }
+
+    // Pemutakhiran Visibilitas Antarmuka Berdasarkan Hak Akses
+    function updateAccessControlUI() {
+      const isAdmin = currentUser && currentUser.role === "ADMIN";
+      const isPeserta = currentUser && currentUser.role === "PESERTA";
+
+      const desktopSidebar = document.getElementById('desktopSidebar');
+      const mobileBottomNav = document.getElementById('mobileBottomNav');
+      const btnTopLogin = document.getElementById('btnTopLogin');
+      const badgeUserLoggedIn = document.getElementById('badgeUserLoggedIn');
+      const userLoggedName = document.getElementById('userLoggedName');
+      const userLoggedBadge = document.getElementById('userLoggedBadge');
+
+      if (isAdmin) {
+        desktopSidebar.classList.remove('hidden');
+        desktopSidebar.classList.add('md:flex');
+        mobileBottomNav.classList.remove('hidden');
+        mobileBottomNav.classList.add('flex');
+
+        btnTopLogin.classList.add('hidden');
+        badgeUserLoggedIn.classList.remove('hidden');
+        badgeUserLoggedIn.classList.add('flex');
+        userLoggedName.innerText = currentUser.name || "Administrator";
+        userLoggedBadge.innerText = "ADMIN MASTER";
+        userLoggedBadge.className = "text-[9px] font-black text-indigo-600 uppercase";
+
+        document.getElementById('desktopUserName').innerText = currentUser.name || "Administrator";
+        document.getElementById('desktopUserRole').innerText = "Administrator Master";
+        document.getElementById('desktopUserAvatar').innerText = "A";
+        document.getElementById('desktopUserAvatar').className = "w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs";
+      } else if (isPeserta) {
+        desktopSidebar.classList.remove('md:flex');
+        desktopSidebar.classList.add('hidden');
+        mobileBottomNav.classList.remove('flex');
+        mobileBottomNav.classList.add('hidden');
+
+        btnTopLogin.classList.add('hidden');
+        badgeUserLoggedIn.classList.remove('hidden');
+        badgeUserLoggedIn.classList.add('flex');
+        userLoggedName.innerText = currentUser.name || "Petugas Piket";
+        userLoggedBadge.innerText = "PETUGAS PIKET";
+        userLoggedBadge.className = "text-[9px] font-black text-emerald-600 uppercase";
+      } else {
+        // MODE PUBLIK (BELUM LOGIN):
+        desktopSidebar.classList.remove('md:flex');
+        desktopSidebar.classList.add('hidden');
+        mobileBottomNav.classList.remove('flex');
+        mobileBottomNav.classList.add('hidden');
+
+        btnTopLogin.classList.remove('hidden');
+        badgeUserLoggedIn.classList.add('hidden');
+        badgeUserLoggedIn.classList.remove('flex');
+      }
+    }
+
+    // ==========================================
+    // NAVIGASI ANTAR VIEW (DILENGKAPI AKSES GUARD)
+    // ==========================================
+    function switchView(viewId) {
+      const adminViews = ['masterSiswa', 'kelolaAbsensi', 'cetakKartu', 'downloadQr', 'kalenderHeb', 'rekapLaporan', 'pengaturan'];
+      
+      // Guard Keamanan Tampilan: Cegah akses menu admin jika belum login Admin
+      if (adminViews.includes(viewId) && (!currentUser || currentUser.role !== 'ADMIN')) {
+        openLoginModal();
+        showNotice("Akses Terbatas", "Menu administratif hanya dapat diakses oleh Administrator. Silakan login terlebih dahulu.", "warning");
+        return;
+      }
+
+      const allViews = ['kiosk', 'masterSiswa', 'kelolaAbsensi', 'cetakKartu', 'downloadQr', 'kalenderHeb', 'rekapLaporan', 'pengaturan'];
+
+      allViews.forEach(v => {
+        const sec = document.getElementById(`view${capitalize(v)}`);
+        const navBtn = document.getElementById(`navBtn-${v}`);
+        const mobBtn = document.getElementById(`mobBtn-${v}`);
+
+        if (v === viewId) {
+          sec?.classList.remove('hidden');
+          navBtn?.classList.remove('text-slate-600', 'hover:bg-slate-100/70');
+          navBtn?.classList.add('text-blue-600', 'bg-blue-50/80');
+          mobBtn?.classList.remove('text-slate-500');
+          mobBtn?.classList.add('text-blue-600');
+        } else {
+          sec?.classList.add('hidden');
+          navBtn?.classList.add('text-slate-600', 'hover:bg-slate-100/70');
+          navBtn?.classList.remove('text-blue-600', 'bg-blue-50/80');
+          mobBtn?.classList.add('text-slate-500');
+          mobBtn?.classList.remove('text-blue-600');
+        }
+      });
+
+      if (viewId === 'masterSiswa') renderStudentsTable();
+      if (viewId === 'kelolaAbsensi') renderAttendanceManagementTable();
+      if (viewId === 'cetakKartu') renderIdCardsForPrint();
+      if (viewId === 'downloadQr') renderQrCodeGrid();
+      if (viewId === 'kalenderHeb') renderSemesterCalendar();
+      if (viewId === 'rekapLaporan') generateRekapView();
+      if (viewId === 'pengaturan') populateSettingsForm();
+    }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // ==========================================
+    // NOTIFIKASI & SOUND ENGINE
+    // ==========================================
+    function showNotice(title, message, type = 'info') {
+      const modal = document.getElementById('noticeModal');
+      const iconEl = document.getElementById('noticeIcon');
+      const iconContainer = document.getElementById('noticeIconContainer');
+      document.getElementById('noticeTitle').innerText = title;
+      document.getElementById('noticeMessage').innerText = message;
+
+      if (type === 'success') {
+        iconContainer.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-2xl bg-emerald-50 text-emerald-600";
+        iconEl.className = "fa-solid fa-circle-check";
+      } else if (type === 'warning') {
+        iconContainer.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-2xl bg-amber-50 text-amber-600";
+        iconEl.className = "fa-solid fa-triangle-exclamation";
+      } else {
+        iconContainer.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-2xl bg-blue-50 text-blue-600";
+        iconEl.className = "fa-solid fa-circle-info";
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeNoticeModal() {
+      document.getElementById('noticeModal').classList.add('hidden');
+    }
+
+    function showConfirm(title, message, onYes) {
+      document.getElementById('confirmTitle').innerText = title;
+      document.getElementById('confirmMessage').innerText = message;
+      onConfirmCallback = onYes;
+      document.getElementById('confirmModal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal(isYes) {
+      document.getElementById('confirmModal').classList.add('hidden');
+      if (isYes && typeof onConfirmCallback === 'function') {
+        onConfirmCallback();
+      }
+      onConfirmCallback = null;
+    }
+
+    function playBeep(type = 'success') {
+      try {
+        if (typeof Tone !== 'undefined') {
+          if (Tone.context && Tone.context.state !== 'running') {
+            Tone.start();
+          }
+          const synth = new Tone.Synth().toDestination();
+          synth.triggerAttackRelease(type === 'success' ? "C5" : "A3", "8n");
+        }
+      } catch (e) {}
+    }
+
+    // ==========================================
+    // MODUL 1: KIOSK & SCANNER QR REALTIME
+    // ==========================================
+    function detectSessionAuto() {
+      if (manualSessionOverride) return manualSessionOverride;
+      const now = new Date();
+      const totalMinutes = now.getHours() * 60 + now.getMinutes();
+      return totalMinutes < 690 ? "Pagi" : "Siang";
+    }
+
+    function toggleSessionManual() {
+      const cur = detectSessionAuto();
+      manualSessionOverride = cur === "Pagi" ? "Siang" : "Pagi";
+      updateSessionBadgeUI();
+      showNotice("Sesi Manual", `Sesi presensi dialihkan menjadi: ${manualSessionOverride.toUpperCase()}`, "info");
+    }
+
+    function updateSessionBadgeUI() {
+      const cur = detectSessionAuto();
+      const badge = document.getElementById('kioskSessionBadge');
+      if (badge) {
+        badge.innerText = cur.toUpperCase();
+        badge.className = cur === 'Pagi' ? 'text-xs font-black text-blue-600' : 'text-xs font-black text-emerald-600';
+      }
+    }
+
+    function calculateAttendanceStatus(session, dateObj = new Date()) {
+      const totalMinutes = dateObj.getHours() * 60 + dateObj.getMinutes();
+      if (session === "Pagi") {
+        if (totalMinutes < 360) return "Hadir Terlalu Dini";
+        if (totalMinutes <= 420) return "Hadir Tepat Waktu";
+        return "Terlambat";
+      } else {
+        if (totalMinutes < 825) return "Pulang Mendahului";
+        if (totalMinutes <= 900) return "Pulang Tepat Waktu";
+        return "Pulang Terlambat";
+      }
+    }
+
+    function startScanner() {
+      if (isScannerRunning) return;
+      playBeep('success');
+      html5QrScanner = new Html5Qrcode("reader");
+
+      html5QrScanner.start(
+        { facingMode: cameraMode },
+        { fps: 15, qrbox: { width: 220, height: 220 } },
+        onScanSuccess,
+        () => {}
+      ).then(() => {
+        isScannerRunning = true;
+        document.getElementById('btnStartScanner').classList.add('hidden');
+        document.getElementById('btnStopScanner').classList.remove('hidden');
+        document.getElementById('btnSwitchCamera').classList.remove('hidden');
+        document.getElementById('scannerOverlay').classList.add('hidden');
+      }).catch(err => {
+        showNotice("Kamera Ditolak", "Mohon berikan izin kamera browser untuk memindai QR.", "warning");
+      });
+    }
+
+    function stopScanner() {
+      if (!isScannerRunning || !html5QrScanner) return;
+      html5QrScanner.stop().then(() => {
+        isScannerRunning = false;
+        document.getElementById('btnStartScanner').classList.remove('hidden');
+        document.getElementById('btnStopScanner').classList.add('hidden');
+        document.getElementById('btnSwitchCamera').classList.add('hidden');
+        document.getElementById('scannerOverlay').classList.remove('hidden');
+      }).catch(() => {});
+    }
+
+    function switchCamera() {
+      cameraMode = cameraMode === "environment" ? "user" : "environment";
+      stopScanner();
+      setTimeout(startScanner, 300);
+    }
+
+    async function onScanSuccess(decodedText) {
+      if (!decodedText) return;
+      const nisnScanned = decodedText.trim();
+      const sessionActive = detectSessionAuto();
+      const todayStr = getTodayISO();
+
+      const siswa = listSiswa.find(s => String(s.nisn) === String(nisnScanned));
+      if (!siswa) {
+        playBeep('error');
+        showNotice("Kartu Tidak Dikenal", `NISN [${nisnScanned}] tidak terdaftar di sistem!`, "warning");
+        return;
+      }
+
+      const already = listAbsensi.find(a => String(a.nisn) === String(nisnScanned) && a.tanggal === todayStr && a.sesi === sessionActive);
+      if (already) {
+        playBeep('error');
+        showNotice("Sudah Presensi", `${siswa.nama} sudah melakukan presensi Sesi ${sessionActive} (${already.waktu} WIB).`, "warning");
+        return;
+      }
+
+      playBeep('success');
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+      const statusText = calculateAttendanceStatus(sessionActive, now);
+
+      const record = {
+        id: "ABS_" + Date.now(),
+        tanggal: todayStr,
+        waktu: timeStr,
+        nisn: siswa.nisn,
+        nama: siswa.nama,
+        kelas: siswa.kelas,
+        sesi: sessionActive,
+        status: statusText,
+        timestamp: new Date().toISOString()
+      };
+
+      listAbsensi.unshift(record);
+
+      document.getElementById('lastScanBox').classList.remove('hidden');
+      document.getElementById('scanSiswaNama').innerText = `${siswa.nama} (${siswa.kelas})`;
+      document.getElementById('scanSiswaInfo').innerText = `Sesi ${sessionActive} • ${timeStr} WIB • ${statusText}`;
+      document.getElementById('scanSiswaFoto').src = siswa.fotoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop";
+
+      updateDashboardStats();
+      renderTodayLogs();
+      renderAttendanceManagementTable();
+      generateRekapView();
+
+      if (!IS_PREVIEW && db) {
+        try {
+          await db.collection("presensi").doc(record.id).set(record);
+        } catch (e) {
+          console.error("Firestore presensi error:", e);
+        }
+      }
+    }
+
+    function updateDashboardStats() {
+      const todayStr = getTodayISO();
+      const todayRecords = listAbsensi.filter(a => a.tanggal === todayStr);
+
+      const uniquePagi = new Set(todayRecords.filter(a => a.sesi === 'Pagi').map(a => a.nisn)).size;
+      const uniqueSiang = new Set(todayRecords.filter(a => a.sesi === 'Siang').map(a => a.nisn)).size;
+      const totalSiswa = listSiswa.length;
+      const presentCount = new Set(todayRecords.map(a => a.nisn)).size;
+      const belumHadir = Math.max(0, totalSiswa - presentCount);
+
+      document.getElementById('statTotalSiswa').innerText = totalSiswa;
+      document.getElementById('statHadirPagi').innerText = uniquePagi;
+      document.getElementById('statHadirSiang').innerText = uniqueSiang;
+      document.getElementById('statBelum').innerText = belumHadir;
+
+      updateChart(uniquePagi, uniqueSiang, belumHadir);
+    }
+
+    function updateChart(pagi, siang, belum) {
+      const ctx = document.getElementById('attendanceChart');
+      if (!ctx) return;
+      if (!attendanceChartInstance) {
+        attendanceChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Hadir Pagi', 'Hadir Siang', 'Belum Hadir'],
+            datasets: [{
+              data: [pagi, siang, belum],
+              backgroundColor: ['#2563eb', '#10b981', '#f59e0b'],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } },
+              x: { grid: { display: false }, ticks: { color: '#334155' } }
+            }
+          }
+        });
+      } else {
+        attendanceChartInstance.data.datasets[0].data = [pagi, siang, belum];
+        attendanceChartInstance.update();
+      }
+    }
+
+    function renderTodayLogs() {
+      const tbody = document.getElementById('todayLogTbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const todayStr = getTodayISO();
+      const logs = listAbsensi.filter(a => a.tanggal === todayStr);
+      document.getElementById('todayLogCount').innerText = `${logs.length} Presensi Terdata`;
+
+      if (logs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400 italic">Belum ada presensi siswa untuk hari ini.</td></tr>`;
+        return;
+      }
+
+      logs.forEach(log => {
+        const tr = document.createElement('tr');
+        const badgeColor = log.sesi === 'Pagi' ? 'text-blue-700 bg-blue-50 border border-blue-200' : 'text-emerald-700 bg-emerald-50 border border-emerald-200';
+        tr.innerHTML = `
+          <td class="py-2 font-mono text-[11px] font-bold text-slate-900">${log.waktu}</td>
+          <td class="py-2 font-semibold text-slate-800">${log.nama}</td>
+          <td class="py-2 text-slate-500">${log.kelas}</td>
+          <td class="py-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeColor}">${log.sesi}</span></td>
+          <td class="py-2 text-[11px] text-slate-600">${log.status}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ==========================================
+    // MODUL 2: MASTER SISWA & EXCEL/ZIP
+    // ==========================================
+    function renderStudentsTable() {
+      const search = (document.getElementById('searchStudentInput')?.value || '').toLowerCase();
+      const filterKelas = document.getElementById('filterStudentKelas')?.value || 'ALL';
+      const tbody = document.getElementById('studentTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let filtered = listSiswa;
+      if (filterKelas !== 'ALL') filtered = filtered.filter(s => s.kelas === filterKelas);
+      if (search) filtered = filtered.filter(s => (s.nama && s.nama.toLowerCase().includes(search)) || (s.nisn && String(s.nisn).includes(search)));
+
+      document.getElementById('studentCountBadge').innerText = `${filtered.length} Siswa`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Tidak ada data siswa ditemukan.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(siswa => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-3">
+            <img src="${siswa.fotoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop'}" class="w-8 h-8 rounded-full object-cover border border-slate-200 shadow-xs" crossorigin="anonymous" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop'">
+          </td>
+          <td class="p-3 font-mono font-bold text-slate-900">${siswa.nisn}</td>
+          <td class="p-3 font-semibold text-slate-800">${siswa.nama}</td>
+          <td class="p-3 text-slate-500">${siswa.jk === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
+          <td class="p-3 text-slate-700 font-medium">${siswa.kelas}</td>
+          <td class="p-3 text-center space-x-1">
+            <button onclick="editStudent('${siswa.nisn}')" class="text-blue-600 hover:text-blue-800 p-1.5" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="confirmDeleteStudent('${siswa.nisn}')" class="text-rose-600 hover:text-rose-800 p-1.5" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openStudentModal(mode = 'ADD', nisn = '') {
+      document.getElementById('studentFormMode').value = mode;
+      document.getElementById('studentOldNisn').value = nisn;
+      document.getElementById('modalStudentTitle').innerText = mode === 'ADD' ? 'Tambah Siswa Baru' : 'Edit Biodata Siswa';
+
+      if (mode === 'EDIT') {
+        const s = listSiswa.find(i => i.nisn === nisn);
+        if (s) {
+          document.getElementById('formNisn').value = s.nisn;
+          document.getElementById('formNama').value = s.nama;
+          document.getElementById('formJk').value = s.jk;
+          document.getElementById('formKelas').value = s.kelas;
+          document.getElementById('formFotoHint').innerText = "Pilih foto baru jika ingin memperbarui.";
+        }
+      } else {
+        document.getElementById('formNisn').value = '';
+        document.getElementById('formNama').value = '';
+        document.getElementById('formJk').value = 'L';
+        document.getElementById('formKelas').value = '';
+        document.getElementById('formFotoHint').innerText = "Foto otomatis dikompresi agar hemat kuota Firestore.";
+      }
+      document.getElementById('formFotoFile').value = '';
+      document.getElementById('modalStudent').classList.remove('hidden');
+    }
+
+    function closeStudentModal() {
+      document.getElementById('modalStudent').classList.add('hidden');
+    }
+
+    async function handleSaveStudent(e) {
+      e.preventDefault();
+      const mode = document.getElementById('studentFormMode').value;
+      const oldNisn = document.getElementById('studentOldNisn').value;
+      const nisn = document.getElementById('formNisn').value.trim();
+      const nama = document.getElementById('formNama').value.trim();
+      const jk = document.getElementById('formJk').value;
+      const kelas = document.getElementById('formKelas').value.trim();
+      const fileInput = document.getElementById('formFotoFile');
+
+      let fotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop";
+      const existing = listSiswa.find(s => s.nisn === (mode === 'EDIT' ? oldNisn : nisn));
+      if (existing && existing.fotoUrl) fotoUrl = existing.fotoUrl;
+
+      if (fileInput.files && fileInput.files[0]) {
+        fotoUrl = await compressImageFile(fileInput.files[0]);
+      }
+
+      const studentData = { nisn, nama, jk, kelas, fotoUrl };
+
+      if (mode === 'ADD') {
+        if (listSiswa.some(s => s.nisn === nisn)) {
+          showNotice("NISN Duplikat", "NISN ini sudah terdaftar di sistem!", "warning");
+          return;
+        }
+        listSiswa.push(studentData);
+      } else {
+        const idx = listSiswa.findIndex(s => s.nisn === oldNisn);
+        if (idx !== -1) {
+          listSiswa[idx] = studentData;
+          if (oldNisn !== nisn) {
+            listAbsensi.forEach(a => {
+              if (a.nisn === oldNisn) {
+                a.nisn = nisn;
+                a.nama = nama;
+                a.kelas = kelas;
+              }
+            });
+          }
+        }
+      }
+
+      closeStudentModal();
+      populateClassDropdowns();
+      renderStudentsTable();
+      renderIdCardsForPrint();
+      updateDashboardStats();
+      generateRekapView();
+      showNotice("Data Disimpan", `Biodata siswa ${nama} berhasil disimpan!`, "success");
+
+      if (!IS_PREVIEW && db) {
+        try {
+          if (mode === 'EDIT' && oldNisn !== nisn) {
+            await db.collection("siswa").doc(oldNisn).delete();
+          }
+          await db.collection("siswa").doc(nisn).set(studentData);
+        } catch (err) {
+          console.error("Firestore save student error:", err);
+        }
+      }
+    }
+
+    function editStudent(nisn) {
+      openStudentModal('EDIT', nisn);
+    }
+
+    function confirmDeleteStudent(nisn) {
+      const s = listSiswa.find(i => i.nisn === nisn);
+      const studentName = s ? s.nama : nisn;
+      showConfirm("Hapus Siswa", `Hapus data siswa ${studentName} beserta seluruh riwayat presensinya?`, async () => {
+        listSiswa = listSiswa.filter(i => i.nisn !== nisn);
+        listAbsensi = listAbsensi.filter(a => a.nisn !== nisn);
+        populateClassDropdowns();
+        renderStudentsTable();
+        renderIdCardsForPrint();
+        updateDashboardStats();
+        generateRekapView();
+        showNotice("Siswa Dihapus", `Data ${studentName} telah dihapus.`, "info");
+
+        if (!IS_PREVIEW && db) {
+          try {
+            await db.collection("siswa").doc(nisn).delete();
+          } catch (e) {}
+        }
+      });
+    }
+
+    function exportStudentsToExcel() {
+      const wsData = [
+        ["NISN", "NAMA", "JENIS_KELAMIN", "KELAS", "FOTO_URL"],
+        ...listSiswa.map(s => [s.nisn, s.nama, s.jk, s.kelas, s.fotoUrl || ''])
+      ];
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(wb, ws, "MASTER_SISWA");
+      XLSX.writeFile(wb, "Format_Master_Siswa.xlsx");
+    }
+
+    function importStudentsFromExcel(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+          let added = 0;
+          const batch = db ? db.batch() : null;
+
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (row[0] && row[1]) {
+              const nisn = String(row[0]).trim();
+              const nama = String(row[1]).trim();
+              const jk = String(row[2] || 'L').toUpperCase().startsWith('P') ? 'P' : 'L';
+              const kelas = String(row[3] || 'Umum').trim();
+              const fotoUrl = String(row[4] || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop');
+
+              const existIdx = listSiswa.findIndex(s => s.nisn === nisn);
+              const sObj = { nisn, nama, jk, kelas, fotoUrl };
+
+              if (existIdx >= 0) {
+                listSiswa[existIdx] = { ...listSiswa[existIdx], ...sObj };
+              } else {
+                listSiswa.push(sObj);
+              }
+              if (!IS_PREVIEW && batch) {
+                batch.set(db.collection("siswa").doc(nisn), sObj);
+              }
+              added++;
+            }
+          }
+
+          if (!IS_PREVIEW && batch) await batch.commit();
+
+          populateClassDropdowns();
+          renderStudentsTable();
+          renderIdCardsForPrint();
+          updateDashboardStats();
+          generateRekapView();
+          showNotice("Impor Sukses", `Berhasil memproses ${added} siswa dari Excel!`, "success");
+        } catch (err) {
+          showNotice("Format Gagal", "Pastikan format berkas Excel sesuai template.", "warning");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    async function uploadPhotoZip(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      showNotice("Mengekstrak ZIP", "Membaca dan mengompresi foto siswa...", "info");
+
+      try {
+        const zip = await JSZip.loadAsync(file);
+        let matched = 0;
+        const batch = db ? db.batch() : null;
+
+        for (const relativePath of Object.keys(zip.files)) {
+          const zipEntry = zip.files[relativePath];
+          if (!zipEntry.dir) {
+            const fileName = zipEntry.name.split('/').pop();
+            const cleanNisn = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+            const target = listSiswa.find(s => String(s.nisn) === String(cleanNisn));
+
+            if (target) {
+              const b64 = await zipEntry.async("base64");
+              const mime = fileName.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+              const dataUrl = `data:${mime};base64,` + b64;
+              
+              const compressed = await compressBase64(dataUrl);
+              target.fotoUrl = compressed;
+              matched++;
+
+              if (!IS_PREVIEW && batch) {
+                batch.update(db.collection("siswa").doc(cleanNisn), { fotoUrl: compressed });
+              }
+            }
+          }
+        }
+
+        if (!IS_PREVIEW && batch) await batch.commit();
+
+        renderStudentsTable();
+        renderIdCardsForPrint();
+        showNotice("Sinkronisasi Selesai", `${matched} pas foto siswa berhasil disinkronkan!`, "success");
+      } catch (err) {
+        showNotice("Gagal Ekstrak", "Pastikan file ZIP berisi foto dengan penamaan NISN.", "warning");
+      }
+    }
+
+    function compressBase64(base64Str) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxW = 320;
+          const maxH = 400;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxW) {
+            h = Math.round((h * maxW) / w);
+            w = maxW;
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.75));
+        };
+        img.onerror = () => resolve(base64Str);
+        img.src = base64Str;
+      });
+    }
+
+    // ==========================================
+    // MODUL 3: KELOLA PRESENSI MANUAL
+    // ==========================================
+    function renderAttendanceManagementTable() {
+      const tglAwal = document.getElementById('filterAbsensiTglAwal')?.value;
+      const tglAkhir = document.getElementById('filterAbsensiTglAkhir')?.value;
+      const kelas = document.getElementById('filterAbsensiKelas')?.value || 'ALL';
+      const sesi = document.getElementById('filterAbsensiSesi')?.value || 'ALL';
+      const tbody = document.getElementById('attendanceManagementTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let filtered = listAbsensi;
+      if (tglAwal && tglAkhir) filtered = filtered.filter(a => a.tanggal >= tglAwal && a.tanggal <= tglAkhir);
+      if (kelas !== 'ALL') filtered = filtered.filter(a => a.kelas === kelas);
+      if (sesi !== 'ALL') filtered = filtered.filter(a => a.sesi === sesi);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 italic">Tidak ada riwayat presensi sesuai filter.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(rec => {
+        const tr = document.createElement('tr');
+        const badgeColor = rec.sesi === 'Pagi' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+        tr.innerHTML = `
+          <td class="p-3 font-mono text-[11px]">${rec.tanggal}</td>
+          <td class="p-3 font-mono text-[11px] font-bold text-slate-900">${rec.waktu}</td>
+          <td class="p-3 font-mono text-[11px]">${rec.nisn}</td>
+          <td class="p-3 font-semibold text-slate-800">${rec.nama}</td>
+          <td class="p-3 text-slate-600">${rec.kelas}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeColor}">${rec.sesi}</span></td>
+          <td class="p-3 text-[11px] text-slate-600">${rec.status}</td>
+          <td class="p-3 text-center space-x-1">
+            <button onclick="editAttendanceRecord('${rec.id}')" class="text-blue-600 hover:text-blue-800 p-1.5" title="Koreksi"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="confirmDeleteAttendanceRecord('${rec.id}')" class="text-rose-600 hover:text-rose-800 p-1.5" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function resetAttendanceFilter() {
+      const now = new Date();
+      const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      document.getElementById('filterAbsensiTglAwal').value = `${ym}-01`;
+      document.getElementById('filterAbsensiTglAkhir').value = getTodayISO();
+      document.getElementById('filterAbsensiKelas').value = 'ALL';
+      document.getElementById('filterAbsensiSesi').value = 'ALL';
+      renderAttendanceManagementTable();
+    }
+
+    function openAttendanceModal(mode = 'EDIT', recordId = '') {
+      document.getElementById('attFormMode').value = mode;
+      document.getElementById('attRecordId').value = recordId;
+      document.getElementById('modalAttendanceTitle').innerText = mode === 'EDIT' ? 'Koreksi Data Presensi' : 'Input Presensi Manual';
+
+      const sel = document.getElementById('attSelectSiswa');
+      sel.innerHTML = '';
+      listSiswa.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.nisn;
+        opt.innerText = `${s.nisn} - ${s.nama} (${s.kelas})`;
+        sel.appendChild(opt);
+      });
+
+      if (mode === 'EDIT') {
+        const rec = listAbsensi.find(a => a.id === recordId);
+        if (rec) {
+          sel.value = rec.nisn;
+          document.getElementById('attInputTanggal').value = rec.tanggal;
+          document.getElementById('attInputWaktu').value = rec.waktu;
+          document.getElementById('attSelectSesi').value = rec.sesi;
+          document.getElementById('attSelectStatus').value = rec.status;
+        }
+      } else {
+        const now = new Date();
+        document.getElementById('attInputTanggal').value = getTodayISO();
+        document.getElementById('attInputWaktu').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+        document.getElementById('attSelectSesi').value = detectSessionAuto();
+        document.getElementById('attSelectStatus').value = "Hadir Tepat Waktu";
+      }
+      document.getElementById('modalAttendance').classList.remove('hidden');
+    }
+
+    function closeAttendanceModal() {
+      document.getElementById('modalAttendance').classList.add('hidden');
+    }
+
+    async function handleSaveAttendance(e) {
+      e.preventDefault();
+      const mode = document.getElementById('attFormMode').value;
+      const recordId = document.getElementById('attRecordId').value;
+      const nisn = document.getElementById('attSelectSiswa').value;
+      const tanggal = document.getElementById('attInputTanggal').value;
+      const waktu = document.getElementById('attInputWaktu').value.trim();
+      const sesi = document.getElementById('attSelectSesi').value;
+      const status = document.getElementById('attSelectStatus').value;
+
+      const siswa = listSiswa.find(s => String(s.nisn) === String(nisn));
+      const nama = siswa ? siswa.nama : "Siswa";
+      const kelas = siswa ? siswa.kelas : "Umum";
+
+      const recordData = {
+        id: mode === 'EDIT' ? recordId : "ABS_" + Date.now(),
+        tanggal, waktu, nisn, nama, kelas, sesi, status
+      };
+
+      if (mode === 'EDIT') {
+        const idx = listAbsensi.findIndex(a => a.id === recordId);
+        if (idx !== -1) listAbsensi[idx] = recordData;
+      } else {
+        listAbsensi.unshift(recordData);
+      }
+
+      closeAttendanceModal();
+      renderAttendanceManagementTable();
+      renderTodayLogs();
+      updateDashboardStats();
+      generateRekapView();
+      showNotice("Presensi Tersimpan", `Presensi siswa ${nama} berhasil diperbarui.`, "success");
+
+      if (!IS_PREVIEW && db) {
+        try {
+          await db.collection("presensi").doc(recordData.id).set(recordData);
+        } catch (e) {}
+      }
+    }
+
+    function editAttendanceRecord(recordId) {
+      openAttendanceModal('EDIT', recordId);
+    }
+
+    function confirmDeleteAttendanceRecord(recordId) {
+      showConfirm("Hapus Presensi", "Apakah Anda yakin ingin menghapus data presensi ini?", async () => {
+        listAbsensi = listAbsensi.filter(a => a.id !== recordId);
+        renderAttendanceManagementTable();
+        renderTodayLogs();
+        updateDashboardStats();
+        generateRekapView();
+        showNotice("Presensi Dihapus", "Catatan presensi telah dihapus dari sistem.", "info");
+
+        if (!IS_PREVIEW && db) {
+          try {
+            await db.collection("presensi").doc(recordId).delete();
+          } catch (e) {}
+        }
+      });
+    }
+
+    // ==========================================
+    // MODUL 4: CETAK ID CARD (F4 3x3 - 9 KARTU)
+    // ==========================================
+    function renderIdCardsForPrint() {
+      const filterKelas = document.getElementById('filterCetakKelas')?.value || 'ALL';
+      const filterNisn = document.getElementById('filterCetakSiswa')?.value || 'ALL';
+      const container = document.getElementById('printArea');
+      if (!container) return;
+      container.innerHTML = '';
+
+      let filtered = listSiswa;
+      if (filterKelas !== 'ALL') filtered = filtered.filter(s => s.kelas === filterKelas);
+      if (filterNisn !== 'ALL') filtered = filtered.filter(s => String(s.nisn) === String(filterNisn));
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-slate-400 text-xs py-8 text-center w-full">Tidak ada kartu siswa yang dipilih.</p>`;
+        return;
+      }
+
+      const logoUrl = appConfig.logoUrl || "https://cdn-icons-png.flaticon.com/512/2856/2856000.png";
+      const schoolName = appConfig.namaSekolah || "SMK NEGERI DIGITAL NUSANTARA";
+      const alamat = appConfig.alamat || "Jl. Pendidikan Karakter No. 101";
+
+      const cardsPerPage = 9;
+      const totalPages = Math.ceil(filtered.length / cardsPerPage);
+      let cardGlobalIdx = 0;
+
+      for (let p = 0; p < totalPages; p++) {
+        const pageDiv = document.createElement('div');
+        pageDiv.className = 'id-card-page';
+        const batch = filtered.slice(p * cardsPerPage, (p + 1) * cardsPerPage);
+
+        batch.forEach(siswa => {
+          const cardDiv = document.createElement('div');
+          cardDiv.className = 'id-card-portrait';
+          const qrId = `qrcode-card-${cardGlobalIdx}`;
+
+          cardDiv.innerHTML = `
+            <!-- Kop Kartu -->
+            <div class="relative w-full pt-1.5 pb-1 px-2 flex items-center gap-1.5 border-b-[1.5px] border-[#09408f] bg-white overflow-hidden shrink-0 z-10">
+              <div class="absolute -right-4 -top-4 w-12 h-12 bg-amber-400/25 rounded-full blur-sm"></div>
+              <img src="${logoUrl}" alt="Logo" class="w-6 h-6 object-contain shrink-0 drop-shadow-sm">
+              <div class="flex-1 text-center pr-0.5">
+                <h4 class="text-[7.5px] font-black text-[#09408f] leading-tight uppercase tracking-tight truncate">${schoolName}</h4>
+                <p class="text-[5.5px] text-slate-600 leading-tight line-clamp-1">${alamat}</p>
+                <p class="text-[5px] text-amber-600 font-bold italic tracking-wide">Disiplin • Karakter • Berprestasi</p>
+              </div>
+            </div>
+
+            <!-- Banner Judul -->
+            <div class="bg-[#09408f] py-0.5 px-2 flex items-center justify-between text-white shadow-xs shrink-0 z-10">
+              <span class="text-[6.5px] font-black uppercase tracking-wider flex items-center gap-1">
+                <i class="fa-solid fa-id-badge text-[6.5px] text-amber-300"></i> KARTU ABSENSI DIGITAL
+              </span>
+              <span class="text-[5.5px] text-blue-200 uppercase tracking-widest font-mono font-bold">F4-ID</span>
+            </div>
+
+            <!-- Biodata & Pas Foto -->
+            <div class="px-2 pt-1 pb-0.5 flex items-center gap-2 shrink-0 z-10">
+              <div class="w-[17mm] h-[22mm] rounded-md border-[1.5px] border-[#09408f] overflow-hidden shrink-0 shadow-xs bg-slate-100 flex items-center justify-center">
+                <img src="${siswa.fotoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop'}" alt="${siswa.nama}" class="w-full h-full object-cover" crossorigin="anonymous" loading="lazy">
+              </div>
+              <div class="flex-1 space-y-0.5 text-slate-800">
+                <div>
+                  <p class="text-[5px] text-slate-500 uppercase font-bold tracking-wider leading-none">Nama Siswa :</p>
+                  <p class="text-[7.5px] font-black text-[#09408f] truncate leading-tight">${siswa.nama}</p>
+                </div>
+                <div>
+                  <p class="text-[5px] text-slate-500 uppercase font-bold tracking-wider leading-none">NISN :</p>
+                  <p class="text-[7px] font-black text-slate-900 tracking-wider font-mono leading-tight">${siswa.nisn}</p>
+                </div>
+                <div class="flex justify-between items-center pr-0.5">
+                  <div>
+                    <p class="text-[5px] text-slate-500 uppercase font-bold tracking-wider leading-none">L/P :</p>
+                    <p class="text-[6.5px] font-bold text-slate-800 leading-tight">${siswa.jk === 'L' ? 'Laki-laki' : 'Perempuan'}</p>
+                  </div>
+                  <div>
+                    <p class="text-[5px] text-slate-500 uppercase font-bold tracking-wider leading-none">Kelas :</p>
+                    <p class="text-[7px] font-bold text-[#09408f] leading-tight">${siswa.kelas}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- QR Code Box -->
+            <div class="flex flex-col items-center justify-center flex-1 py-0.5 z-10">
+              <div class="p-1 bg-white border-[1.2px] border-[#09408f] rounded-lg shadow-xs">
+                <div id="${qrId}" class="flex items-center justify-center w-[76px] h-[76px]"></div>
+              </div>
+              <div class="mt-0.5 px-2 py-0.5 bg-[#09408f] text-white rounded-full text-[5.5px] font-black tracking-wider flex items-center gap-1 shadow-xs">
+                <i class="fa-solid fa-expand text-[5px]"></i> SCAN PAGI & SIANG
+              </div>
+            </div>
+
+            <!-- Footer Slogan -->
+            <div class="w-full bg-[#09408f] text-white py-0.5 px-1 text-center relative border-t-[1.5px] border-amber-400 shrink-0 z-10">
+              <p class="text-[5.5px] italic text-amber-200 font-medium tracking-wide leading-tight">— Disiplin Membentuk Karakter & Masa Depan —</p>
+            </div>
+          `;
+
+          pageDiv.appendChild(cardDiv);
+
+          const targetNisn = String(siswa.nisn);
+          setTimeout(() => {
+            const qrEl = document.getElementById(qrId);
+            if (qrEl && typeof QRCode !== 'undefined') {
+              qrEl.innerHTML = '';
+              new QRCode(qrEl, {
+                text: targetNisn,
+                width: 76,
+                height: 76,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+              });
+            }
+          }, 60);
+
+          cardGlobalIdx++;
+        });
+
+        container.appendChild(pageDiv);
+      }
+    }
+
+    function printIdCards() {
+      window.print();
+    }
+
+    async function downloadIdCardsPDF() {
+      const container = document.getElementById('printArea');
+      const pages = container ? container.querySelectorAll('.id-card-page') : [];
+      if (!pages.length) {
+        showNotice("Peringatan", "Tidak ada kartu yang dapat diunduh.", "warning");
+        return;
+      }
+
+      showNotice("Menyiapkan PDF F4", "Memproses dan menyusun kartu per lembar F4 (215 x 330 mm)...", "info");
+
+      try {
+        const h2c = window.html2canvas || (typeof html2canvas === 'function' ? html2canvas : null);
+        const JsPdfConstructor = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : (typeof jsPDF === 'function' ? jsPDF : null);
+
+        if (h2c && JsPdfConstructor) {
+          const pdf = new JsPdfConstructor('p', 'mm', [215, 330]);
+
+          for (let i = 0; i < pages.length; i++) {
+            const pageEl = pages[i];
+            const origMargin = pageEl.style.margin;
+            const origShadow = pageEl.style.boxShadow;
+            const origRadius = pageEl.style.borderRadius;
+
+            pageEl.style.margin = '0 auto';
+            pageEl.style.boxShadow = 'none';
+            pageEl.style.borderRadius = '0';
+
+            const canvas = await h2c(pageEl, {
+              scale: 2.5,
+              useCORS: true,
+              allowTaint: false,
+              logging: false,
+              backgroundColor: '#ffffff',
+              scrollX: 0,
+              scrollY: 0
+            });
+
+            pageEl.style.margin = origMargin;
+            pageEl.style.boxShadow = origShadow;
+            pageEl.style.borderRadius = origRadius;
+
+            const imgData = canvas.toDataURL('image/jpeg', 0.96);
+            if (i > 0) {
+              pdf.addPage([215, 330], 'p');
+            }
+            pdf.addImage(imgData, 'JPEG', 0, 0, 215, 330, undefined, 'FAST');
+          }
+
+          pdf.save(`ID_Card_Presensi_F4_${getTodayISO()}.pdf`);
+          closeNoticeModal();
+          showNotice("Berhasil", "Berkas PDF ID Card ukuran F4 berhasil diunduh tanpa terpotong dan tanpa lembar kosong!", "success");
+          return;
+        }
+
+        if (typeof html2pdf !== 'undefined') {
+          const opt = {
+            margin: 0,
+            filename: `ID_Card_Presensi_F4_${getTodayISO()}.pdf`,
+            image: { type: 'jpeg', quality: 0.96 },
+            html2canvas: {
+              scale: 2.5,
+              useCORS: true,
+              allowTaint: false,
+              backgroundColor: '#ffffff',
+              scrollX: 0,
+              scrollY: 0
+            },
+            jsPDF: { unit: 'mm', format: [215, 330], orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'] }
+          };
+
+          await html2pdf().set(opt).from(container).save();
+          closeNoticeModal();
+          showNotice("Berhasil", "Berkas PDF ID Card ukuran F4 berhasil diunduh!", "success");
+          return;
+        }
+
+        throw new Error("Pustaka PDF tidak dapat dimuat.");
+      } catch (err) {
+        console.error("Error downloadIdCardsPDF:", err);
+        showNotice("Gagal Unduh", "Terjadi kendala saat merender PDF. Silakan gunakan tombol Cetak Langsung.", "warning");
+      }
+    }
+
+    // ==========================================
+    // MODUL 4B: DOWNLOAD QR CODE SISWA MANDIRI (PNG / ZIP)
+    // ==========================================
+    function renderQrCodeGrid() {
+      const filterKelas = document.getElementById('filterQrKelas')?.value || 'ALL';
+      const search = (document.getElementById('searchQrInput')?.value || '').toLowerCase().trim();
+      const container = document.getElementById('qrCodeGridContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      let filtered = listSiswa;
+      if (filterKelas !== 'ALL') filtered = filtered.filter(s => s.kelas === filterKelas);
+      if (search) filtered = filtered.filter(s => (s.nama && s.nama.toLowerCase().includes(search)) || (s.nisn && String(s.nisn).includes(search)));
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-xs italic">Tidak ada data siswa yang cocok.</div>`;
+        return;
+      }
+
+      filtered.forEach((siswa, index) => {
+        const qrContainerId = `qr-preview-box-${index}`;
+        const card = document.createElement('div');
+        card.className = "bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs flex flex-col items-center justify-between text-center space-y-2.5 transition hover:shadow-md";
+
+        card.innerHTML = `
+          <div class="w-full overflow-hidden">
+            <h4 class="font-bold text-xs text-slate-900 truncate" title="${siswa.nama}">${siswa.nama}</h4>
+            <p class="text-[10px] text-blue-600 font-mono font-semibold">${siswa.nisn} • ${siswa.kelas}</p>
+          </div>
+          
+          <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center">
+            <div id="${qrContainerId}" class="flex items-center justify-center"></div>
+          </div>
+
+          <button onclick="downloadSingleQrCode('${siswa.nisn}', '${siswa.nama.replace(/'/g, "\\'")}')" class="w-full py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-download text-[10px]"></i> Unduh PNG
+          </button>
+        `;
+
+        container.appendChild(card);
+
+        setTimeout(() => {
+          const el = document.getElementById(qrContainerId);
+          if (el && typeof QRCode !== 'undefined') {
+            el.innerHTML = '';
+            new QRCode(el, {
+              text: String(siswa.nisn),
+              width: 110,
+              height: 110,
+              colorDark: "#000000",
+              colorLight: "#ffffff",
+              correctLevel: QRCode.CorrectLevel.H
+            });
+          }
+        }, 50);
+      });
+    }
+
+    function generateQrCanvasWithLabel(nisn, nama) {
+      return new Promise((resolve) => {
+        const tempDiv = document.createElement('div');
+        new QRCode(tempDiv, {
+          text: String(nisn),
+          width: 300,
+          height: 300,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        setTimeout(() => {
+          const qrImg = tempDiv.querySelector('img') || tempDiv.querySelector('canvas');
+          if (!qrImg) {
+            resolve(null);
+            return;
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = 360;
+          canvas.height = 420;
+          const ctx = canvas.getContext('2d');
+
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          ctx.strokeStyle = "#e2e8f0";
+          ctx.lineWidth = 4;
+          ctx.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
+
+          ctx.drawImage(qrImg, 30, 25, 300, 300);
+
+          ctx.fillStyle = "#0f172a";
+          ctx.font = "bold 18px 'Inter', Arial, sans-serif";
+          ctx.textAlign = "center";
+          
+          let displayNama = nama;
+          if (displayNama.length > 24) displayNama = displayNama.substring(0, 22) + '...';
+          ctx.fillText(displayNama, 180, 358);
+
+          ctx.fillStyle = "#2563eb";
+          ctx.font = "bold 16px 'Courier New', monospace";
+          ctx.fillText(`NISN: ${nisn}`, 180, 388);
+
+          resolve(canvas);
+        }, 120);
+      });
+    }
+
+    async function downloadSingleQrCode(nisn, nama) {
+      const canvas = await generateQrCanvasWithLabel(nisn, nama);
+      if (!canvas) {
+        showNotice("Gagal", "Gagal memproses QR Code.", "warning");
+        return;
+      }
+
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = `QR_${nisn}_${nama.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+      a.click();
+    }
+
+    async function downloadAllQrAsZip() {
+      const filterKelas = document.getElementById('filterQrKelas')?.value || 'ALL';
+      let targetSiswa = listSiswa;
+      if (filterKelas !== 'ALL') targetSiswa = targetSiswa.filter(s => s.kelas === filterKelas);
+
+      if (targetSiswa.length === 0) {
+        showNotice("Peringatan", "Tidak ada data siswa untuk diunduh.", "warning");
+        return;
+      }
+
+      const btn = document.getElementById('btnDownloadAllZip');
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-rotate animate-spin"></i> Mengemas ${targetSiswa.length} QR...`;
+
+      showNotice("Menyiapkan ZIP", `Sedang memproses ${targetSiswa.length} QR Code siswa...`, "info");
+
+      try {
+        const zip = new JSZip();
+        const folder = zip.folder(`QR_Siswa_${filterKelas === 'ALL' ? 'Semua_Kelas' : filterKelas}`);
+
+        for (let i = 0; i < targetSiswa.length; i++) {
+          const s = targetSiswa[i];
+          const canvas = await generateQrCanvasWithLabel(s.nisn, s.nama);
+          if (canvas) {
+            const dataUrl = canvas.toDataURL('image/png');
+            const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "");
+            const fileName = `${String(s.nisn).padStart(4, '0')}_${s.nama.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+            folder.file(fileName, base64Data, { base64: true });
+          }
+        }
+
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(zipBlob);
+        a.download = `Arsip_QR_Siswa_${filterKelas}_${getTodayISO()}.zip`;
+        a.click();
+
+        closeNoticeModal();
+        showNotice("Berhasil", `Arsip ZIP ${targetSiswa.length} QR Code berhasil diunduh!`, "success");
+      } catch (err) {
+        console.error("Error generating ZIP:", err);
+        showNotice("Gagal Unduh ZIP", "Terjadi kendala saat mengemas QR Code ke file ZIP.", "warning");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+
+    // ==========================================
+    // MODUL 5: KALENDER HEB (HARI EFEKTIF BELAJAR)
+    // ==========================================
+    function getSemesterMonths() {
+      const sem = document.getElementById('hebSelectSemester')?.value || 'ganjil';
+      const curYear = new Date().getFullYear();
+      if (sem === 'ganjil') {
+        return [
+          { monthIdx: 6, year: curYear, name: "Juli" },
+          { monthIdx: 7, year: curYear, name: "Agustus" },
+          { monthIdx: 8, year: curYear, name: "September" },
+          { monthIdx: 9, year: curYear, name: "Oktober" },
+          { monthIdx: 10, year: curYear, name: "November" },
+          { monthIdx: 11, year: curYear, name: "Desember" }
+        ];
+      } else {
+        return [
+          { monthIdx: 0, year: curYear, name: "Januari" },
+          { monthIdx: 1, year: curYear, name: "Februari" },
+          { monthIdx: 2, year: curYear, name: "Maret" },
+          { monthIdx: 3, year: curYear, name: "April" },
+          { monthIdx: 4, year: curYear, name: "Mei" },
+          { monthIdx: 5, year: curYear, name: "Juni" }
+        ];
+      }
+    }
+
+    function initDefaultCalendarHeb() {
+      const semesterMonths = getSemesterMonths();
+      const workdays = parseInt(appConfig.sistemHariSekolah || "5");
+
+      semesterMonths.forEach(mObj => {
+        const { monthIdx, year } = mObj;
+        const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+        for (let day = 1; day <= daysInMonth; day++) {
+          const mStr = String(monthIdx + 1).padStart(2, '0');
+          const dStr = String(day).padStart(2, '0');
+          const dateKey = `${year}-${mStr}-${dStr}`;
+          const dayOfWeek = new Date(year, monthIdx, day).getDay();
+
+          if (kalenderHebData[dateKey] === undefined) {
+            kalenderHebData[dateKey] = workdays === 6 ? (dayOfWeek !== 0) : (dayOfWeek !== 0 && dayOfWeek !== 6);
+          }
+        }
+      });
+      renderSemesterCalendar();
+    }
+
+    function renderSemesterCalendar() {
+      const container = document.getElementById('hebCalendarGrid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const semesterMonths = getSemesterMonths();
+      let totalHebSemester = 0;
+      let totalLiburSemester = 0;
+
+      semesterMonths.forEach(mObj => {
+        const { monthIdx, year, name } = mObj;
+        const firstDayIndex = new Date(year, monthIdx, 1).getDay();
+        const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+
+        let monthHebCount = 0;
+        let daysHtml = '';
+
+        for (let b = 0; b < firstDayIndex; b++) daysHtml += `<div></div>`;
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const mStr = String(monthIdx + 1).padStart(2, '0');
+          const dStr = String(d).padStart(2, '0');
+          const dateKey = `${year}-${mStr}-${dStr}`;
+          const isHeb = kalenderHebData[dateKey] === true;
+
+          if (isHeb) {
+            monthHebCount++;
+            totalHebSemester++;
+          } else {
+            totalLiburSemester++;
+          }
+
+          const btnBg = isHeb ? 'bg-emerald-600 hover:bg-emerald-500 text-white font-bold' : 'bg-slate-100 hover:bg-slate-200 text-slate-400 font-medium';
+          daysHtml += `
+            <button type="button" onclick="toggleDateHeb('${dateKey}')" class="h-7 w-full rounded text-[11px] flex items-center justify-center transition ${btnBg}">
+              ${d}
+            </button>
+          `;
+        }
+
+        const card = document.createElement('div');
+        card.className = "bg-white border border-slate-200 rounded-xl p-3 shadow-xs text-xs";
+        card.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+            <span class="font-bold text-slate-900 text-xs">${name} ${year}</span>
+            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[10px] font-bold">${monthHebCount} Hari Efektif</span>
+          </div>
+          <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-slate-400 font-bold mb-1">
+            <span class="text-rose-500">Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+          </div>
+          <div class="grid grid-cols-7 gap-1">${daysHtml}</div>
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById('hebTotalHariBadge').innerText = `${totalHebSemester} Hari`;
+      document.getElementById('hebTotalSesiBadge').innerText = `${totalHebSemester * 2} Sesi`;
+      document.getElementById('hebTotalLiburBadge').innerText = `${totalLiburSemester} Hari`;
+    }
+
+    function toggleDateHeb(dateKey) {
+      kalenderHebData[dateKey] = !kalenderHebData[dateKey];
+      renderSemesterCalendar();
+      generateRekapView();
+    }
+
+    function onHebSemesterChange() {
+      initDefaultCalendarHeb();
+    }
+
+    function applyCalendarWeeklyPattern(workdaysCount) {
+      const semesterMonths = getSemesterMonths();
+      semesterMonths.forEach(mObj => {
+        const { monthIdx, year } = mObj;
+        const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+        for (let day = 1; day <= daysInMonth; day++) {
+          const mStr = String(monthIdx + 1).padStart(2, '0');
+          const dStr = String(day).padStart(2, '0');
+          const dateKey = `${year}-${mStr}-${dStr}`;
+          const dayOfWeek = new Date(year, monthIdx, day).getDay();
+          kalenderHebData[dateKey] = workdaysCount === 6 ? (dayOfWeek !== 0) : (dayOfWeek !== 0 && dayOfWeek !== 6);
+        }
+      });
+      renderSemesterCalendar();
+      generateRekapView();
+      showNotice("Pola Belajar Diterapkan", `Pola ${workdaysCount} hari sekolah berhasil disimpan.`, "success");
+    }
+
+    async function saveKalenderHebToDatabase() {
+      const sem = document.getElementById('hebSelectSemester')?.value || 'ganjil';
+      const curYear = new Date().getFullYear();
+      const semKey = `${curYear}_${sem}`;
+
+      if (!IS_PREVIEW && db) {
+        try {
+          await db.collection("kalender_heb").doc(semKey).set({
+            semKey,
+            dates: kalenderHebData,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          showNotice("Tersimpan", "Pengaturan kalender HEB tersimpan ke Cloud Firestore.", "success");
+        } catch (e) {
+          showNotice("Gagal Simpan", e.message, "warning");
+        }
+      } else {
+        showNotice("Tersimpan (Preview)", "Pengaturan kalender HEB tersimpan pada sesi ini.", "success");
+      }
+    }
+
+    function countHebFromCalendar(startDateStr, endDateStr) {
+      if (!startDateStr || !endDateStr) return 1;
+      let cur = new Date(startDateStr + 'T00:00:00');
+      const end = new Date(endDateStr + 'T00:00:00');
+      if (cur > end) return 1;
+
+      let count = 0;
+      while (cur <= end) {
+        const y = cur.getFullYear();
+        const m = String(cur.getMonth() + 1).padStart(2, '0');
+        const d = String(cur.getDate()).padStart(2, '0');
+        const dateKey = `${y}-${m}-${d}`;
+        if (kalenderHebData[dateKey] === true) count++;
+        cur.setDate(cur.getDate() + 1);
+      }
+      return Math.max(1, count);
+    }
+
+    // ==========================================
+    // MODUL 6: REKAPITULASI LAPORAN (PDF/EXCEL)
+    // ==========================================
+    function formatIndoDate(dateStr) {
+      if (!dateStr) return "--";
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      const d = new Date(parts[0], parseInt(parts[1]) - 1, parts[2]);
+      const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
+      const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function formatTitimangsaDate(dateStr) {
+      if (!dateStr) return "--";
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      const d = new Date(parts[0], parseInt(parts[1]) - 1, parts[2]);
+      const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function initRekapDefaultDates() {
+      const now = new Date();
+      const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const today = getTodayISO();
+
+      document.getElementById('rekapTglAwal').value = `${ym}-01`;
+      document.getElementById('rekapTglAkhir').value = today;
+      document.getElementById('rekapInputTglTtd').value = today;
+      document.getElementById('rekapInputKota').value = appConfig.kota || "Cianjur";
+
+      document.getElementById('filterAbsensiTglAwal').value = `${ym}-01`;
+      document.getElementById('filterAbsensiTglAkhir').value = today;
+    }
+
+    function adjustRekapFields() {
+      const periode = document.getElementById('rekapPeriode').value;
+      const today = new Date();
+      let start = new Date();
+
+      if (periode === 'harian') start = today;
+      else if (periode === 'mingguan') start.setDate(today.getDate() - 7);
+      else if (periode === 'bulanan') start.setMonth(today.getMonth() - 1);
+      else if (periode === 'semester') start.setMonth(today.getMonth() - 6);
+      else if (periode === 'tahunan') start.setFullYear(today.getFullYear() - 1);
+
+      document.getElementById('rekapTglAwal').value = start.toISOString().split('T')[0];
+      document.getElementById('rekapTglAkhir').value = today.toISOString().split('T')[0];
+      generateRekapView();
+    }
+
+    function getDayKey(dateStr) {
+      if (!dateStr) return "senin";
+      const d = new Date(dateStr + 'T00:00:00');
+      const day = d.getDay();
+      if (day === 1) return "senin";
+      if (day === 2) return "selasa";
+      if (day === 3) return "rabu";
+      if (day === 4) return "kamis";
+      if (day === 5) return "jumat";
+      return "senin";
+    }
+
+    function updateSignatureDisplay() {
+      const inputTgl = document.getElementById('rekapInputTglTtd')?.value || getTodayISO();
+      const inputKota = document.getElementById('rekapInputKota')?.value || appConfig.kota || "Cianjur";
+      const selPiket = document.getElementById('rekapSelectPetugasPiket')?.value || "AUTO";
+
+      let piketKey = selPiket === "AUTO" ? getDayKey(inputTgl) : selPiket;
+      const piketObj = appConfig.jadwalPiket[piketKey] || appConfig.jadwalPiket.senin;
+
+      document.getElementById('ttdJabatanPiket').innerText = "Guru Piket";
+      document.getElementById('ttdNamaPiket').innerText = piketObj.nama || "Petugas Piket";
+      document.getElementById('ttdNipPiket').innerText = piketObj.nip ? `NIP: ${piketObj.nip}` : "NIP: -";
+
+      document.getElementById('ttdKotaTanggal').innerText = `${inputKota}, ${formatTitimangsaDate(inputTgl)}`;
+      document.getElementById('ttdNamaKepsek').innerText = appConfig.namaKepsek || "Nama Kepala Sekolah";
+      document.getElementById('ttdNipKepsek').innerText = appConfig.nipKepsek ? `NIP: ${appConfig.nipKepsek}` : "NIP: -";
+    }
+
+    function generateRekapView() {
+      const tglAwal = document.getElementById('rekapTglAwal').value;
+      const tglAkhir = document.getElementById('rekapTglAkhir').value;
+      const kelas = document.getElementById('rekapKelas').value;
+      const periode = document.getElementById('rekapPeriode').value;
+
+      const isSingleDay = (tglAwal === tglAkhir);
+      const strTanggalHeader = isSingleDay ? formatIndoDate(tglAwal) : `${formatIndoDate(tglAwal)} s/d ${formatIndoDate(tglAkhir)}`;
+
+      document.getElementById('rekapInfoTanggal').innerHTML = `<i class="fa-solid fa-calendar-day text-blue-600 mr-1"></i> Tanggal: <strong>${strTanggalHeader}</strong>`;
+      document.getElementById('rekapInfoKelas').innerHTML = `<i class="fa-solid fa-users text-blue-600 mr-1"></i> Kelas: <strong>${kelas === 'ALL' ? 'Semua Kelas' : kelas}</strong>`;
+      document.getElementById('rekapSubJudul').innerText = `Periode: ${periode.toUpperCase()} (${tglAwal} s/d ${tglAkhir})`;
+
+      updateSignatureDisplay();
+
+      const totalHariEfektif = isSingleDay ? 1 : Math.max(1, countHebFromCalendar(tglAwal, tglAkhir));
+      const targetSesiPerSiswa = totalHariEfektif * 2;
+
+      document.getElementById('rekapInfoHeb').innerHTML = `<i class="fa-solid fa-business-time text-emerald-600 mr-1"></i> Hari Efektif: <strong>${totalHariEfektif} Hari (${targetSesiPerSiswa} Sesi)</strong>`;
+
+      const filteredSiswa = kelas === 'ALL' ? listSiswa : listSiswa.filter(s => s.kelas === kelas);
+      const tbody = document.getElementById('rekapTableBody');
+      tbody.innerHTML = '';
+
+      if (filteredSiswa.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500 border border-slate-900 italic">Tidak ada data siswa untuk kelas ini.</td></tr>`;
+        return;
+      }
+
+      let grandTotalHadirPagi = 0;
+      let grandTotalHadirSiang = 0;
+      let totalPercentageSum = 0;
+
+      filteredSiswa.forEach((siswa, idx) => {
+        const studentAbsensi = listAbsensi.filter(a => {
+          const matchStudent = String(a.nisn) === String(siswa.nisn);
+          const matchDate = (a.tanggal >= tglAwal && a.tanggal <= tglAkhir);
+          return matchStudent && matchDate;
+        });
+
+        const logPagi = studentAbsensi.filter(a => a.sesi === 'Pagi');
+        const logSiang = studentAbsensi.filter(a => a.sesi === 'Siang');
+
+        const totalPagi = logPagi.length;
+        const totalSiang = logSiang.length;
+
+        grandTotalHadirPagi += totalPagi;
+        grandTotalHadirSiang += totalSiang;
+
+        const totalSesiHadir = totalPagi + totalSiang;
+        let percentage = Math.min(100, Math.round((totalSesiHadir / targetSesiPerSiswa) * 100));
+        totalPercentageSum += percentage;
+
+        let displayPagi = isSingleDay
+          ? (totalPagi > 0 ? `<span class="text-blue-700 font-bold"><i class="fa-solid fa-check"></i> ${logPagi[0].waktu}</span>` : `<span class="text-slate-400">-</span>`)
+          : (totalPagi > 0 ? `<span class="text-blue-700 font-bold">${totalPagi} Hadir</span>` : `<span class="text-slate-400">0</span>`);
+
+        let displaySiang = isSingleDay
+          ? (totalSiang > 0 ? `<span class="text-emerald-700 font-bold"><i class="fa-solid fa-check"></i> ${logSiang[0].waktu}</span>` : `<span class="text-slate-400">-</span>`)
+          : (totalSiang > 0 ? `<span class="text-indigo-700 font-bold">${totalSiang} Hadir</span>` : `<span class="text-slate-400">0</span>`);
+
+        const dateColText = isSingleDay
+          ? tglAwal.split('-').reverse().join('/')
+          : `${tglAwal.slice(5).replace('-', '/')} - ${tglAkhir.slice(5).replace('-', '/')}`;
+
+        const tr = document.createElement('tr');
+        tr.className = idx % 2 === 0 ? "bg-white" : "bg-slate-50";
+        tr.innerHTML = `
+          <td class="border border-slate-900 py-1.5 px-1 text-center font-semibold">${idx + 1}</td>
+          <td class="border border-slate-900 py-1.5 px-1 text-center font-mono text-[10px] whitespace-nowrap">${dateColText}</td>
+          <td class="border border-slate-900 py-1.5 px-1 text-center font-mono font-bold text-[11px]">${siswa.nisn}</td>
+          <td class="border border-slate-900 py-1.5 px-2 font-medium truncate" title="${siswa.nama}">${siswa.nama}</td>
+          <td class="border border-slate-900 py-1.5 px-1 text-center text-[11px]">${siswa.kelas}</td>
+          <td class="border border-slate-900 py-1.5 px-1 text-center text-[11px]">${displayPagi}</td>
+          <td class="border border-slate-900 py-1.5 px-1 text-center text-[11px]">${displaySiang}</td>
+          <td class="border border-slate-900 py-1.5 px-1 text-center font-bold text-[11px] ${percentage >= 75 ? 'text-emerald-700' : 'text-amber-700'}">${percentage}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const avgPercentage = filteredSiswa.length > 0 ? Math.round(totalPercentageSum / filteredSiswa.length) : 0;
+      const trTotal = document.createElement('tr');
+      trTotal.className = "bg-slate-100 font-bold text-slate-900 border-t-2 border-slate-900";
+      trTotal.innerHTML = `
+        <td colspan="5" class="border border-slate-900 py-2 px-2 text-center uppercase tracking-wider font-bold">
+          TOTAL KESELURUHAN HADIR (${filteredSiswa.length} SISWA)
+        </td>
+        <td class="border border-slate-900 py-2 px-1 text-center text-blue-800 font-extrabold text-[11px]">${grandTotalHadirPagi} Hadir</td>
+        <td class="border border-slate-900 py-2 px-1 text-center text-indigo-800 font-extrabold text-[11px]">${grandTotalHadirSiang} Hadir</td>
+        <td class="border border-slate-900 py-2 px-1 text-center text-emerald-800 font-black text-[11px]">${avgPercentage}%</td>
+      `;
+      tbody.appendChild(trTotal);
+    }
+
+    function exportRekapToExcel() {
+      const tglAwal = document.getElementById('rekapTglAwal').value;
+      const tglAkhir = document.getElementById('rekapTglAkhir').value;
+      const kelas = document.getElementById('rekapKelas').value;
+      const periode = document.getElementById('rekapPeriode').value;
+
+      const filteredSiswa = kelas === 'ALL' ? listSiswa : listSiswa.filter(s => s.kelas === kelas);
+      const isSingleDay = (tglAwal === tglAkhir);
+      const totalHariEfektif = isSingleDay ? 1 : Math.max(1, countHebFromCalendar(tglAwal, tglAkhir));
+      const targetSesiPerSiswa = totalHariEfektif * 2;
+
+      const rowsData = [
+        ["LAPORAN REKAPITULASI PRESENSI SISWA DIGITAL"],
+        [appConfig.namaSekolah],
+        [`Periode: ${periode.toUpperCase()} (${tglAwal} s/d ${tglAkhir})`],
+        [`Kelas: ${kelas === 'ALL' ? 'Semua Kelas' : kelas} | Hari Efektif: ${totalHariEfektif} Hari (${targetSesiPerSiswa} Sesi)`],
+        [],
+        ["NO", "NISN", "NAMA SISWA", "KELAS", "HADIR PAGI", "HADIR SIANG", "TOTAL HADIR", "TARGET SESI", "PERSENTASE"]
+      ];
+
+      filteredSiswa.forEach((siswa, idx) => {
+        const studentAbsensi = listAbsensi.filter(a => String(a.nisn) === String(siswa.nisn) && (a.tanggal >= tglAwal && a.tanggal <= tglAkhir));
+        const totalPagi = studentAbsensi.filter(a => a.sesi === 'Pagi').length;
+        const totalSiang = studentAbsensi.filter(a => a.sesi === 'Siang').length;
+        const totalHadir = totalPagi + totalSiang;
+        const percentage = Math.min(100, Math.round((totalHadir / targetSesiPerSiswa) * 100));
+
+        rowsData.push([
+          idx + 1, siswa.nisn, siswa.nama, siswa.kelas, totalPagi, totalSiang, totalHadir, targetSesiPerSiswa, `${percentage}%`
+        ]);
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(rowsData);
+      XLSX.utils.book_append_sheet(wb, ws, "REKAP_PRESENSI");
+      XLSX.writeFile(wb, `Rekap_Presensi_${kelas}_${tglAwal}_sd_${tglAkhir}.xlsx`);
+      showNotice("Excel Berhasil Diekspor", "File laporan presensi Excel (.xlsx) siap dicetak!", "success");
+    }
+
+    function printRekapSheet() {
+      const targetEl = document.getElementById('rekapSheetWrapper');
+      if (!targetEl) return;
+
+      const printFrame = document.createElement('iframe');
+      printFrame.style.position = 'fixed';
+      printFrame.style.right = '0';
+      printFrame.style.bottom = '0';
+      printFrame.style.width = '0';
+      printFrame.style.height = '0';
+      printFrame.style.border = '0';
+      document.body.appendChild(printFrame);
+
+      const frameDoc = printFrame.contentWindow.document;
+      frameDoc.open();
+      frameDoc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8"/>
+          <title>Cetak Laporan Rekapitulasi</title>
+          <style>
+            @page { size: A4 portrait; margin: 8mm 8mm; }
+            body { margin: 0; padding: 0; background: #ffffff; color: #000000; font-family: Arial, sans-serif; }
+            table { width: 100% !important; border-collapse: collapse !important; font-size: 11px; table-layout: fixed !important; }
+            th, td { border: 1px solid #000 !important; padding: 4px; word-break: break-word; }
+            tr { page-break-inside: avoid !important; }
+            thead { display: table-header-group !important; }
+            .signature-block { page-break-inside: avoid !important; break-inside: avoid !important; }
+          </style>
+        </head>
+        <body>
+          <div style="min-height: auto !important; height: auto !important;">${targetEl.innerHTML}</div>
+        </body>
+        </html>
+      `);
+      frameDoc.close();
+
+      setTimeout(() => {
+        printFrame.contentWindow.focus();
+        printFrame.contentWindow.print();
+        setTimeout(() => document.body.removeChild(printFrame), 1000);
+      }, 300);
+    }
+
+    function downloadRekapPDF() {
+      const element = document.getElementById('rekapSheetWrapper');
+      if (!element) return;
+      const periode = document.getElementById('rekapPeriode').value;
+      const tglAwal = document.getElementById('rekapTglAwal').value;
+      const tglAkhir = document.getElementById('rekapTglAkhir').value;
+      const kelas = document.getElementById('rekapKelas').value;
+
+      showNotice("Menyiapkan Rekap PDF", "Sedang mengonversi lembar laporan ke berkas PDF...", "info");
+
+      const clone = element.cloneNode(true);
+      clone.style.boxShadow = 'none';
+      clone.style.margin = '0';
+      clone.style.minHeight = 'auto';
+      clone.style.height = 'auto';
+      clone.style.width = '100%';
+      clone.style.maxWidth = '194mm';
+      clone.style.boxSizing = 'border-box';
+      clone.style.padding = '0';
+
+      const tempWrapper = document.createElement('div');
+      tempWrapper.style.position = 'fixed';
+      tempWrapper.style.top = '-99999px';
+      tempWrapper.style.left = '0';
+      tempWrapper.style.width = '194mm';
+      tempWrapper.style.boxSizing = 'border-box';
+      tempWrapper.style.backgroundColor = '#ffffff';
+      tempWrapper.appendChild(clone);
+      document.body.appendChild(tempWrapper);
+
+      const opt = {
+        margin: [8, 8, 8, 8],
+        filename: `Laporan_Rekap_Presensi_${kelas}_${periode}_${tglAwal}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2.5,
+          useCORS: true,
+          scrollY: 0,
+          scrollX: 0,
+          backgroundColor: '#ffffff'
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+
+      html2pdf().set(opt).from(clone).save().then(() => {
+        if (document.body.contains(tempWrapper)) document.body.removeChild(tempWrapper);
+        showNotice("Berhasil", "Laporan Rekapitulasi PDF berhasil diunduh secara penuh tanpa terpotong!", "success");
+      }).catch(() => {
+        if (document.body.contains(tempWrapper)) document.body.removeChild(tempWrapper);
+        showNotice("Gagal Unduh", "Terjadi kendala saat merender PDF rekap.", "warning");
+      });
+    }
+
+    // ==========================================
+    // MODUL 7: PENGATURAN IDENTITAS SEKOLAH & PIKET
+    // ==========================================
+    function applySchoolIdentityUI() {
+      const logoUrl = appConfig.logoUrl || "https://cdn-icons-png.flaticon.com/512/2856/2856000.png";
+      document.getElementById('sidebarLogo').src = logoUrl;
+      document.getElementById('topbarLogo').src = logoUrl;
+      document.getElementById('sidebarSchoolName').innerText = appConfig.namaSekolah;
+      document.getElementById('sidebarSchoolNpsn').innerText = `NPSN: ${appConfig.npsn}`;
+      document.getElementById('topbarSchoolName').innerText = appConfig.namaSekolah;
+      document.getElementById('topbarSchoolNpsn').innerText = `NPSN: ${appConfig.npsn} • Presensi Digital Realtime`;
+
+      document.getElementById('rekapKopLogo').src = logoUrl;
+      document.getElementById('rekapKopNama').innerText = appConfig.namaSekolah;
+      document.getElementById('rekapKopAlamat').innerText = appConfig.alamat;
+      document.getElementById('rekapKopNpsn').innerText = `NPSN: ${appConfig.npsn} • E-Presensi Siswa Berbasis Cloud Serverless`;
+
+      updatePiketBannerToday();
+      updateSignatureDisplay();
+    }
+
+    function updatePiketBannerToday() {
+      const todayKey = getDayKey(getTodayISO());
+      const piket = appConfig.jadwalPiket[todayKey] || appConfig.jadwalPiket.senin;
+
+      document.getElementById('badgeHariPiket').innerText = todayKey.toUpperCase();
+      document.getElementById('namaPiketHariIni').innerText = piket.nama || "Petugas Piket";
+      document.getElementById('nipPiketHariIni').innerText = piket.nip ? `NIP: ${piket.nip}` : "NIP: -";
+    }
+
+    function populateSettingsForm() {
+      document.getElementById('cfgNamaSekolah').value = appConfig.namaSekolah;
+      document.getElementById('cfgNpsn').value = appConfig.npsn;
+      document.getElementById('cfgKota').value = appConfig.kota;
+      document.getElementById('cfgAlamat').value = appConfig.alamat;
+      document.getElementById('cfgNamaKepsek').value = appConfig.namaKepsek;
+      document.getElementById('cfgNipKepsek').value = appConfig.nipKepsek;
+      document.getElementById('cfgLogoPreview').src = appConfig.logoUrl || "https://cdn-icons-png.flaticon.com/512/2856/2856000.png";
+
+      document.getElementById('piketSeninNama').value = appConfig.jadwalPiket.senin?.nama || '';
+      document.getElementById('piketSeninNip').value = appConfig.jadwalPiket.senin?.nip || '';
+      document.getElementById('piketSelasaNama').value = appConfig.jadwalPiket.selasa?.nama || '';
+      document.getElementById('piketSelasaNip').value = appConfig.jadwalPiket.selasa?.nip || '';
+      document.getElementById('piketRabuNama').value = appConfig.jadwalPiket.rabu?.nama || '';
+      document.getElementById('piketRabuNip').value = appConfig.jadwalPiket.rabu?.nip || '';
+      document.getElementById('piketKamisNama').value = appConfig.jadwalPiket.kamis?.nama || '';
+      document.getElementById('piketKamisNip').value = appConfig.jadwalPiket.kamis?.nip || '';
+      document.getElementById('piketJumatNama').value = appConfig.jadwalPiket.jumat?.nama || '';
+      document.getElementById('piketJumatNip').value = appConfig.jadwalPiket.jumat?.nip || '';
+    }
+
+    async function previewSchoolLogo(e) {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        const compressed = await compressImageFile(file, 200, 200, 0.85);
+        document.getElementById('cfgLogoPreview').src = compressed;
+        appConfig.logoUrl = compressed;
+      }
+    }
+
+    async function saveSchoolIdentity(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSaveSchoolIdentity');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-rotate animate-spin mr-1"></i> Menyimpan...`;
+
+      appConfig.namaSekolah = document.getElementById('cfgNamaSekolah').value.trim();
+      appConfig.npsn = document.getElementById('cfgNpsn').value.trim();
+      appConfig.kota = document.getElementById('cfgKota').value.trim();
+      appConfig.alamat = document.getElementById('cfgAlamat').value.trim();
+      appConfig.namaKepsek = document.getElementById('cfgNamaKepsek').value.trim();
+      appConfig.nipKepsek = document.getElementById('cfgNipKepsek').value.trim();
+
+      applySchoolIdentityUI();
+      renderIdCardsForPrint();
+
+      if (!IS_PREVIEW && db) {
+        try {
+          await db.collection("pengaturan").doc("sekolah_config").set(appConfig);
+        } catch (err) {
+          console.error("Save config error:", err);
+        }
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Identitas Sekolah`;
+      showNotice("Tersimpan", "Identitas instansi sekolah berhasil diperbarui!", "success");
+    }
+
+    async function saveJadwalPiket(e) {
+      e.preventDefault();
+      appConfig.jadwalPiket.senin = { nama: document.getElementById('piketSeninNama').value.trim(), nip: document.getElementById('piketSeninNip').value.trim() };
+      appConfig.jadwalPiket.selasa = { nama: document.getElementById('piketSelasaNama').value.trim(), nip: document.getElementById('piketSelasaNip').value.trim() };
+      appConfig.jadwalPiket.rabu = { nama: document.getElementById('piketRabuNama').value.trim(), nip: document.getElementById('piketRabuNip').value.trim() };
+      appConfig.jadwalPiket.kamis = { nama: document.getElementById('piketKamisNama').value.trim(), nip: document.getElementById('piketKamisNip').value.trim() };
+      appConfig.jadwalPiket.jumat = { nama: document.getElementById('piketJumatNama').value.trim(), nip: document.getElementById('piketJumatNip').value.trim() };
+
+      updatePiketBannerToday();
+      updateSignatureDisplay();
+
+      if (!IS_PREVIEW && db) {
+        try {
+          await db.collection("pengaturan").doc("sekolah_config").set(appConfig);
+        } catch (err) {}
+      }
+
+      showNotice("Piket Disimpan", "Jadwal guru piket presensi berhasil disimpan!", "success");
+    }
+
+    function populateClassDropdowns() {
+      const classes = Array.from(new Set(listSiswa.map(s => s.kelas))).filter(Boolean).sort();
+      const dropdowns = ['filterStudentKelas', 'filterCetakKelas', 'filterQrKelas', 'rekapKelas', 'filterAbsensiKelas'];
+
+      dropdowns.forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        const cur = sel.value;
+        sel.innerHTML = '<option value="ALL">Semua Kelas</option>';
+        classes.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.innerText = c;
+          sel.appendChild(opt);
+        });
+        if (cur && classes.includes(cur)) sel.value = cur;
+      });
+
+      const cetakSiswaSel = document.getElementById('filterCetakSiswa');
+      if (cetakSiswaSel) {
+        const cur = cetakSiswaSel.value || 'ALL';
+        cetakSiswaSel.innerHTML = '<option value="ALL">Semua Siswa (Cetak Semua)</option>';
+        listSiswa.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = String(s.nisn);
+          opt.innerText = `${s.nisn} - ${s.nama}`;
+          cetakSiswaSel.appendChild(opt);
+        });
+        cetakSiswaSel.value = cur;
+      }
+    }
+
+    // ==========================================
+    // PWA & SERVICE WORKER (DYNAMIC BLOB)
+    // ==========================================
+    function initPwa() {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const btn = document.getElementById('btnInstallPwa');
+        if (btn) btn.classList.remove('hidden');
+      });
+
+      if ('serviceWorker' in navigator) {
+        try {
+          const swCode = `
+            self.addEventListener('install', e => self.skipWaiting());
+            self.addEventListener('activate', e => self.clients.claim());
+            self.addEventListener('fetch', e => {});
+          `;
+          const blob = new Blob([swCode], { type: 'text/javascript' });
+          navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+        } catch (e) {}
+      }
+    }
+
+    function triggerPwaInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          document.getElementById('btnInstallPwa').classList.add('hidden');
+        });
+      }
+    }
+
+    function startRealtimeClock() {
+      setInterval(() => {
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} WIB`;
+        const elClock = document.getElementById('realtimeClock');
+        const elDate = document.getElementById('realtimeDate');
+        if (elClock) elClock.innerText = timeStr;
+        if (elDate) elDate.innerText = formatIndoDate(getTodayISO());
+        updateSessionBadgeUI();
+      }, 1000);
+    }
+
+    // Lifecycle Bootstrap
+    window.onload = async function() {
+      startRealtimeClock();
+      updateSessionBadgeUI();
+      initPwa();
+      applySchoolIdentityUI();
+      populateClassDropdowns();
+      populateSettingsForm();
+      updatePiketBannerToday();
+      renderStudentsTable();
+      updateDashboardStats();
+      renderTodayLogs();
+      initDefaultCalendarHeb();
+      initRekapDefaultDates();
+      renderAttendanceManagementTable();
+      renderIdCardsForPrint();
+      generateRekapView();
+
+      // Inisialisasi Kontrol Akses Tampilan Awal (Mode Publik)
+      updateAccessControlUI();
+
+      // Mulai Firebase & Auto-Setup
+      await initFirebaseApp();
+    };
+  </script>
+</body>
+</html>
