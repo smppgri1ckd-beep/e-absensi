@@ -8,6 +8,7 @@
   <!-- PWA Manifest via Data URI -->
   <link href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22E-Presensi%20SMP%20PGRI%201%20CIKADU%22%2C%22short_name%22%3A%22PresensiQR%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%232563eb%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F2856%2F2856000.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D" rel="manifest"/>
   <meta content="#2563eb" name="theme-color"/>
+  <meta content="yes" name="mobile-web-app-capable"/>
   <meta content="yes" name="apple-mobile-web-app-capable"/>
   <meta content="default" name="apple-mobile-web-app-status-bar-style"/>
 
@@ -87,13 +88,6 @@
       border: 1px solid rgba(226, 232, 240, 0.8);
     }
 
-    .glass-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-
     /* ID CARD 6.5 x 10 cm & KERTAS F4 (215 x 330 mm) - 9 KARTU (3x3) */
     .id-card-page {
       width: 215mm !important;
@@ -133,7 +127,6 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.03);
     }
 
-    /* Print Specific Media Rules */
     @media print {
       @page {
         size: 215mm 330mm portrait;
@@ -167,17 +160,14 @@
   <!-- LAYAR SAMBUTAN (WELCOME HERO SCREEN)       -->
   <!-- ========================================== -->
   <div id="welcomeHeroScreen" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-500">
-    <div class="glass-panel max-w-lg w-full rounded-3xl p-6 sm:p-8 text-center shadow-2xl border border-white/60 space-y-6 animate-fade-in relative overflow-hidden">
-      <!-- Background Glow Accent -->
+    <div class="glass-panel max-w-lg w-full rounded-3xl p-6 sm:p-8 text-center shadow-2xl border border-white/60 space-y-6 relative overflow-hidden">
       <div class="absolute -top-16 -right-16 w-36 h-36 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
       <div class="absolute -bottom-16 -left-16 w-36 h-36 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none"></div>
 
-      <!-- School Logo Container -->
       <div class="relative mx-auto w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white p-2.5 shadow-lg border border-slate-100 flex items-center justify-center">
         <img id="welcomeLogoImg" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" class="w-full h-full object-contain" alt="Logo Sekolah"/>
       </div>
 
-      <!-- Welcome Text Block -->
       <div class="space-y-2">
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
@@ -191,7 +181,6 @@
         </p>
       </div>
 
-      <!-- Action Button to Main Application -->
       <div class="pt-2">
         <button onclick="enterApplicationFromWelcome()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-2xl text-xs sm:text-sm font-bold shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2.5 mx-auto transition-transform active:scale-95">
           <span>Buka Sistem Presensi</span>
@@ -208,7 +197,6 @@
   <!-- ========================================== -->
   <aside id="sidebarDesktop" class="hidden w-64 bg-white border-r border-slate-200 flex-col justify-between shrink-0 z-30 transition-all duration-300">
     <div class="flex flex-col h-full">
-      <!-- App Header / Logo -->
       <div class="p-4 border-b border-slate-100 flex items-center gap-3">
         <img id="sidebarLogo" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" class="w-9 h-9 object-contain rounded-lg p-1 bg-blue-50 border border-blue-100" alt="Logo"/>
         <div class="truncate">
@@ -219,7 +207,6 @@
         </div>
       </div>
 
-      <!-- Navigation Links -->
       <nav class="flex-1 overflow-y-auto p-3 space-y-1 text-xs font-semibold">
         <div class="pb-1 text-[10px] uppercase font-bold text-slate-400 px-3 tracking-wider">Operasional</div>
         <button onclick="switchView('kiosk')" id="navBtn-kiosk" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
@@ -262,7 +249,6 @@
         </button>
       </nav>
 
-      <!-- User Active Badge & Logout -->
       <div class="p-3 border-t border-slate-100 bg-slate-50/70">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2 overflow-hidden">
@@ -287,7 +273,6 @@
   <!-- ========================================== -->
   <div class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 relative">
 
-    <!-- TOP BAR (HEADER) -->
     <header class="glass-panel sticky top-0 z-20 border-b border-slate-200 px-4 py-2.5 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <img id="topNavLogo" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" class="w-8 h-8 object-contain rounded-lg p-0.5 bg-blue-50 border border-blue-100" alt="Logo"/>
@@ -298,23 +283,19 @@
       </div>
 
       <div class="flex items-center gap-2.5">
-        <!-- Tombol Tampilkan Layar Sambutan -->
         <button onclick="showWelcomeScreen()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-1.5 transition" title="Tampilkan Layar Sambutan">
           <i class="fa-solid fa-house"></i> <span class="hidden lg:inline">Beranda</span>
         </button>
 
-        <!-- Realtime Clock -->
         <div class="text-right border-r border-slate-200 pr-3 mr-1 hidden sm:block">
           <p id="realtimeClock" class="font-mono text-xs font-bold text-blue-600">--:--:-- WIB</p>
           <p id="realtimeDate" class="text-[10px] text-slate-500 font-medium">--</p>
         </div>
 
-        <!-- PWA Install Button -->
         <button id="btnInstallPwa" onclick="triggerPwaInstall()" class="hidden px-2.5 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-xs font-bold items-center gap-1.5 transition">
           <i class="fa-solid fa-download"></i> <span class="hidden md:inline">Install App</span>
         </button>
 
-        <!-- Auth Button Container -->
         <div id="authNavContainer">
           <button onclick="openLoginModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition active:scale-95">
             <i class="fa-solid fa-arrow-right-to-bracket"></i> <span>Login</span>
@@ -323,14 +304,12 @@
       </div>
     </header>
 
-    <!-- CONTENT BODY (SWITCHABLE VIEWS) -->
     <main class="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 pb-20 md:pb-6">
 
       <!-- ========================================== -->
       <!-- VIEW 1: KIOSK PRESENSI (PUBLIK & UTAMA)    -->
       <!-- ========================================== -->
       <section id="view-kiosk" class="space-y-4 max-w-7xl mx-auto">
-        <!-- Top Status Banner -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div class="lg:col-span-2 bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 rounded-2xl p-5 text-white shadow-md flex items-start gap-4">
             <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center shrink-0 text-2xl">
@@ -350,7 +329,6 @@
             </div>
           </div>
 
-          <!-- Card Guru Piket -->
           <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
@@ -368,13 +346,11 @@
           </div>
         </div>
 
-        <!-- Scanner & Log Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <!-- Kamera Scanner Box -->
           <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="scanPulseIndicator" class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
                 <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Pemindai QR Kamera</h4>
               </div>
               <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-lg border border-slate-200">
@@ -386,18 +362,19 @@
               </div>
             </div>
 
-            <!-- Viewport Kamera -->
             <div class="relative bg-slate-900 rounded-xl overflow-hidden aspect-square border border-slate-300 flex flex-col items-center justify-center">
               <div id="reader" class="w-full h-full"></div>
               <div id="scannerOverlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-6 text-center">
-                <div class="w-48 h-48 border-2 border-blue-400/70 rounded-2xl border-dashed animate-pulse flex items-center justify-center">
+                <div class="w-48 h-48 border-2 border-blue-400/70 rounded-2xl border-dashed flex items-center justify-center">
                   <i class="fa-solid fa-qrcode text-5xl text-white/30"></i>
                 </div>
                 <p class="text-[11px] text-slate-300 mt-3 font-medium">Arahkan QR Code Kartu ke Kamera</p>
               </div>
+              <div id="scannerProcessingBanner" class="hidden absolute top-2 inset-x-2 py-1.5 px-3 bg-blue-600/90 text-white rounded-lg text-center text-xs font-bold shadow animate-pulse">
+                Memproses Presensi...
+              </div>
             </div>
 
-            <!-- Tombol Kontrol Kamera -->
             <div class="flex gap-2">
               <button id="btnStartScanner" onclick="startScanner()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
                 <i class="fa-solid fa-camera"></i> Aktifkan Kamera
@@ -410,7 +387,6 @@
               </button>
             </div>
 
-            <!-- Box Hasil Scan Terakhir -->
             <div id="lastScanBox" class="hidden p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5 transition">
               <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Hasil Pindai Baru Saja</span>
@@ -426,7 +402,6 @@
             </div>
           </div>
 
-          <!-- Statistik & Log Hari Ini -->
           <div class="lg:col-span-7 space-y-4">
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
@@ -447,7 +422,6 @@
               </div>
             </div>
 
-            <!-- Grafik Presensi Hari Ini -->
             <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
               <div class="flex items-center justify-between mb-2">
                 <h5 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -462,13 +436,12 @@
               </div>
             </div>
 
-            <!-- Tabel Log Hari Ini -->
             <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
               <div class="flex items-center justify-between mb-2.5">
                 <h5 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                   <i class="fa-solid fa-clock-rotate-left text-blue-600"></i> Log Presensi Terakhir Hari Ini
                 </h5>
-                <span id="todayLogCount" class="text-[10px] text-slate-500 font-medium">0 Terdata</span>
+                <span id="todayLogCount" class="text-[10px] text-slate-500 font-medium">0 Presensi Terdata</span>
               </div>
               <div class="overflow-y-auto max-h-48 rounded-lg border border-slate-100">
                 <table class="w-full text-left text-xs">
@@ -505,7 +478,6 @@
               <button onclick="openStudentModal('ADD')" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-user-plus"></i> Tambah Siswa
               </button>
-              <!-- TOMBOL HAPUS MASSAL SISWA TERPILIH -->
               <button onclick="deleteSelectedStudents()" id="btnDeleteSelectedStudents" class="hidden px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-trash-can"></i> Hapus Siswa Terpilih (<span id="countSelectedStudents">0</span>)
               </button>
@@ -523,7 +495,6 @@
             </div>
           </div>
 
-          <!-- Filter & Search -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <input type="text" id="searchStudentInput" oninput="renderStudentsTable()" placeholder="Cari NISN atau Nama Siswa..." class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500"/>
             <select id="filterStudentKelas" onchange="renderStudentsTable()" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500">
@@ -534,7 +505,6 @@
             </div>
           </div>
 
-          <!-- Tabel Siswa dengan Kotak Centang (Checklist) -->
           <div class="overflow-x-auto rounded-xl border border-slate-200">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
@@ -551,7 +521,7 @@
                 </tr>
               </thead>
               <tbody id="studentTableBody" class="divide-y divide-slate-100 text-slate-700">
-                <tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada data siswa. Tambahkan melalui tombol Tambah Siswa atau Impor Excel.</td></tr>
+                <tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada data siswa.</td></tr>
               </tbody>
             </table>
           </div>
@@ -572,7 +542,6 @@
               <button onclick="openAttendanceModal('ADD')" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-plus"></i> Input Presensi Manual
               </button>
-              <!-- TOMBOL HAPUS MASSAL PRESENSI TERPILIH -->
               <button onclick="deleteSelectedAttendance()" id="btnDeleteSelectedAttendance" class="hidden px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-trash-can"></i> Hapus Presensi Terpilih (<span id="countSelectedAttendance">0</span>)
               </button>
@@ -582,7 +551,6 @@
             </div>
           </div>
 
-          <!-- Filter Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
             <div>
               <label class="block text-[10px] font-bold text-slate-600 mb-1">Tanggal Mulai</label>
@@ -613,7 +581,6 @@
             </div>
           </div>
 
-          <!-- Tabel Riwayat Presensi dengan Kotak Centang -->
           <div class="overflow-x-auto rounded-xl border border-slate-200">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
@@ -670,7 +637,6 @@
             <span><strong>Panduan Cetak F4:</strong> Pilih ukuran kertas <strong>Folio / F4 (215 x 330 mm)</strong>, margin <strong>None</strong>, dan pastikan opsi <strong>Background Graphics</strong> dicentang.</span>
           </div>
 
-          <!-- Render Container Kartu -->
           <div class="p-6 bg-slate-100/70 rounded-2xl border border-slate-200 overflow-x-auto flex flex-col items-center">
             <div id="printArea" class="w-full flex flex-col items-center"></div>
           </div>
@@ -694,7 +660,6 @@
             </div>
           </div>
 
-          <!-- Filter & Search -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input type="text" id="searchQrInput" oninput="renderDownloadQrGrid()" placeholder="Cari NISN atau Nama Siswa..." class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-amber-500"/>
             <select id="filterQrKelas" onchange="renderDownloadQrGrid()" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-amber-500">
@@ -702,7 +667,6 @@
             </select>
           </div>
 
-          <!-- Grid QR Code -->
           <div id="qrGridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-2"></div>
         </div>
       </section>
@@ -734,7 +698,6 @@
             </div>
           </div>
 
-          <!-- Statistik Ringkas HEB -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
             <div>
               <p class="text-[11px] text-slate-500">Hari Efektif KBM Semester</p>
@@ -750,7 +713,6 @@
             </div>
           </div>
 
-          <!-- Grid 6 Bulan Kalender -->
           <div id="hebCalendarGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
       </section>
@@ -778,7 +740,6 @@
             </div>
           </div>
 
-          <!-- Filter Rekap -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
             <div>
               <label class="block text-[10px] font-bold text-slate-600 mb-1">Periode</label>
@@ -810,7 +771,6 @@
             </div>
           </div>
 
-          <!-- Parameter Pengesahan TTD -->
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
@@ -838,7 +798,6 @@
           <!-- LEMBAR RESMI A4 (BER-KOP SURAT) -->
           <div class="overflow-x-auto bg-slate-100 p-4 rounded-xl border border-slate-200 flex justify-center">
             <div id="rekapSheetWrapper" class="w-[210mm] max-w-full bg-white text-slate-900 p-8 shadow-sm rounded-sm">
-              <!-- Kop Surat -->
               <div class="border-b-4 border-double border-slate-900 pb-3 mb-4 flex items-center gap-5">
                 <img id="rekapKopLogo" src="https://cdn-icons-png.flaticon.com/512/2856/2856000.png" class="w-20 h-20 object-contain" alt="Logo Sekolah" crossorigin="anonymous"/>
                 <div class="flex-1 text-center">
@@ -849,7 +808,6 @@
                 </div>
               </div>
 
-              <!-- Judul Laporan -->
               <div class="text-center my-4 space-y-1">
                 <h4 class="text-sm font-black uppercase underline tracking-wide">LAPORAN REKAPITULASI KEHADIRAN SISWA</h4>
                 <p id="rekapSubJudul" class="text-xs text-slate-600 font-semibold">Periode: BULANAN</p>
@@ -860,7 +818,6 @@
                 </div>
               </div>
 
-              <!-- Tabel Rekap A4 -->
               <div class="mt-4">
                 <table class="table-fixed w-full border-collapse border border-slate-900 text-xs">
                   <thead class="bg-slate-100 text-slate-900 font-bold text-center">
@@ -879,7 +836,6 @@
                 </table>
               </div>
 
-              <!-- Blok Tanda Tangan -->
               <div class="signature-block mt-8 pt-2 text-xs">
                 <div class="flex justify-between items-start">
                   <div class="text-center w-56">
@@ -890,7 +846,7 @@
                     <p id="ttdNipKepsek" class="text-[11px] text-slate-600 font-mono">NIP: 19750101 200001 1 001</p>
                   </div>
                   <div class="text-center w-56">
-                    <p id="ttdKotaTanggal" class="font-medium text-slate-700">Cianjur, 20 September 2026</p>
+                    <p id="ttdKotaTanggal" class="font-medium text-slate-700">Cianjur, 21 September 2026</p>
                     <p id="ttdJabatanPiket" class="font-bold text-slate-900">Guru Piket</p>
                     <div class="h-16"></div>
                     <p id="ttdNamaPiket" class="font-bold text-slate-900 underline">Guru Piket Senin, S.Pd</p>
@@ -908,7 +864,6 @@
       <!-- ========================================== -->
       <section id="view-pengaturan" class="hidden space-y-4 max-w-7xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <!-- Identitas Sekolah & Logo -->
           <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
             <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
               <i class="fa-solid fa-school text-blue-600"></i> Identitas Sekolah &amp; Kepala Sekolah
@@ -960,7 +915,6 @@
           </div>
 
           <div class="space-y-4">
-            <!-- PENGATURAN KHUSUS LAYAR SAMBUTAN (WELCOME SCREEN) -->
             <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
               <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
                 <i class="fa-solid fa-desktop text-indigo-600"></i> Kustomisasi Layar Sambutan
@@ -984,7 +938,6 @@
               </form>
             </div>
 
-            <!-- Jadwal Guru Piket -->
             <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
               <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
                 <i class="fa-solid fa-calendar-week text-emerald-600"></i> Rotasi Jadwal Guru Piket
@@ -1031,7 +984,7 @@
               </form>
             </div>
 
-            <!-- MODUL PEMELIHARAAN BASIS DATA (DIPISAH TEGAS: CADANGKAN & BERSIHKAN) -->
+            <!-- MODUL PEMELIHARAAN TERPISAH -->
             <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
               <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
                 <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm">
@@ -1043,7 +996,6 @@
                 </div>
               </div>
 
-              <!-- Parameter Semester & Tahun -->
               <div class="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-1">Tahun Ajaran</label>
@@ -1058,14 +1010,11 @@
                 </div>
               </div>
 
-              <!-- 2 Tombol Terpisah Sesuai Instruksi -->
               <div class="space-y-2 pt-1">
-                <!-- Tombol 1: HANYA CADANGKAN EXCEL (TIDAK MENGHAPUS) -->
                 <button onclick="downloadBackupExcelOnly()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-sm">
                   <i class="fa-solid fa-file-excel text-sm"></i> 1. Unduh Cadangan Excel (.xlsx) Saja
                 </button>
 
-                <!-- Tombol 2: HANYA BERSIHKAN / RESET DATA SEMESTER -->
                 <button onclick="purgeSemesterAttendanceOnly()" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2">
                   <i class="fa-solid fa-trash-can text-sm"></i> 2. Bersihkan / Reset Presensi Semester
                 </button>
@@ -1228,7 +1177,7 @@
             </select>
           </div>
         </div>
-        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md">
+        <button type="submit" id="btnSubmitAttendance" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md">
           Simpan Presensi
         </button>
       </form>
@@ -1271,24 +1220,24 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
-      getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, query, where, orderBy, writeBatch 
+      getFirestore, collection, doc, getDoc, setDoc, deleteDoc, onSnapshot, writeBatch 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { 
-      getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
+      getAuth, signInWithEmailAndPassword, signOut 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     // ==========================================
     // SAKLAR & KONFIGURASI FIREBASE AKTIF
     // ==========================================
-    const IS_PREVIEW = false; // Mode produksi terhubung ke Firebase
+    const IS_PREVIEW = false;
 
     const firebaseConfig = {
-apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
-  authDomain: "presensi-siswa-digital-a24ca.firebaseapp.com",
-  projectId: "presensi-siswa-digital-a24ca",
-  storageBucket: "presensi-siswa-digital-a24ca.firebasestorage.app",
-  messagingSenderId: "696200452974",
-  appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
+      apiKey: "AIzaSy...", // Ganti dengan apiKey aktif Anda
+      authDomain: "presensi-siswa-digital-a24ca.firebaseapp.com",
+      projectId: "presensi-siswa-digital-a24ca",
+      storageBucket: "presensi-siswa-digital-a24ca.appspot.com",
+      messagingSenderId: "...",
+      appId: "..."
     };
 
     let db = null;
@@ -1311,7 +1260,11 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
     let attendanceChartInstance = null;
     let deferredPrompt = null;
 
-    // STATE BERSIH (MURNI KOSONG BEBAS DATA DUMMY)
+    // LAPISAN 1: MUTEX LOCK & SCAN COOLDOWN BUFFER
+    let isProcessingScan = false;
+    let scanCooldownTimer = null;
+
+    // STATE BERSIH (MURNI BEBAS DATA DUMMY)
     let listSiswa = [];
     let listAbsensi = [];
     let kalenderHebData = {};
@@ -1356,7 +1309,7 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       return map[d.getDay()] || "senin";
     }
 
-    // WELCOME SCREEN CONTROLLERS
+    // WELCOME SCREEN
     window.enterApplicationFromWelcome = function() {
       const screen = document.getElementById('welcomeHeroScreen');
       screen.classList.add('opacity-0', 'pointer-events-none');
@@ -1377,7 +1330,6 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       document.getElementById('welcomeHeroTitle').innerHTML = (w.title || "Selamat Datang Di E-Absensi\nSMP PGRI 1 CIKADU").replace(/\n/g, '<br/>');
       document.getElementById('welcomeHeroSubtitle').innerText = w.subtitle || "Portal presensi digital berbasis QR Code.";
       
-      // Sync ke form pengaturan
       const chk = document.getElementById('cfgWelcomeShow');
       if (chk) chk.checked = w.show !== false;
       const t = document.getElementById('cfgWelcomeTitle');
@@ -1450,15 +1402,13 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       } catch (e) {}
     }
 
-    // AUTO SETUP DATABASE CLOUD FIRESTORE (HANYA PENGATURAN & AKUN PETUGAS, TANPA DUMMY SISWA/LOG)
+    // AUTO SETUP DATABASE CLOUD FIRESTORE
     async function autoSetupDatabase() {
       if (IS_PREVIEW || !db) return;
       try {
         const checkDoc = await getDoc(doc(db, "pengaturan", "identitas_sekolah"));
         if (!checkDoc.exists()) {
-          console.log("Inisialisasi Firestore Database Otomatis...");
           const batch = writeBatch(db);
-
           batch.set(doc(db, "pengaturan", "identitas_sekolah"), appConfig);
           batch.set(doc(db, "users", "peserta"), {
             username: "peserta",
@@ -1466,23 +1416,26 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
             role: "PESERTA",
             nama: "Petugas Piket Harian"
           });
-
           await batch.commit();
-          console.log("Auto-setup database selesai!");
         }
       } catch (err) {
-        console.warn("Auto-setup database error:", err);
+        console.warn("Auto-setup database info:", err);
       }
     }
 
-    // REALTIME FIRESTORE SYNC
+    // REALTIME FIRESTORE SYNC & LAPISAN 3: DEDUPLIKASI ARRAY OTOMATIS
     function setupRealtimeListeners() {
       if (IS_PREVIEW || !db) return;
 
       onSnapshot(collection(db, "siswa"), (snapshot) => {
-        const arr = [];
-        snapshot.forEach(d => arr.push(d.data()));
-        listSiswa = arr;
+        const uniqueSiswaMap = new Map();
+        snapshot.forEach(d => {
+          const data = d.data();
+          if (data && data.nisn) {
+            uniqueSiswaMap.set(String(data.nisn), data);
+          }
+        });
+        listSiswa = Array.from(uniqueSiswaMap.values());
         populateClassDropdowns();
         renderStudentsTable();
         renderIdCardsForPrint();
@@ -1492,8 +1445,19 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       });
 
       onSnapshot(collection(db, "presensi"), (snapshot) => {
-        const arr = [];
-        snapshot.forEach(d => arr.push(d.data()));
+        const uniquePresensiMap = new Map();
+        snapshot.forEach(d => {
+          const data = d.data();
+          if (data && data.nisn && data.tanggal && data.sesi) {
+            // Dedup key unik: kombinasi NISN + TANGGAL + SESI
+            const dedupKey = `${data.nisn}_${data.tanggal}_${data.sesi}`;
+            if (!uniquePresensiMap.has(dedupKey)) {
+              uniquePresensiMap.set(dedupKey, data);
+            }
+          }
+        });
+
+        const arr = Array.from(uniquePresensiMap.values());
         arr.sort((a, b) => (b.tanggal + b.waktu).localeCompare(a.tanggal + a.waktu));
         listAbsensi = arr;
         renderTodayLogs();
@@ -1565,8 +1529,13 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       e.preventDefault();
       const user = document.getElementById('loginUsername').value.trim();
       const pass = document.getElementById('loginPassword').value.trim();
+      const btn = document.getElementById('btnSubmitLogin');
+      btn.disabled = true;
+      btn.innerText = "Memverifikasi...";
 
       if (IS_PREVIEW) {
+        btn.disabled = false;
+        btn.innerText = "Masuk Sekarang";
         if (user === "admin@absensi.id" && pass === "edudigital") {
           activateUserSession("ADMIN", "Administrator");
         } else if (user === "peserta" && pass === "edudigital") {
@@ -1579,6 +1548,8 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
 
       try {
         const userCredential = await signInWithEmailAndPassword(auth, user, pass);
+        btn.disabled = false;
+        btn.innerText = "Masuk Sekarang";
         activateUserSession("ADMIN", userCredential.user.email);
         return;
       } catch (authError) {
@@ -1587,11 +1558,15 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
           if (userDoc.exists()) {
             const userData = userDoc.data();
             if (userData.password === pass) {
+              btn.disabled = false;
+              btn.innerText = "Masuk Sekarang";
               activateUserSession(userData.role || "PESERTA", userData.nama || user);
               return;
             }
           }
         } catch (dbErr) {}
+        btn.disabled = false;
+        btn.innerText = "Masuk Sekarang";
         showNotice("Login Gagal", "Email/Username atau password salah!", "warning");
       }
     };
@@ -1761,14 +1736,15 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
                 await batch.commit();
               }
             } catch (e) {}
+          } else {
+            listSiswa = listSiswa.filter(s => !selected.includes(String(s.nisn)));
+            populateClassDropdowns();
+            renderStudentsTable();
+            renderIdCardsForPrint();
+            renderDownloadQrGrid();
+            updateDashboardStats();
           }
 
-          listSiswa = listSiswa.filter(s => !selected.includes(String(s.nisn)));
-          populateClassDropdowns();
-          renderStudentsTable();
-          renderIdCardsForPrint();
-          renderDownloadQrGrid();
-          updateDashboardStats();
           closeNoticeModal();
           showNotice("Sukses", `${selected.length} data siswa berhasil dihapus!`, "success");
         }
@@ -1781,7 +1757,7 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       document.getElementById('modalStudentTitle').innerText = mode === 'ADD' ? 'Tambah Data Siswa' : 'Edit Biodata Siswa';
 
       if (mode === 'EDIT') {
-        const s = listSiswa.find(i => i.nisn === nisn);
+        const s = listSiswa.find(i => String(i.nisn) === String(nisn));
         if (s) {
           document.getElementById('formNisn').value = s.nisn;
           document.getElementById('formNama').value = s.nama;
@@ -1804,8 +1780,13 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       document.getElementById('modalStudent').classList.add('hidden');
     };
 
+    // SIMPAN DATA SISWA (MURNI ASINKRON KE FIRESTORE, TANPA PUSH MANUAL)
     window.handleSaveStudent = async function(e) {
       e.preventDefault();
+      const btn = document.getElementById('btnSubmitStudent');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+
       const mode = document.getElementById('studentFormMode').value;
       const oldNisn = document.getElementById('studentOldNisn').value;
       const nisn = document.getElementById('formNisn').value.trim();
@@ -1815,7 +1796,7 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       const fileInput = document.getElementById('formFotoFile');
 
       let fotoUrl = "https://placehold.co/200x250/e2e8f0/64748b?text=Pas+Foto";
-      const existing = listSiswa.find(s => s.nisn === (mode === 'EDIT' ? oldNisn : nisn));
+      const existing = listSiswa.find(s => String(s.nisn) === String(mode === 'EDIT' ? oldNisn : nisn));
       if (existing && existing.fotoUrl) fotoUrl = existing.fotoUrl;
 
       if (fileInput.files && fileInput.files[0]) {
@@ -1831,23 +1812,25 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
           }
           await setDoc(doc(db, "siswa", nisn), studentData);
         } catch (err) {
-          console.error("Gagal simpan siswa:", err);
+          console.error("Gagal simpan siswa ke database:", err);
         }
-      }
-
-      if (mode === 'ADD') {
-        listSiswa.push(studentData);
       } else {
-        const idx = listSiswa.findIndex(s => s.nisn === oldNisn);
-        if (idx !== -1) listSiswa[idx] = studentData;
+        if (mode === 'ADD') {
+          listSiswa.push(studentData);
+        } else {
+          const idx = listSiswa.findIndex(s => String(s.nisn) === String(oldNisn));
+          if (idx !== -1) listSiswa[idx] = studentData;
+        }
+        populateClassDropdowns();
+        renderStudentsTable();
+        renderIdCardsForPrint();
+        renderDownloadQrGrid();
+        updateDashboardStats();
       }
 
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Data Siswa`;
       closeStudentModal();
-      populateClassDropdowns();
-      renderStudentsTable();
-      renderIdCardsForPrint();
-      renderDownloadQrGrid();
-      updateDashboardStats();
       showNotice("Sukses", `Data siswa ${nama} berhasil disimpan!`, "success");
     };
 
@@ -1856,19 +1839,20 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
     };
 
     window.confirmDeleteStudent = function(nisn) {
-      const s = listSiswa.find(i => i.nisn === nisn);
+      const s = listSiswa.find(i => String(i.nisn) === String(nisn));
       showConfirm("Hapus Siswa", `Hapus data siswa ${s ? s.nama : nisn}?`, async () => {
         if (!IS_PREVIEW && db) {
           try {
-            await deleteDoc(doc(db, "siswa", nisn));
+            await deleteDoc(doc(db, "siswa", String(nisn)));
           } catch (e) {}
+        } else {
+          listSiswa = listSiswa.filter(i => String(i.nisn) !== String(nisn));
+          populateClassDropdowns();
+          renderStudentsTable();
+          renderIdCardsForPrint();
+          renderDownloadQrGrid();
+          updateDashboardStats();
         }
-        listSiswa = listSiswa.filter(i => i.nisn !== nisn);
-        populateClassDropdowns();
-        renderStudentsTable();
-        renderIdCardsForPrint();
-        renderDownloadQrGrid();
-        updateDashboardStats();
         showNotice("Terhapus", "Data siswa berhasil dihapus.", "info");
       });
     };
@@ -1908,21 +1892,25 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
               const fotoUrl = String(row[4] || "https://placehold.co/200x250/e2e8f0/64748b?text=Pas+Foto");
 
               const sObj = { nisn, nama, jk, kelas, fotoUrl };
-              const exIdx = listSiswa.findIndex(s => s.nisn === nisn);
-              if (exIdx >= 0) listSiswa[exIdx] = sObj;
-              else listSiswa.push(sObj);
-
-              if (batch) batch.set(doc(db, "siswa", nisn), sObj);
+              if (batch) {
+                batch.set(doc(db, "siswa", nisn), sObj);
+              } else {
+                const exIdx = listSiswa.findIndex(s => String(s.nisn) === String(nisn));
+                if (exIdx >= 0) listSiswa[exIdx] = sObj;
+                else listSiswa.push(sObj);
+              }
               count++;
             }
           }
 
           if (batch) await batch.commit();
-          populateClassDropdowns();
-          renderStudentsTable();
-          renderIdCardsForPrint();
-          renderDownloadQrGrid();
-          updateDashboardStats();
+          if (IS_PREVIEW) {
+            populateClassDropdowns();
+            renderStudentsTable();
+            renderIdCardsForPrint();
+            renderDownloadQrGrid();
+            updateDashboardStats();
+          }
           showNotice("Impor Selesai", `Berhasil memasukkan ${count} siswa dari Excel!`, "success");
         } catch (err) {
           showNotice("Format Gagal", "Gagal membaca berkas Excel.", "warning");
@@ -2053,13 +2041,14 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
                 await batch.commit();
               }
             } catch (e) {}
+          } else {
+            listAbsensi = listAbsensi.filter(a => !selected.includes(a.id));
+            renderAttendanceManagementTable();
+            renderTodayLogs();
+            updateDashboardStats();
+            generateRekapView();
           }
 
-          listAbsensi = listAbsensi.filter(a => !selected.includes(a.id));
-          renderAttendanceManagementTable();
-          renderTodayLogs();
-          updateDashboardStats();
-          generateRekapView();
           closeNoticeModal();
           showNotice("Sukses", `${selected.length} data presensi berhasil dihapus!`, "success");
         }
@@ -2110,13 +2099,14 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
             } catch (err) {
               console.error("Gagal hapus data presensi:", err);
             }
+          } else {
+            listAbsensi = listAbsensi.filter(a => !targetIds.includes(a.id));
+            renderAttendanceManagementTable();
+            renderTodayLogs();
+            updateDashboardStats();
+            generateRekapView();
           }
 
-          listAbsensi = listAbsensi.filter(a => !targetIds.includes(a.id));
-          renderAttendanceManagementTable();
-          renderTodayLogs();
-          updateDashboardStats();
-          generateRekapView();
           closeNoticeModal();
           showNotice("Berhasil Dihapus", `${targetIds.length} catatan presensi berhasil dibersihkan!`, "success");
         }
@@ -2165,37 +2155,44 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       document.getElementById('modalAttendance').classList.add('hidden');
     };
 
+    // SIMPAN DATA PRESENSI MANUAL DENGAN ID DETERMINISTIK
     window.handleSaveAttendance = async function(e) {
       e.preventDefault();
+      const btn = document.getElementById('btnSubmitAttendance');
+      btn.disabled = true;
+      btn.innerText = "Menyimpan...";
+
       const mode = document.getElementById('attFormMode').value;
-      const recordId = document.getElementById('attRecordId').value || "ABS-" + Date.now();
       const nisn = document.getElementById('attSelectSiswa').value;
       const tanggal = document.getElementById('attInputTanggal').value;
       const waktu = document.getElementById('attInputWaktu').value.trim();
       const sesi = document.getElementById('attSelectSesi').value;
       const status = document.getElementById('attSelectStatus').value;
 
-      const s = listSiswa.find(i => i.nisn === nisn);
+      // LAPISAN 2: ID deterministik mencegah Firestore membuat data ganda
+      const recordId = mode === 'EDIT' ? document.getElementById('attRecordId').value : `ABS_${nisn}_${tanggal}_${sesi}`;
+
+      const s = listSiswa.find(i => String(i.nisn) === String(nisn));
       const rec = { id: recordId, tanggal, waktu, nisn, nama: s ? s.nama : nisn, kelas: s ? s.kelas : 'Umum', sesi, status };
 
       if (!IS_PREVIEW && db) {
         try {
           await setDoc(doc(db, "presensi", recordId), rec);
         } catch (err) {}
-      }
-
-      if (mode === 'EDIT') {
+      } else {
         const idx = listAbsensi.findIndex(i => i.id === recordId);
         if (idx !== -1) listAbsensi[idx] = rec;
-      } else {
-        listAbsensi.unshift(rec);
+        else listAbsensi.unshift(rec);
+
+        renderAttendanceManagementTable();
+        renderTodayLogs();
+        updateDashboardStats();
+        generateRekapView();
       }
 
+      btn.disabled = false;
+      btn.innerText = "Simpan Presensi";
       closeAttendanceModal();
-      renderAttendanceManagementTable();
-      renderTodayLogs();
-      updateDashboardStats();
-      generateRekapView();
       showNotice("Sukses", "Data presensi berhasil disimpan!", "success");
     };
 
@@ -2209,12 +2206,13 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
           try {
             await deleteDoc(doc(db, "presensi", recordId));
           } catch (e) {}
+        } else {
+          listAbsensi = listAbsensi.filter(a => a.id !== recordId);
+          renderAttendanceManagementTable();
+          renderTodayLogs();
+          updateDashboardStats();
+          generateRekapView();
         }
-        listAbsensi = listAbsensi.filter(a => a.id !== recordId);
-        renderAttendanceManagementTable();
-        renderTodayLogs();
-        updateDashboardStats();
-        generateRekapView();
         showNotice("Terhapus", "Presensi berhasil dihapus.", "info");
       });
     };
@@ -2879,7 +2877,7 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
     };
 
     // ==========================================
-    // MODUL 7: PENGATURAN & PEMELIHARAAN TERPISAH
+    // MODUL 7: PENGATURAN & PEMELIHARAAN
     // ==========================================
     window.previewSchoolLogo = async function(e) {
       const file = e.target.files && e.target.files[0];
@@ -2959,7 +2957,7 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       document.getElementById('piketJumatNip').value = appConfig.jadwalPiket.jumat?.nip || '';
     }
 
-    // PEMISAHAN TOMBOL 1: HANYA UNDUH CADANGAN EXCEL (TIDAK MENGHAPUS DATA)
+    // PEMISAHAN TOMBOL 1: HANYA UNDUH CADANGAN EXCEL
     window.downloadBackupExcelOnly = function() {
       const year = parseInt(document.getElementById('maintenanceYear').value) || 2026;
       const sem = document.getElementById('maintenanceSemester').value;
@@ -3025,13 +3023,14 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
             } catch (err) {
               console.error("Gagal menghapus data arsip:", err);
             }
+          } else {
+            listAbsensi = listAbsensi.filter(a => !targetIds.includes(a.id));
+            renderAttendanceManagementTable();
+            renderTodayLogs();
+            updateDashboardStats();
+            generateRekapView();
           }
 
-          listAbsensi = listAbsensi.filter(a => !targetIds.includes(a.id));
-          renderAttendanceManagementTable();
-          renderTodayLogs();
-          updateDashboardStats();
-          generateRekapView();
           closeNoticeModal();
           showNotice("Pembersihan Sukses", `${targetIds.length} data presensi semester lama berhasil dibersihkan!`, "success");
         }
@@ -3039,7 +3038,7 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
     };
 
     // ==========================================
-    // MODUL 8: SCANNER & KIOSK LOGIC
+    // MODUL 8: SCANNER CEPAT & ANTI-DUPLIKASI (MUTEX LOCK)
     // ==========================================
     function detectSessionAuto() {
       if (manualSessionOverride) return manualSessionOverride;
@@ -3066,23 +3065,39 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       showNotice("Sesi Diubah", `Sesi dialihkan ke: ${manualSessionOverride.toUpperCase()}`, "info");
     };
 
+    // INISIALISASI SCANNER CEPAT HP DENGAN CONSTRAINTS RINGAN
     window.startScanner = function() {
       if (isScannerRunning) return;
       playBeep('success');
+
+      document.getElementById('scanPulseIndicator').className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+
       html5QrScanner = new Html5Qrcode("reader");
+
+      const qrConfig = {
+        fps: 10,
+        qrbox: { width: 220, height: 220 },
+        aspectRatio: 1.0
+      };
+
+      const cameraConstraint = cameraMode === "environment" 
+        ? { facingMode: { ideal: "environment" } } 
+        : { facingMode: "user" };
+
       html5QrScanner.start(
-        { facingMode: cameraMode },
-        { fps: 15, qrbox: { width: 220, height: 220 } },
+        cameraConstraint,
+        qrConfig,
         onScanSuccess,
-        () => {}
+        () => {} // Abaikan frame kontinu
       ).then(() => {
         isScannerRunning = true;
         document.getElementById('btnStartScanner').classList.add('hidden');
         document.getElementById('btnStopScanner').classList.remove('hidden');
         document.getElementById('btnSwitchCamera').classList.remove('hidden');
         document.getElementById('scannerOverlay').classList.add('hidden');
-      }).catch(() => {
-        showNotice("Kamera Ditolak", "Izin akses kamera browser diperlukan.", "warning");
+      }).catch((err) => {
+        document.getElementById('scanPulseIndicator').className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+        showNotice("Kamera Gagal", "Izin akses kamera diperlukan atau kamera sedang digunakan aplikasi lain.", "warning");
       });
     };
 
@@ -3090,10 +3105,12 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       if (!isScannerRunning || !html5QrScanner) return;
       html5QrScanner.stop().then(() => {
         isScannerRunning = false;
+        document.getElementById('scanPulseIndicator').className = "w-2.5 h-2.5 rounded-full bg-slate-400";
         document.getElementById('btnStartScanner').classList.remove('hidden');
         document.getElementById('btnStopScanner').classList.add('hidden');
         document.getElementById('btnSwitchCamera').classList.add('hidden');
         document.getElementById('scannerOverlay').classList.remove('hidden');
+        document.getElementById('scannerProcessingBanner').classList.add('hidden');
       }).catch(() => {});
     };
 
@@ -3103,23 +3120,33 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       setTimeout(() => startScanner(), 300);
     };
 
+    // HANDLER SCAN ANTI-DUPLIKASI (SCAN MUTEX & DETERMINISTIC RECORD ID)
     async function onScanSuccess(decodedText) {
-      if (!decodedText) return;
+      if (!decodedText || isProcessingScan) return;
+
+      // 1. Kunci Mutex Seketika
+      isProcessingScan = true;
+      document.getElementById('scannerProcessingBanner').classList.remove('hidden');
+
       const nisnScanned = decodedText.trim();
       const session = detectSessionAuto();
       const today = getTodayISO();
 
+      // Cek ketersediaan siswa
       const siswa = listSiswa.find(s => String(s.nisn) === String(nisnScanned));
       if (!siswa) {
         playBeep('error');
-        showNotice("Tidak Terdaftar", `Kartu NISN [${nisnScanned}] tidak dikenal!`, "warning");
+        showNotice("Tidak Terdaftar", `Kartu QR dengan NISN [${nisnScanned}] tidak ditemukan pada sistem!`, "warning");
+        releaseScanLock(3000);
         return;
       }
 
+      // 2. Cek apakah sudah presensi sesi ini
       const already = listAbsensi.find(a => String(a.nisn) === String(nisnScanned) && a.tanggal === today && a.sesi === session);
       if (already) {
         playBeep('error');
-        showNotice("Sudah Presensi", `${siswa.nama} sudah presensi Sesi ${session} hari ini pada jam ${already.waktu} WIB.`, "warning");
+        showNotice("Sudah Presensi", `${siswa.nama} sudah melakukan presensi Sesi ${session} hari ini pada pukul ${already.waktu} WIB.`, "warning");
+        releaseScanLock(3000);
         return;
       }
 
@@ -3128,8 +3155,11 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
       const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
       const statusText = calculateAttendanceStatus(session, now);
 
+      // LAPISAN 2: ID Deterministik Mengunci Firestore (Upsert)
+      const recordId = `ABS_${siswa.nisn}_${today}_${session}`;
+
       const record = {
-        id: "ABS-" + Date.now(),
+        id: recordId,
         tanggal: today,
         waktu: timeStr,
         nisn: siswa.nisn,
@@ -3141,39 +3171,58 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
 
       if (!IS_PREVIEW && db) {
         try {
-          await setDoc(doc(db, "presensi", record.id), record);
-        } catch (e) {}
+          await setDoc(doc(db, "presensi", recordId), record);
+        } catch (e) {
+          console.error("Gagal simpan presensi ke database:", e);
+        }
+      } else {
+        listAbsensi.unshift(record);
+        updateDashboardStats();
+        renderTodayLogs();
+        renderAttendanceManagementTable();
+        generateRekapView();
       }
-
-      listAbsensi.unshift(record);
 
       document.getElementById('lastScanBox').classList.remove('hidden');
       document.getElementById('scanSiswaNama').innerText = `${siswa.nama} (${siswa.kelas})`;
       document.getElementById('scanSiswaInfo').innerText = `Sesi ${session} • ${timeStr} WIB • ${statusText}`;
       document.getElementById('scanSiswaFoto').src = siswa.fotoUrl;
 
-      updateDashboardStats();
-      renderTodayLogs();
-      renderAttendanceManagementTable();
-      generateRekapView();
+      // Beri jeda 3.5 detik sebelum scan kartu selanjutnya
+      releaseScanLock(3500);
     }
 
+    function releaseScanLock(delayMs) {
+      if (scanCooldownTimer) clearTimeout(scanCooldownTimer);
+      scanCooldownTimer = setTimeout(() => {
+        isProcessingScan = false;
+        document.getElementById('scannerProcessingBanner').classList.add('hidden');
+      }, delayMs);
+    }
+
+    // ==========================================
+    // STATISTIK KEHADIRAN REALTIME & GRAFIK
+    // ==========================================
     function updateDashboardStats() {
       const today = getTodayISO();
-      const records = listAbsensi.filter(a => a.tanggal === today);
+      const todayRecords = listAbsensi.filter(a => a.tanggal === today);
 
-      const uniquePagi = new Set(records.filter(a => a.sesi === 'Pagi').map(a => a.nisn)).size;
-      const uniqueSiang = new Set(records.filter(a => a.sesi === 'Siang').map(a => a.nisn)).size;
+      // Gunakan Set untuk menjamin hitungan siswa UNIK
+      const uniquePagiSet = new Set(todayRecords.filter(a => a.sesi === 'Pagi').map(a => String(a.nisn)));
+      const uniqueSiangSet = new Set(todayRecords.filter(a => a.sesi === 'Siang').map(a => String(a.nisn)));
+      const totalPresentSet = new Set(todayRecords.map(a => String(a.nisn)));
+
       const totalSiswa = listSiswa.length;
-      const allPresent = new Set(records.map(a => a.nisn)).size;
-      const belum = Math.max(0, totalSiswa - allPresent);
+      const hadirPagi = uniquePagiSet.size;
+      const hadirSiang = uniqueSiangSet.size;
+      const belumHadir = Math.max(0, totalSiswa - totalPresentSet.size);
 
       document.getElementById('statTotalSiswa').innerText = totalSiswa;
-      document.getElementById('statHadirPagi').innerText = uniquePagi;
-      document.getElementById('statHadirSiang').innerText = uniqueSiang;
-      document.getElementById('statBelum').innerText = belum;
+      document.getElementById('statHadirPagi').innerText = hadirPagi;
+      document.getElementById('statHadirSiang').innerText = hadirSiang;
+      document.getElementById('statBelum').innerText = belumHadir;
 
-      updateChart(uniquePagi, uniqueSiang, belum);
+      updateChart(hadirPagi, hadirSiang, belumHadir);
     }
 
     function updateChart(pagi, siang, belum) {
@@ -3196,24 +3245,35 @@ apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-              y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+              y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
               x: { grid: { display: false } }
             }
           }
         });
       } else {
         attendanceChartInstance.data.datasets[0].data = [pagi, siang, belum];
-        attendanceChartInstance.update();
+        attendanceChartInstance.update('none');
       }
     }
 
+    // RENDER LOG PRESENSI DENGAN FILTER UNIK (DEDUPLIKASI FRONTEND)
     function renderTodayLogs() {
       const tbody = document.getElementById('todayLogTbody');
       if (!tbody) return;
       tbody.innerHTML = '';
 
       const today = getTodayISO();
-      const logs = listAbsensi.filter(a => a.tanggal === today);
+      // Filter log hari ini dan deduplikasi unik per NISN + Sesi
+      const todayLogs = listAbsensi.filter(a => a.tanggal === today);
+      const uniqueTodayLogsMap = new Map();
+      todayLogs.forEach(log => {
+        const key = `${log.nisn}_${log.sesi}`;
+        if (!uniqueTodayLogsMap.has(key)) {
+          uniqueTodayLogsMap.set(key, log);
+        }
+      });
+
+      const logs = Array.from(uniqueTodayLogsMap.values());
       document.getElementById('todayLogCount').innerText = `${logs.length} Presensi Terdata`;
 
       if (logs.length === 0) {
