@@ -1232,12 +1232,12 @@
     const IS_PREVIEW = false;
 
     const firebaseConfig = {
-    apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
-    authDomain: "presensi-siswa-digital-a24ca.firebaseapp.com",
-    projectId: "presensi-siswa-digital-a24ca",
-    storageBucket: "presensi-siswa-digital-a24ca.firebasestorage.app",
-    messagingSenderId: "696200452974",
-    appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
+apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
+authDomain: "presensi-siswa-digital-a24ca.firebaseapp.com",
+projectId: "presensi-siswa-digital-a24ca",
+storageBucket: "presensi-siswa-digital-a24ca.firebasestorage.app",
+messagingSenderId: "696200452974",
+appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
     };
 
     let db = null;
@@ -1449,7 +1449,6 @@
         snapshot.forEach(d => {
           const data = d.data();
           if (data && data.nisn && data.tanggal && data.sesi) {
-            // Dedup key unik: kombinasi NISN + TANGGAL + SESI
             const dedupKey = `${data.nisn}_${data.tanggal}_${data.sesi}`;
             if (!uniquePresensiMap.has(dedupKey)) {
               uniquePresensiMap.set(dedupKey, data);
@@ -1780,7 +1779,6 @@
       document.getElementById('modalStudent').classList.add('hidden');
     };
 
-    // SIMPAN DATA SISWA (MURNI ASINKRON KE FIRESTORE, TANPA PUSH MANUAL)
     window.handleSaveStudent = async function(e) {
       e.preventDefault();
       const btn = document.getElementById('btnSubmitStudent');
@@ -2169,7 +2167,6 @@
       const sesi = document.getElementById('attSelectSesi').value;
       const status = document.getElementById('attSelectStatus').value;
 
-      // LAPISAN 2: ID deterministik mencegah Firestore membuat data ganda
       const recordId = mode === 'EDIT' ? document.getElementById('attRecordId').value : `ABS_${nisn}_${tanggal}_${sesi}`;
 
       const s = listSiswa.find(i => String(i.nisn) === String(nisn));
@@ -3038,7 +3035,7 @@
     };
 
     // ==========================================
-    // MODUL 8: SCANNER CEPAT & ANTI-DUPLIKASI (MUTEX LOCK)
+    // MODUL 8: SCANNER CEPAT & MULTI-TIER CAMERA FALLBACK
     // ==========================================
     function detectSessionAuto() {
       if (manualSessionOverride) return manualSessionOverride;
@@ -3065,12 +3062,34 @@
       showNotice("Sesi Diubah", `Sesi dialihkan ke: ${manualSessionOverride.toUpperCase()}`, "info");
     };
 
-    // INISIALISASI SCANNER CEPAT HP DENGAN CONSTRAINTS RINGAN
-    window.startScanner = function() {
+    // FUNGSI BERSIHKAN ALIRAN STREAM KAMERA AKTIF
+    async function cleanupActiveMediaStream() {
+      try {
+        if (html5QrScanner) {
+          if (html5QrScanner.isScanning) {
+            await html5QrScanner.stop();
+          }
+          await html5QrScanner.clear();
+        }
+      } catch (e) {}
+
+      try {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          const tempStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          tempStream.getTracks().forEach(track => track.stop());
+        }
+      } catch (e) {}
+    }
+
+    // MULTI-TIER ROBUST CAMERA ENGINE
+    window.startScanner = async function() {
       if (isScannerRunning) return;
       playBeep('success');
 
-      document.getElementById('scanPulseIndicator').className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+      const indicator = document.getElementById('scanPulseIndicator');
+      indicator.className = "w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse";
+
+      await cleanupActiveMediaStream();
 
       html5QrScanner = new Html5Qrcode("reader");
 
@@ -3080,51 +3099,99 @@
         aspectRatio: 1.0
       };
 
-      const cameraConstraint = cameraMode === "environment" 
-        ? { facingMode: { ideal: "environment" } } 
-        : { facingMode: "user" };
+      try {
+        // TIER 1: ENUMERASI KAMERA FISIK (PILIH LENSA BELAKANG SECARA SPESIFIK)
+        const devices = await Html5Qrcode.getCameras();
+        let targetCameraId = null;
 
-      html5QrScanner.start(
-        cameraConstraint,
-        qrConfig,
-        onScanSuccess,
-        () => {} // Abaikan frame kontinu
-      ).then(() => {
+        if (devices && devices.length > 0) {
+          if (cameraMode === "environment") {
+            const backCam = devices.find(d => {
+              const label = (d.label || '').toLowerCase();
+              return label.includes('back') || label.includes('rear') || label.includes('environment') || label.includes('belakang');
+            });
+            targetCameraId = backCam ? backCam.id : devices[devices.length - 1].id;
+          } else {
+            const frontCam = devices.find(d => {
+              const label = (d.label || '').toLowerCase();
+              return label.includes('front') || label.includes('user') || label.includes('depan');
+            });
+            targetCameraId = frontCam ? frontCam.id : devices[0].id;
+          }
+        }
+
+        if (targetCameraId) {
+          await html5QrScanner.start(targetCameraId, qrConfig, onScanSuccess, () => {});
+        } else {
+          // TIER 2: FALLBACK SOFT CONSTRAINTS
+          await html5QrScanner.start(
+            { facingMode: cameraMode === "environment" ? { ideal: "environment" } : "user" },
+            qrConfig,
+            onScanSuccess,
+            () => {}
+          );
+        }
+
         isScannerRunning = true;
+        indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
         document.getElementById('btnStartScanner').classList.add('hidden');
         document.getElementById('btnStopScanner').classList.remove('hidden');
         document.getElementById('btnSwitchCamera').classList.remove('hidden');
         document.getElementById('scannerOverlay').classList.add('hidden');
-      }).catch((err) => {
-        document.getElementById('scanPulseIndicator').className = "w-2.5 h-2.5 rounded-full bg-rose-500";
-        showNotice("Kamera Gagal", "Izin akses kamera diperlukan atau kamera sedang digunakan aplikasi lain.", "warning");
-      });
+
+      } catch (errTier1And2) {
+        console.warn("Percobaan Tier 1 & 2 kamera gagal, mencoba Tier 3 (Safe Mode):", errTier1And2);
+
+        try {
+          // TIER 3: SAFE MODE DEFAULT KAMERA PERANGKAT
+          await html5QrScanner.start(
+            { facingMode: "user" },
+            qrConfig,
+            onScanSuccess,
+            () => {}
+          );
+
+          isScannerRunning = true;
+          indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+          document.getElementById('btnStartScanner').classList.add('hidden');
+          document.getElementById('btnStopScanner').classList.remove('hidden');
+          document.getElementById('btnSwitchCamera').classList.remove('hidden');
+          document.getElementById('scannerOverlay').classList.add('hidden');
+
+        } catch (finalErr) {
+          console.error("Semua tingkatan inisialisasi kamera gagal:", finalErr);
+          indicator.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+          showNotice("Kamera Gagal Dibuka", "Peramban memblokir izin kamera atau kamera sedang dipakai tab lain. Silakan periksa izin kamera di ikon gembok bilah URL peramban Anda.", "warning");
+        }
+      }
     };
 
-    window.stopScanner = function() {
+    window.stopScanner = async function() {
       if (!isScannerRunning || !html5QrScanner) return;
-      html5QrScanner.stop().then(() => {
-        isScannerRunning = false;
-        document.getElementById('scanPulseIndicator').className = "w-2.5 h-2.5 rounded-full bg-slate-400";
-        document.getElementById('btnStartScanner').classList.remove('hidden');
-        document.getElementById('btnStopScanner').classList.add('hidden');
-        document.getElementById('btnSwitchCamera').classList.add('hidden');
-        document.getElementById('scannerOverlay').classList.remove('hidden');
-        document.getElementById('scannerProcessingBanner').classList.add('hidden');
-      }).catch(() => {});
+      try {
+        await html5QrScanner.stop();
+        await html5QrScanner.clear();
+      } catch (e) {}
+
+      isScannerRunning = false;
+      document.getElementById('scanPulseIndicator').className = "w-2.5 h-2.5 rounded-full bg-slate-400";
+      document.getElementById('btnStartScanner').classList.remove('hidden');
+      document.getElementById('btnStopScanner').classList.add('hidden');
+      document.getElementById('btnSwitchCamera').classList.add('hidden');
+      document.getElementById('scannerOverlay').classList.remove('hidden');
+      document.getElementById('scannerProcessingBanner').classList.add('hidden');
     };
 
-    window.switchCamera = function() {
+    window.switchCamera = async function() {
       cameraMode = cameraMode === "environment" ? "user" : "environment";
-      stopScanner();
-      setTimeout(() => startScanner(), 300);
+      await stopScanner();
+      setTimeout(() => startScanner(), 350);
     };
 
     // HANDLER SCAN ANTI-DUPLIKASI (SCAN MUTEX & DETERMINISTIC RECORD ID)
     async function onScanSuccess(decodedText) {
       if (!decodedText || isProcessingScan) return;
 
-      // 1. Kunci Mutex Seketika
       isProcessingScan = true;
       document.getElementById('scannerProcessingBanner').classList.remove('hidden');
 
@@ -3132,7 +3199,6 @@
       const session = detectSessionAuto();
       const today = getTodayISO();
 
-      // Cek ketersediaan siswa
       const siswa = listSiswa.find(s => String(s.nisn) === String(nisnScanned));
       if (!siswa) {
         playBeep('error');
@@ -3141,7 +3207,6 @@
         return;
       }
 
-      // 2. Cek apakah sudah presensi sesi ini
       const already = listAbsensi.find(a => String(a.nisn) === String(nisnScanned) && a.tanggal === today && a.sesi === session);
       if (already) {
         playBeep('error');
@@ -3155,7 +3220,6 @@
       const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
       const statusText = calculateAttendanceStatus(session, now);
 
-      // LAPISAN 2: ID Deterministik Mengunci Firestore (Upsert)
       const recordId = `ABS_${siswa.nisn}_${today}_${session}`;
 
       const record = {
@@ -3188,7 +3252,6 @@
       document.getElementById('scanSiswaInfo').innerText = `Sesi ${session} • ${timeStr} WIB • ${statusText}`;
       document.getElementById('scanSiswaFoto').src = siswa.fotoUrl;
 
-      // Beri jeda 3.5 detik sebelum scan kartu selanjutnya
       releaseScanLock(3500);
     }
 
@@ -3207,7 +3270,6 @@
       const today = getTodayISO();
       const todayRecords = listAbsensi.filter(a => a.tanggal === today);
 
-      // Gunakan Set untuk menjamin hitungan siswa UNIK
       const uniquePagiSet = new Set(todayRecords.filter(a => a.sesi === 'Pagi').map(a => String(a.nisn)));
       const uniqueSiangSet = new Set(todayRecords.filter(a => a.sesi === 'Siang').map(a => String(a.nisn)));
       const totalPresentSet = new Set(todayRecords.map(a => String(a.nisn)));
@@ -3263,7 +3325,6 @@
       tbody.innerHTML = '';
 
       const today = getTodayISO();
-      // Filter log hari ini dan deduplikasi unik per NISN + Sesi
       const todayLogs = listAbsensi.filter(a => a.tanggal === today);
       const uniqueTodayLogsMap = new Map();
       todayLogs.forEach(log => {
