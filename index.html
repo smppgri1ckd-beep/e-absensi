@@ -8,7 +8,6 @@
   <!-- PWA Manifest via Data URI -->
   <link href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22E-Presensi%20SMP%20PGRI%201%20CIKADU%22%2C%22short_name%22%3A%22PresensiQR%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%232563eb%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F2856%2F2856000.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D" rel="manifest"/>
   <meta content="#2563eb" name="theme-color"/>
-  <meta content="yes" name="mobile-web-app-capable"/>
   <meta content="yes" name="apple-mobile-web-app-capable"/>
   <meta content="default" name="apple-mobile-web-app-status-bar-style"/>
 
@@ -69,12 +68,12 @@
       overflow-x: hidden;
     }
 
-    /* Isolasi Total dari Template Blogger */
+    /* Isolasi Penuh dari Template Blogger */
     .navbar, .header, .sidebar, .footer, .blog-pager, .post-feeds, #header, #footer, #sidebar, .post-title, .feed-links, .comments {
       display: none !important;
     }
 
-    /* Scrollbar */
+    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -127,6 +126,7 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.03);
     }
 
+    /* Print Specific Media Rules */
     @media print {
       @page {
         size: 215mm 330mm portrait;
@@ -350,7 +350,7 @@
           <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <span id="scanPulseIndicator" class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Pemindai QR Kamera</h4>
               </div>
               <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-lg border border-slate-200">
@@ -365,13 +365,10 @@
             <div class="relative bg-slate-900 rounded-xl overflow-hidden aspect-square border border-slate-300 flex flex-col items-center justify-center">
               <div id="reader" class="w-full h-full"></div>
               <div id="scannerOverlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-6 text-center">
-                <div class="w-48 h-48 border-2 border-blue-400/70 rounded-2xl border-dashed flex items-center justify-center">
+                <div class="w-48 h-48 border-2 border-blue-400/70 rounded-2xl border-dashed animate-pulse flex items-center justify-center">
                   <i class="fa-solid fa-qrcode text-5xl text-white/30"></i>
                 </div>
                 <p class="text-[11px] text-slate-300 mt-3 font-medium">Arahkan QR Code Kartu ke Kamera</p>
-              </div>
-              <div id="scannerProcessingBanner" class="hidden absolute top-2 inset-x-2 py-1.5 px-3 bg-blue-600/90 text-white rounded-lg text-center text-xs font-bold shadow animate-pulse">
-                Memproses Presensi...
               </div>
             </div>
 
@@ -984,7 +981,7 @@
               </form>
             </div>
 
-            <!-- MODUL PEMELIHARAAN TERPISAH -->
+            <!-- MODUL PEMELIHARAAN BASIS DATA (TOMBOL TERPISAH) -->
             <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
               <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
                 <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm">
@@ -1014,7 +1011,6 @@
                 <button onclick="downloadBackupExcelOnly()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-sm">
                   <i class="fa-solid fa-file-excel text-sm"></i> 1. Unduh Cadangan Excel (.xlsx) Saja
                 </button>
-
                 <button onclick="purgeSemesterAttendanceOnly()" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2">
                   <i class="fa-solid fa-trash-can text-sm"></i> 2. Bersihkan / Reset Presensi Semester
                 </button>
@@ -1027,9 +1023,6 @@
 
     </main>
 
-    <!-- ========================================== -->
-    <!-- BOTTOM NAVIGATION (MOBILE / TABLET)        -->
-    <!-- ========================================== -->
     <nav id="bottomNavMobile" class="hidden md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur border-t border-slate-200 px-2 py-1.5 z-30 justify-around items-center text-[10px]">
       <button onclick="switchView('kiosk')" id="mobBtn-kiosk" class="flex flex-col items-center p-1 text-blue-600 font-bold">
         <i class="fa-solid fa-camera text-base"></i>
@@ -1058,9 +1051,7 @@
     </nav>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL: LOGIN (CLEAN HYBRID)                -->
-  <!-- ========================================== -->
+  <!-- MODAL: LOGIN -->
   <div id="modalLogin" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 text-slate-900 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -1085,9 +1076,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL: FORM DATA SISWA                     -->
-  <!-- ========================================== -->
+  <!-- MODAL: DATA SISWA -->
   <div id="modalStudent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 text-slate-900 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -1130,9 +1119,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL: FORM PRESENSI MANUAL                -->
-  <!-- ========================================== -->
+  <!-- MODAL: PRESENSI MANUAL -->
   <div id="modalAttendance" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 text-slate-900 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -1177,16 +1164,14 @@
             </select>
           </div>
         </div>
-        <button type="submit" id="btnSubmitAttendance" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md">
+        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md">
           Simpan Presensi
         </button>
       </form>
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL: NOTIFIKASI & KONFIRMASI             -->
-  <!-- ========================================== -->
+  <!-- NOTIFIKASI & KONFIRMASI -->
   <div id="noticeModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-5 text-slate-900 shadow-2xl space-y-3 text-center">
       <div id="noticeIconContainer" class="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-2xl bg-blue-50 text-blue-600">
@@ -1214,20 +1199,18 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- JAVASCRIPT MODULAR (FIREBASE & LOGIC)      -->
-  <!-- ========================================== -->
+  <!-- JAVASCRIPT MODULAR -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
-      getFirestore, collection, doc, getDoc, setDoc, deleteDoc, onSnapshot, writeBatch 
+      getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, query, where, orderBy, writeBatch 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { 
-      getAuth, signInWithEmailAndPassword, signOut 
+      getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     // ==========================================
-    // SAKLAR & KONFIGURASI FIREBASE AKTIF
+    // KONFIGURASI FIREBASE
     // ==========================================
     const IS_PREVIEW = false;
 
@@ -1256,15 +1239,12 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
     let cameraMode = "environment";
     let html5QrScanner = null;
     let isScannerRunning = false;
+    let isProcessingScan = false; // Mutex Lock Scan
     let manualSessionOverride = null;
     let attendanceChartInstance = null;
     let deferredPrompt = null;
+    let renderDebounceTimer = null;
 
-    // LAPISAN 1: MUTEX LOCK & SCAN COOLDOWN BUFFER
-    let isProcessingScan = false;
-    let scanCooldownTimer = null;
-
-    // STATE BERSIH (MURNI BEBAS DATA DUMMY)
     let listSiswa = [];
     let listAbsensi = [];
     let kalenderHebData = {};
@@ -1309,7 +1289,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       return map[d.getDay()] || "senin";
     }
 
-    // WELCOME SCREEN
+    // WELCOME SCREEN CONTROLLERS
     window.enterApplicationFromWelcome = function() {
       const screen = document.getElementById('welcomeHeroScreen');
       screen.classList.add('opacity-0', 'pointer-events-none');
@@ -1408,7 +1388,9 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       try {
         const checkDoc = await getDoc(doc(db, "pengaturan", "identitas_sekolah"));
         if (!checkDoc.exists()) {
+          console.log("Inisialisasi Firestore Database Otomatis...");
           const batch = writeBatch(db);
+
           batch.set(doc(db, "pengaturan", "identitas_sekolah"), appConfig);
           batch.set(doc(db, "users", "peserta"), {
             username: "peserta",
@@ -1416,53 +1398,57 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
             role: "PESERTA",
             nama: "Petugas Piket Harian"
           });
+
           await batch.commit();
+          console.log("Auto-setup database selesai!");
         }
       } catch (err) {
-        console.warn("Auto-setup database info:", err);
+        console.warn("Auto-setup database error:", err);
       }
     }
 
-    // REALTIME FIRESTORE SYNC & LAPISAN 3: DEDUPLIKASI ARRAY OTOMATIS
-    function setupRealtimeListeners() {
-      if (IS_PREVIEW || !db) return;
-
-      onSnapshot(collection(db, "siswa"), (snapshot) => {
-        const uniqueSiswaMap = new Map();
-        snapshot.forEach(d => {
-          const data = d.data();
-          if (data && data.nisn) {
-            uniqueSiswaMap.set(String(data.nisn), data);
-          }
-        });
-        listSiswa = Array.from(uniqueSiswaMap.values());
+    // REALTIME FIRESTORE SYNC BERSIH & CEPAT (DEDUPLICATED)
+    function triggerDebouncedRender() {
+      clearTimeout(renderDebounceTimer);
+      renderDebounceTimer = setTimeout(() => {
         populateClassDropdowns();
         renderStudentsTable();
-        renderIdCardsForPrint();
-        renderDownloadQrGrid();
-        updateDashboardStats();
-        generateRekapView();
-      });
-
-      onSnapshot(collection(db, "presensi"), (snapshot) => {
-        const uniquePresensiMap = new Map();
-        snapshot.forEach(d => {
-          const data = d.data();
-          if (data && data.nisn && data.tanggal && data.sesi) {
-            const dedupKey = `${data.nisn}_${data.tanggal}_${data.sesi}`;
-            if (!uniquePresensiMap.has(dedupKey)) {
-              uniquePresensiMap.set(dedupKey, data);
-            }
-          }
-        });
-
-        const arr = Array.from(uniquePresensiMap.values());
-        arr.sort((a, b) => (b.tanggal + b.waktu).localeCompare(a.tanggal + a.waktu));
-        listAbsensi = arr;
         renderTodayLogs();
         renderAttendanceManagementTable();
         updateDashboardStats();
         generateRekapView();
+      }, 50);
+    }
+
+    function setupRealtimeListeners() {
+      if (IS_PREVIEW || !db) return;
+
+      onSnapshot(collection(db, "siswa"), (snapshot) => {
+        const arr = [];
+        snapshot.forEach(d => {
+          const item = d.data();
+          item.nisn = String(item.nisn || d.id).trim();
+          arr.push(item);
+        });
+        listSiswa = arr;
+        triggerDebouncedRender();
+      });
+
+      onSnapshot(collection(db, "presensi"), (snapshot) => {
+        const uniqueMap = new Map();
+        snapshot.forEach(d => {
+          const item = d.data();
+          item.id = d.id;
+          item.nisn = String(item.nisn).trim();
+          const dedupeKey = `${item.nisn}_${item.tanggal}_${item.sesi}`;
+          if (!uniqueMap.has(dedupeKey)) {
+            uniqueMap.set(dedupeKey, item);
+          }
+        });
+        const arr = Array.from(uniqueMap.values());
+        arr.sort((a, b) => (b.tanggal + b.waktu).localeCompare(a.tanggal + a.waktu));
+        listAbsensi = arr;
+        triggerDebouncedRender();
       });
 
       onSnapshot(doc(db, "pengaturan", "identitas_sekolah"), (d) => {
@@ -1528,13 +1514,8 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       e.preventDefault();
       const user = document.getElementById('loginUsername').value.trim();
       const pass = document.getElementById('loginPassword').value.trim();
-      const btn = document.getElementById('btnSubmitLogin');
-      btn.disabled = true;
-      btn.innerText = "Memverifikasi...";
 
       if (IS_PREVIEW) {
-        btn.disabled = false;
-        btn.innerText = "Masuk Sekarang";
         if (user === "admin@absensi.id" && pass === "edudigital") {
           activateUserSession("ADMIN", "Administrator");
         } else if (user === "peserta" && pass === "edudigital") {
@@ -1547,8 +1528,6 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
 
       try {
         const userCredential = await signInWithEmailAndPassword(auth, user, pass);
-        btn.disabled = false;
-        btn.innerText = "Masuk Sekarang";
         activateUserSession("ADMIN", userCredential.user.email);
         return;
       } catch (authError) {
@@ -1557,15 +1536,11 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
           if (userDoc.exists()) {
             const userData = userDoc.data();
             if (userData.password === pass) {
-              btn.disabled = false;
-              btn.innerText = "Masuk Sekarang";
               activateUserSession(userData.role || "PESERTA", userData.nama || user);
               return;
             }
           }
         } catch (dbErr) {}
-        btn.disabled = false;
-        btn.innerText = "Masuk Sekarang";
         showNotice("Login Gagal", "Email/Username atau password salah!", "warning");
       }
     };
@@ -1673,7 +1648,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       updateSelectedStudentsCount();
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada data siswa. Tambahkan melalui tombol Tambah Siswa atau Impor Excel.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada data siswa.</td></tr>`;
         return;
       }
 
@@ -1716,15 +1691,23 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       }
     };
 
+    // HAPUS SISWA OPTIMISTIS (0 ms)
     window.deleteSelectedStudents = function() {
-      const selected = Array.from(document.querySelectorAll('.student-row-checkbox:checked')).map(cb => cb.value);
+      const selected = Array.from(document.querySelectorAll('.student-row-checkbox:checked')).map(cb => String(cb.value).trim());
       if (selected.length === 0) return;
 
       showConfirm(
         "Hapus Siswa Terpilih",
-        `Hapus ${selected.length} data siswa yang dipilih secara permanen dari database?`,
+        `Hapus ${selected.length} data siswa yang dipilih secara permanen?`,
         async () => {
-          showNotice("Menghapus Data", `Menghapus ${selected.length} data siswa...`, "info");
+          // Optimistic UI Update
+          listSiswa = listSiswa.filter(s => !selected.includes(String(s.nisn).trim()));
+          renderStudentsTable();
+          populateClassDropdowns();
+          renderIdCardsForPrint();
+          renderDownloadQrGrid();
+          updateDashboardStats();
+
           if (!IS_PREVIEW && db) {
             try {
               const chunkSize = 400;
@@ -1734,17 +1717,10 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
                 chunk.forEach(nisn => batch.delete(doc(db, "siswa", nisn)));
                 await batch.commit();
               }
-            } catch (e) {}
-          } else {
-            listSiswa = listSiswa.filter(s => !selected.includes(String(s.nisn)));
-            populateClassDropdowns();
-            renderStudentsTable();
-            renderIdCardsForPrint();
-            renderDownloadQrGrid();
-            updateDashboardStats();
+            } catch (e) {
+              console.error("Gagal hapus data siswa Firestore:", e);
+            }
           }
-
-          closeNoticeModal();
           showNotice("Sukses", `${selected.length} data siswa berhasil dihapus!`, "success");
         }
       );
@@ -1786,15 +1762,15 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
 
       const mode = document.getElementById('studentFormMode').value;
-      const oldNisn = document.getElementById('studentOldNisn').value;
-      const nisn = document.getElementById('formNisn').value.trim();
+      const oldNisn = String(document.getElementById('studentOldNisn').value).trim();
+      const nisn = String(document.getElementById('formNisn').value).trim();
       const nama = document.getElementById('formNama').value.trim();
       const jk = document.getElementById('formJk').value;
       const kelas = document.getElementById('formKelas').value.trim();
       const fileInput = document.getElementById('formFotoFile');
 
       let fotoUrl = "https://placehold.co/200x250/e2e8f0/64748b?text=Pas+Foto";
-      const existing = listSiswa.find(s => String(s.nisn) === String(mode === 'EDIT' ? oldNisn : nisn));
+      const existing = listSiswa.find(s => String(s.nisn) === (mode === 'EDIT' ? oldNisn : nisn));
       if (existing && existing.fotoUrl) fotoUrl = existing.fotoUrl;
 
       if (fileInput.files && fileInput.files[0]) {
@@ -1810,20 +1786,13 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
           }
           await setDoc(doc(db, "siswa", nisn), studentData);
         } catch (err) {
-          console.error("Gagal simpan siswa ke database:", err);
+          console.error("Gagal simpan siswa:", err);
         }
       } else {
-        if (mode === 'ADD') {
-          listSiswa.push(studentData);
-        } else {
-          const idx = listSiswa.findIndex(s => String(s.nisn) === String(oldNisn));
-          if (idx !== -1) listSiswa[idx] = studentData;
-        }
-        populateClassDropdowns();
+        const idx = listSiswa.findIndex(s => String(s.nisn) === (mode === 'EDIT' ? oldNisn : nisn));
+        if (idx !== -1) listSiswa[idx] = studentData;
+        else listSiswa.push(studentData);
         renderStudentsTable();
-        renderIdCardsForPrint();
-        renderDownloadQrGrid();
-        updateDashboardStats();
       }
 
       btn.disabled = false;
@@ -1837,19 +1806,23 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
     };
 
     window.confirmDeleteStudent = function(nisn) {
-      const s = listSiswa.find(i => String(i.nisn) === String(nisn));
-      showConfirm("Hapus Siswa", `Hapus data siswa ${s ? s.nama : nisn}?`, async () => {
+      const cleanNisn = String(nisn).trim();
+      const s = listSiswa.find(i => String(i.nisn) === cleanNisn);
+      showConfirm("Hapus Siswa", `Hapus data siswa ${s ? s.nama : cleanNisn}?`, async () => {
+        // Optimistic UI Update
+        listSiswa = listSiswa.filter(i => String(i.nisn) !== cleanNisn);
+        renderStudentsTable();
+        populateClassDropdowns();
+        renderIdCardsForPrint();
+        renderDownloadQrGrid();
+        updateDashboardStats();
+
         if (!IS_PREVIEW && db) {
           try {
-            await deleteDoc(doc(db, "siswa", String(nisn)));
-          } catch (e) {}
-        } else {
-          listSiswa = listSiswa.filter(i => String(i.nisn) !== String(nisn));
-          populateClassDropdowns();
-          renderStudentsTable();
-          renderIdCardsForPrint();
-          renderDownloadQrGrid();
-          updateDashboardStats();
+            await deleteDoc(doc(db, "siswa", cleanNisn));
+          } catch (e) {
+            console.error("Gagal hapus dokumen:", e);
+          }
         }
         showNotice("Terhapus", "Data siswa berhasil dihapus.", "info");
       });
@@ -1890,25 +1863,12 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
               const fotoUrl = String(row[4] || "https://placehold.co/200x250/e2e8f0/64748b?text=Pas+Foto");
 
               const sObj = { nisn, nama, jk, kelas, fotoUrl };
-              if (batch) {
-                batch.set(doc(db, "siswa", nisn), sObj);
-              } else {
-                const exIdx = listSiswa.findIndex(s => String(s.nisn) === String(nisn));
-                if (exIdx >= 0) listSiswa[exIdx] = sObj;
-                else listSiswa.push(sObj);
-              }
+              if (batch) batch.set(doc(db, "siswa", nisn), sObj);
               count++;
             }
           }
 
           if (batch) await batch.commit();
-          if (IS_PREVIEW) {
-            populateClassDropdowns();
-            renderStudentsTable();
-            renderIdCardsForPrint();
-            renderDownloadQrGrid();
-            updateDashboardStats();
-          }
           showNotice("Impor Selesai", `Berhasil memasukkan ${count} siswa dari Excel!`, "success");
         } catch (err) {
           showNotice("Format Gagal", "Gagal membaca berkas Excel.", "warning");
@@ -1937,7 +1897,6 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
               const p = zipEntry.async("base64").then((b64) => {
                 const mime = fileName.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
                 const fullB64 = `data:${mime};base64,` + b64;
-                target.fotoUrl = fullB64;
                 matched++;
                 if (batch) batch.update(doc(db, "siswa", cleanNisn), { fotoUrl: fullB64 });
               });
@@ -1948,8 +1907,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
 
         await Promise.all(promises);
         if (batch) await batch.commit();
-        renderStudentsTable();
-        renderIdCardsForPrint();
+        closeNoticeModal();
         showNotice("Ekstraksi Berhasil", `${matched} foto siswa berhasil disinkronkan!`, "success");
       }).catch(() => {
         showNotice("Gagal Ekstrak", "Pastikan file ZIP valid.", "warning");
@@ -2020,6 +1978,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       }
     };
 
+    // HAPUS PRESENSI OPTIMISTIS (0 ms)
     window.deleteSelectedAttendance = function() {
       const selected = Array.from(document.querySelectorAll('.attendance-row-checkbox:checked')).map(cb => cb.value);
       if (selected.length === 0) return;
@@ -2028,7 +1987,13 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         "Hapus Presensi Terpilih",
         `Hapus ${selected.length} data presensi yang dicentang secara permanen?`,
         async () => {
-          showNotice("Menghapus Presensi", `Menghapus ${selected.length} data presensi...`, "info");
+          // Optimistic UI Update
+          listAbsensi = listAbsensi.filter(a => !selected.includes(a.id));
+          renderAttendanceManagementTable();
+          renderTodayLogs();
+          updateDashboardStats();
+          generateRekapView();
+
           if (!IS_PREVIEW && db) {
             try {
               const chunkSize = 400;
@@ -2038,16 +2003,10 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
                 chunk.forEach(id => batch.delete(doc(db, "presensi", id)));
                 await batch.commit();
               }
-            } catch (e) {}
-          } else {
-            listAbsensi = listAbsensi.filter(a => !selected.includes(a.id));
-            renderAttendanceManagementTable();
-            renderTodayLogs();
-            updateDashboardStats();
-            generateRekapView();
+            } catch (e) {
+              console.error("Gagal hapus log presensi:", e);
+            }
           }
-
-          closeNoticeModal();
           showNotice("Sukses", `${selected.length} data presensi berhasil dihapus!`, "success");
         }
       );
@@ -2082,8 +2041,14 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         "Hapus Riwayat Terfilter",
         `Ditemukan ${targets.length} catatan presensi pada rentang ${tglAwal} s/d ${tglAkhir}. Hapus permanen data ini dari database?`,
         async () => {
-          showNotice("Menghapus Data", `Menghapus ${targets.length} catatan presensi dari Firestore...`, "info");
           const targetIds = targets.map(t => t.id);
+          
+          // Optimistic UI Update
+          listAbsensi = listAbsensi.filter(a => !targetIds.includes(a.id));
+          renderAttendanceManagementTable();
+          renderTodayLogs();
+          updateDashboardStats();
+          generateRekapView();
 
           if (!IS_PREVIEW && db) {
             try {
@@ -2097,15 +2062,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
             } catch (err) {
               console.error("Gagal hapus data presensi:", err);
             }
-          } else {
-            listAbsensi = listAbsensi.filter(a => !targetIds.includes(a.id));
-            renderAttendanceManagementTable();
-            renderTodayLogs();
-            updateDashboardStats();
-            generateRekapView();
           }
-
-          closeNoticeModal();
           showNotice("Berhasil Dihapus", `${targetIds.length} catatan presensi berhasil dibersihkan!`, "success");
         }
       );
@@ -2153,23 +2110,16 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       document.getElementById('modalAttendance').classList.add('hidden');
     };
 
-    // SIMPAN DATA PRESENSI MANUAL DENGAN ID DETERMINISTIK
     window.handleSaveAttendance = async function(e) {
       e.preventDefault();
-      const btn = document.getElementById('btnSubmitAttendance');
-      btn.disabled = true;
-      btn.innerText = "Menyimpan...";
-
-      const mode = document.getElementById('attFormMode').value;
-      const nisn = document.getElementById('attSelectSiswa').value;
+      const nisn = String(document.getElementById('attSelectSiswa').value).trim();
       const tanggal = document.getElementById('attInputTanggal').value;
-      const waktu = document.getElementById('attInputWaktu').value.trim();
       const sesi = document.getElementById('attSelectSesi').value;
+      const waktu = document.getElementById('attInputWaktu').value.trim();
       const status = document.getElementById('attSelectStatus').value;
-
-      const recordId = mode === 'EDIT' ? document.getElementById('attRecordId').value : `ABS_${nisn}_${tanggal}_${sesi}`;
-
-      const s = listSiswa.find(i => String(i.nisn) === String(nisn));
+      const s = listSiswa.find(i => String(i.nisn) === nisn);
+      
+      const recordId = `PRESENSI_${nisn}_${tanggal}_${sesi}`;
       const rec = { id: recordId, tanggal, waktu, nisn, nama: s ? s.nama : nisn, kelas: s ? s.kelas : 'Umum', sesi, status };
 
       if (!IS_PREVIEW && db) {
@@ -2180,15 +2130,10 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         const idx = listAbsensi.findIndex(i => i.id === recordId);
         if (idx !== -1) listAbsensi[idx] = rec;
         else listAbsensi.unshift(rec);
-
         renderAttendanceManagementTable();
         renderTodayLogs();
-        updateDashboardStats();
-        generateRekapView();
       }
 
-      btn.disabled = false;
-      btn.innerText = "Simpan Presensi";
       closeAttendanceModal();
       showNotice("Sukses", "Data presensi berhasil disimpan!", "success");
     };
@@ -2199,16 +2144,17 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
 
     window.confirmDeleteAttendanceRecord = function(recordId) {
       showConfirm("Hapus Catatan", "Hapus riwayat presensi ini?", async () => {
+        // Optimistic UI Update
+        listAbsensi = listAbsensi.filter(a => a.id !== recordId);
+        renderAttendanceManagementTable();
+        renderTodayLogs();
+        updateDashboardStats();
+        generateRekapView();
+
         if (!IS_PREVIEW && db) {
           try {
             await deleteDoc(doc(db, "presensi", recordId));
           } catch (e) {}
-        } else {
-          listAbsensi = listAbsensi.filter(a => a.id !== recordId);
-          renderAttendanceManagementTable();
-          renderTodayLogs();
-          updateDashboardStats();
-          generateRekapView();
         }
         showNotice("Terhapus", "Presensi berhasil dihapus.", "info");
       });
@@ -2874,7 +2820,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
     };
 
     // ==========================================
-    // MODUL 7: PENGATURAN & PEMELIHARAAN
+    // MODUL 7: PENGATURAN & PEMELIHARAAN TERPISAH
     // ==========================================
     window.previewSchoolLogo = async function(e) {
       const file = e.target.files && e.target.files[0];
@@ -2954,7 +2900,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       document.getElementById('piketJumatNip').value = appConfig.jadwalPiket.jumat?.nip || '';
     }
 
-    // PEMISAHAN TOMBOL 1: HANYA UNDUH CADANGAN EXCEL
+    // PEMISAHAN TOMBOL 1: HANYA UNDUH CADANGAN EXCEL (TIDAK MENGHAPUS)
     window.downloadBackupExcelOnly = function() {
       const year = parseInt(document.getElementById('maintenanceYear').value) || 2026;
       const sem = document.getElementById('maintenanceSemester').value;
@@ -3003,10 +2949,16 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
 
       showConfirm(
         "Konfirmasi Pembersihan Semester",
-        `PERINGATAN: Anda akan menghapus ${targets.length} data presensi periode ${startIso} s/d ${endIso} secara permanen. Pastikan Anda sudah mengunduh cadangan Excel terlebih dahulu. Lanjutkan penghapusan?`,
+        `PERINGATAN: Anda akan menghapus ${targets.length} data presensi periode ${startIso} s/d ${endIso} secara permanen. Lanjutkan?`,
         async () => {
-          showNotice("Menghapus Data", `Menghapus ${targets.length} data presensi semester lama...`, "info");
           const targetIds = targets.map(t => t.id);
+
+          // Optimistic UI Update
+          listAbsensi = listAbsensi.filter(a => !targetIds.includes(a.id));
+          renderAttendanceManagementTable();
+          renderTodayLogs();
+          updateDashboardStats();
+          generateRekapView();
 
           if (!IS_PREVIEW && db) {
             try {
@@ -3020,22 +2972,14 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
             } catch (err) {
               console.error("Gagal menghapus data arsip:", err);
             }
-          } else {
-            listAbsensi = listAbsensi.filter(a => !targetIds.includes(a.id));
-            renderAttendanceManagementTable();
-            renderTodayLogs();
-            updateDashboardStats();
-            generateRekapView();
           }
-
-          closeNoticeModal();
           showNotice("Pembersihan Sukses", `${targetIds.length} data presensi semester lama berhasil dibersihkan!`, "success");
         }
       );
     };
 
     // ==========================================
-    // MODUL 8: SCANNER CEPAT & MULTI-TIER CAMERA FALLBACK
+    // MODUL 8: SCANNER MULTI-TIER FAST START
     // ==========================================
     function detectSessionAuto() {
       if (manualSessionOverride) return manualSessionOverride;
@@ -3062,106 +3006,71 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       showNotice("Sesi Diubah", `Sesi dialihkan ke: ${manualSessionOverride.toUpperCase()}`, "info");
     };
 
-    // FUNGSI BERSIHKAN ALIRAN STREAM KAMERA AKTIF
-    async function cleanupActiveMediaStream() {
-      try {
-        if (html5QrScanner) {
-          if (html5QrScanner.isScanning) {
-            await html5QrScanner.stop();
-          }
-          await html5QrScanner.clear();
-        }
-      } catch (e) {}
-
-      try {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          const tempStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-          tempStream.getTracks().forEach(track => track.stop());
-        }
-      } catch (e) {}
-    }
-
-    // MULTI-TIER ROBUST CAMERA ENGINE
+    // INISIALISASI KAMERA MULTI-TIER CEPAT & TANPA MACET
     window.startScanner = async function() {
       if (isScannerRunning) return;
       playBeep('success');
 
-      const indicator = document.getElementById('scanPulseIndicator');
-      indicator.className = "w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse";
-
-      await cleanupActiveMediaStream();
-
-      html5QrScanner = new Html5Qrcode("reader");
-
-      const qrConfig = {
+      const config = {
         fps: 10,
         qrbox: { width: 220, height: 220 },
         aspectRatio: 1.0
       };
 
       try {
-        // TIER 1: ENUMERASI KAMERA FISIK (PILIH LENSA BELAKANG SECARA SPESIFIK)
-        const devices = await Html5Qrcode.getCameras();
-        let targetCameraId = null;
+        if (html5QrScanner) {
+          try { await html5QrScanner.stop(); } catch(e) {}
+        }
 
-        if (devices && devices.length > 0) {
-          if (cameraMode === "environment") {
-            const backCam = devices.find(d => {
-              const label = (d.label || '').toLowerCase();
-              return label.includes('back') || label.includes('rear') || label.includes('environment') || label.includes('belakang');
-            });
-            targetCameraId = backCam ? backCam.id : devices[devices.length - 1].id;
-          } else {
-            const frontCam = devices.find(d => {
-              const label = (d.label || '').toLowerCase();
-              return label.includes('front') || label.includes('user') || label.includes('depan');
-            });
-            targetCameraId = frontCam ? frontCam.id : devices[0].id;
+        html5QrScanner = new Html5Qrcode("reader");
+
+        // Tier 1: Hardware Enumeration (deviceId)
+        let selectedCameraId = null;
+        try {
+          const devices = await Html5Qrcode.getCameras();
+          if (devices && devices.length > 0) {
+            const backCam = devices.find(d => 
+              d.label.toLowerCase().includes('back') || 
+              d.label.toLowerCase().includes('rear') || 
+              d.label.toLowerCase().includes('environment')
+            );
+            selectedCameraId = backCam ? backCam.id : devices[0].id;
           }
-        }
+        } catch (camErr) {}
 
-        if (targetCameraId) {
-          await html5QrScanner.start(targetCameraId, qrConfig, onScanSuccess, () => {});
-        } else {
-          // TIER 2: FALLBACK SOFT CONSTRAINTS
-          await html5QrScanner.start(
-            { facingMode: cameraMode === "environment" ? { ideal: "environment" } : "user" },
-            qrConfig,
-            onScanSuccess,
-            () => {}
-          );
-        }
+        const cameraSource = selectedCameraId ? selectedCameraId : { facingMode: { ideal: cameraMode } };
+
+        await html5QrScanner.start(
+          cameraSource,
+          config,
+          onScanSuccess,
+          () => {}
+        );
 
         isScannerRunning = true;
-        indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+        isProcessingScan = false;
         document.getElementById('btnStartScanner').classList.add('hidden');
         document.getElementById('btnStopScanner').classList.remove('hidden');
         document.getElementById('btnSwitchCamera').classList.remove('hidden');
         document.getElementById('scannerOverlay').classList.add('hidden');
 
-      } catch (errTier1And2) {
-        console.warn("Percobaan Tier 1 & 2 kamera gagal, mencoba Tier 3 (Safe Mode):", errTier1And2);
-
+      } catch (err) {
+        // Tier 2: Fallback ke Default facingMode
         try {
-          // TIER 3: SAFE MODE DEFAULT KAMERA PERANGKAT
           await html5QrScanner.start(
-            { facingMode: "user" },
-            qrConfig,
+            { facingMode: cameraMode },
+            config,
             onScanSuccess,
             () => {}
           );
-
           isScannerRunning = true;
-          indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+          isProcessingScan = false;
           document.getElementById('btnStartScanner').classList.add('hidden');
           document.getElementById('btnStopScanner').classList.remove('hidden');
           document.getElementById('btnSwitchCamera').classList.remove('hidden');
           document.getElementById('scannerOverlay').classList.add('hidden');
-
-        } catch (finalErr) {
-          console.error("Semua tingkatan inisialisasi kamera gagal:", finalErr);
-          indicator.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
-          showNotice("Kamera Gagal Dibuka", "Peramban memblokir izin kamera atau kamera sedang dipakai tab lain. Silakan periksa izin kamera di ikon gembok bilah URL peramban Anda.", "warning");
+        } catch (fallbackErr) {
+          showNotice("Kamera Gagal", "Izin akses kamera browser diperlukan atau kamera sedang digunakan aplikasi lain.", "warning");
         }
       }
     };
@@ -3170,48 +3079,44 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       if (!isScannerRunning || !html5QrScanner) return;
       try {
         await html5QrScanner.stop();
-        await html5QrScanner.clear();
       } catch (e) {}
-
       isScannerRunning = false;
-      document.getElementById('scanPulseIndicator').className = "w-2.5 h-2.5 rounded-full bg-slate-400";
+      isProcessingScan = false;
       document.getElementById('btnStartScanner').classList.remove('hidden');
       document.getElementById('btnStopScanner').classList.add('hidden');
       document.getElementById('btnSwitchCamera').classList.add('hidden');
       document.getElementById('scannerOverlay').classList.remove('hidden');
-      document.getElementById('scannerProcessingBanner').classList.add('hidden');
     };
 
-    window.switchCamera = async function() {
+    window.switchCamera = function() {
       cameraMode = cameraMode === "environment" ? "user" : "environment";
-      await stopScanner();
-      setTimeout(() => startScanner(), 350);
+      stopScanner().then(() => {
+        setTimeout(() => startScanner(), 300);
+      });
     };
 
-    // HANDLER SCAN ANTI-DUPLIKASI (SCAN MUTEX & DETERMINISTIC RECORD ID)
+    // ON SCAN SUCCESS DENGAN SCANNING MUTEX & COOLDOWN (ANTI-GANDA)
     async function onScanSuccess(decodedText) {
       if (!decodedText || isProcessingScan) return;
+      isProcessingScan = true; // Kunci seketika
 
-      isProcessingScan = true;
-      document.getElementById('scannerProcessingBanner').classList.remove('hidden');
-
-      const nisnScanned = decodedText.trim();
+      const nisnScanned = String(decodedText).trim();
       const session = detectSessionAuto();
       const today = getTodayISO();
 
-      const siswa = listSiswa.find(s => String(s.nisn) === String(nisnScanned));
+      const siswa = listSiswa.find(s => String(s.nisn).trim() === nisnScanned);
       if (!siswa) {
         playBeep('error');
-        showNotice("Tidak Terdaftar", `Kartu QR dengan NISN [${nisnScanned}] tidak ditemukan pada sistem!`, "warning");
-        releaseScanLock(3000);
+        showNotice("Tidak Terdaftar", `Kartu NISN [${nisnScanned}] tidak dikenal!`, "warning");
+        setTimeout(() => { isProcessingScan = false; }, 2500);
         return;
       }
 
-      const already = listAbsensi.find(a => String(a.nisn) === String(nisnScanned) && a.tanggal === today && a.sesi === session);
+      const already = listAbsensi.find(a => String(a.nisn).trim() === nisnScanned && a.tanggal === today && a.sesi === session);
       if (already) {
         playBeep('error');
-        showNotice("Sudah Presensi", `${siswa.nama} sudah melakukan presensi Sesi ${session} hari ini pada pukul ${already.waktu} WIB.`, "warning");
-        releaseScanLock(3000);
+        showNotice("Sudah Presensi", `${siswa.nama} sudah presensi Sesi ${session} hari ini pada jam ${already.waktu} WIB.`, "warning");
+        setTimeout(() => { isProcessingScan = false; }, 3000);
         return;
       }
 
@@ -3220,8 +3125,8 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
       const statusText = calculateAttendanceStatus(session, now);
 
-      const recordId = `ABS_${siswa.nisn}_${today}_${session}`;
-
+      // ID DETERMINISTIK MUTLAK
+      const recordId = `PRESENSI_${nisnScanned}_${today}_${session}`;
       const record = {
         id: recordId,
         tanggal: today,
@@ -3233,58 +3138,47 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         status: statusText
       };
 
-      if (!IS_PREVIEW && db) {
-        try {
-          await setDoc(doc(db, "presensi", recordId), record);
-        } catch (e) {
-          console.error("Gagal simpan presensi ke database:", e);
-        }
-      } else {
-        listAbsensi.unshift(record);
-        updateDashboardStats();
-        renderTodayLogs();
-        renderAttendanceManagementTable();
-        generateRekapView();
-      }
+      // Optimistic UI Update untuk Tampilan Kiosk Instan
+      listAbsensi = listAbsensi.filter(a => a.id !== recordId);
+      listAbsensi.unshift(record);
+      renderTodayLogs();
+      updateDashboardStats();
 
       document.getElementById('lastScanBox').classList.remove('hidden');
       document.getElementById('scanSiswaNama').innerText = `${siswa.nama} (${siswa.kelas})`;
       document.getElementById('scanSiswaInfo').innerText = `Sesi ${session} • ${timeStr} WIB • ${statusText}`;
       document.getElementById('scanSiswaFoto').src = siswa.fotoUrl;
 
-      releaseScanLock(3500);
-    }
+      if (!IS_PREVIEW && db) {
+        try {
+          await setDoc(doc(db, "presensi", recordId), record);
+        } catch (e) {
+          console.error("Gagal simpan presensi Firestore:", e);
+        }
+      }
 
-    function releaseScanLock(delayMs) {
-      if (scanCooldownTimer) clearTimeout(scanCooldownTimer);
-      scanCooldownTimer = setTimeout(() => {
+      // Jeda Cooldown 3 detik sebelum kartu berikutnya
+      setTimeout(() => {
         isProcessingScan = false;
-        document.getElementById('scannerProcessingBanner').classList.add('hidden');
-      }, delayMs);
+      }, 3000);
     }
 
-    // ==========================================
-    // STATISTIK KEHADIRAN REALTIME & GRAFIK
-    // ==========================================
     function updateDashboardStats() {
       const today = getTodayISO();
-      const todayRecords = listAbsensi.filter(a => a.tanggal === today);
+      const records = listAbsensi.filter(a => a.tanggal === today);
 
-      const uniquePagiSet = new Set(todayRecords.filter(a => a.sesi === 'Pagi').map(a => String(a.nisn)));
-      const uniqueSiangSet = new Set(todayRecords.filter(a => a.sesi === 'Siang').map(a => String(a.nisn)));
-      const totalPresentSet = new Set(todayRecords.map(a => String(a.nisn)));
-
+      const uniquePagi = new Set(records.filter(a => a.sesi === 'Pagi').map(a => String(a.nisn).trim())).size;
+      const uniqueSiang = new Set(records.filter(a => a.sesi === 'Siang').map(a => String(a.nisn).trim())).size;
       const totalSiswa = listSiswa.length;
-      const hadirPagi = uniquePagiSet.size;
-      const hadirSiang = uniqueSiangSet.size;
-      const belumHadir = Math.max(0, totalSiswa - totalPresentSet.size);
+      const allPresent = new Set(records.map(a => String(a.nisn).trim())).size;
+      const belum = Math.max(0, totalSiswa - allPresent);
 
       document.getElementById('statTotalSiswa').innerText = totalSiswa;
-      document.getElementById('statHadirPagi').innerText = hadirPagi;
-      document.getElementById('statHadirSiang').innerText = hadirSiang;
-      document.getElementById('statBelum').innerText = belumHadir;
+      document.getElementById('statHadirPagi').innerText = uniquePagi;
+      document.getElementById('statHadirSiang').innerText = uniqueSiang;
+      document.getElementById('statBelum').innerText = belum;
 
-      updateChart(hadirPagi, hadirSiang, belumHadir);
+      updateChart(uniquePagi, uniqueSiang, belum);
     }
 
     function updateChart(pagi, siang, belum) {
@@ -3307,7 +3201,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-              y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
+              y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
               x: { grid: { display: false } }
             }
           }
@@ -3318,27 +3212,17 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       }
     }
 
-    // RENDER LOG PRESENSI DENGAN FILTER UNIK (DEDUPLIKASI FRONTEND)
     function renderTodayLogs() {
       const tbody = document.getElementById('todayLogTbody');
       if (!tbody) return;
       tbody.innerHTML = '';
 
       const today = getTodayISO();
-      const todayLogs = listAbsensi.filter(a => a.tanggal === today);
-      const uniqueTodayLogsMap = new Map();
-      todayLogs.forEach(log => {
-        const key = `${log.nisn}_${log.sesi}`;
-        if (!uniqueTodayLogsMap.has(key)) {
-          uniqueTodayLogsMap.set(key, log);
-        }
-      });
-
-      const logs = Array.from(uniqueTodayLogsMap.values());
+      const logs = listAbsensi.filter(a => a.tanggal === today);
       document.getElementById('todayLogCount').innerText = `${logs.length} Presensi Terdata`;
 
       if (logs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada presensi siswa untuk hari ini.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada data presensi hari ini.</td></tr>`;
         return;
       }
 
