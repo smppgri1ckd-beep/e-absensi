@@ -493,8 +493,8 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <input type="text" id="searchStudentInput" oninput="renderStudentsTable()" placeholder="Cari NISN atau Nama Siswa..." class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500"/>
-            <select id="filterStudentKelas" onchange="renderStudentsTable()" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500">
+            <input type="text" id="searchStudentInput" oninput="triggerDebouncedRender()" placeholder="Cari NISN atau Nama Siswa..." class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500"/>
+            <select id="filterStudentKelas" onchange="triggerDebouncedRender()" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500">
               <option value="ALL">Semua Kelas</option>
             </select>
             <div class="flex items-center justify-end text-xs text-slate-500 font-medium">
@@ -533,7 +533,7 @@
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <h3 class="text-base font-bold text-slate-900">Kelola Catatan Presensi (Realtime Database)</h3>
-              <p class="text-xs text-slate-500">Filter, edit riwayat kehadiran, dan bersihkan log kehadiran.</p>
+              <p class="text-xs text-slate-500">Filter, edit riwayat kehadiran, dan bersihkan log kehadiran instan.</p>
             </div>
             <div class="flex flex-wrap gap-2">
               <button onclick="openAttendanceModal('ADD')" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
@@ -551,21 +551,21 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
             <div>
               <label class="block text-[10px] font-bold text-slate-600 mb-1">Tanggal Mulai</label>
-              <input type="date" id="filterAbsensiTglAwal" onchange="renderAttendanceManagementTable()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs"/>
+              <input type="date" id="filterAbsensiTglAwal" onchange="triggerDebouncedRender()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs"/>
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-600 mb-1">Tanggal Sampai</label>
-              <input type="date" id="filterAbsensiTglAkhir" onchange="renderAttendanceManagementTable()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs"/>
+              <input type="date" id="filterAbsensiTglAkhir" onchange="triggerDebouncedRender()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs"/>
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-600 mb-1">Kelas</label>
-              <select id="filterAbsensiKelas" onchange="renderAttendanceManagementTable()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs">
+              <select id="filterAbsensiKelas" onchange="triggerDebouncedRender()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs">
                 <option value="ALL">Semua Kelas</option>
               </select>
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-600 mb-1">Sesi Presensi</label>
-              <select id="filterAbsensiSesi" onchange="renderAttendanceManagementTable()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs">
+              <select id="filterAbsensiSesi" onchange="triggerDebouncedRender()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs">
                 <option value="ALL">Semua Sesi</option>
                 <option value="Pagi">Sesi Pagi</option>
                 <option value="Siang">Sesi Siang</option>
@@ -1212,15 +1212,16 @@
     // ==========================================
     // KONFIGURASI FIREBASE
     // ==========================================
-    const IS_PREVIEW = false;
+    const IS_PREVIEW = false; // Harus False saat rilis
 
+    // GANTI DENGAN KREDENSIAL ASLI ANDA
     const firebaseConfig = {
-apiKey: "AIzaSyDjXxuEJYYlr2YxobGnk7TU2BXATk1nmJM",
-authDomain: "presensi-siswa-digital-a24ca.firebaseapp.com",
-projectId: "presensi-siswa-digital-a24ca",
-storageBucket: "presensi-siswa-digital-a24ca.firebasestorage.app",
-messagingSenderId: "696200452974",
-appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
+      apiKey: "API_KEY_ANDA",
+      authDomain: "PROJECT_ID.firebaseapp.com",
+      projectId: "PROJECT_ID",
+      storageBucket: "PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
     };
 
     let db = null;
@@ -1239,15 +1240,21 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
     let cameraMode = "environment";
     let html5QrScanner = null;
     let isScannerRunning = false;
-    let isProcessingScan = false; // Mutex Lock Scan
+    let isProcessingScan = false;
     let manualSessionOverride = null;
     let attendanceChartInstance = null;
     let deferredPrompt = null;
     let renderDebounceTimer = null;
 
+    // STATE LISTENER & TOMBSTONE MURNI KOSONG
     let listSiswa = [];
     let listAbsensi = [];
     let kalenderHebData = {};
+    
+    let unsubSiswa = null;
+    let unsubPresensi = null;
+    let pendingDeleteSiswa = new Set();
+    let pendingDeletePresensi = new Set();
 
     let appConfig = {
       namaSekolah: "SMP PGRI 1 CIKADU",
@@ -1331,7 +1338,6 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
           await setDoc(doc(db, "pengaturan", "identitas_sekolah"), appConfig);
         } catch (err) {}
       }
-
       applyWelcomeUI();
       showNotice("Tersimpan", "Pengaturan Layar Sambutan berhasil diperbarui!", "success");
     };
@@ -1388,9 +1394,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       try {
         const checkDoc = await getDoc(doc(db, "pengaturan", "identitas_sekolah"));
         if (!checkDoc.exists()) {
-          console.log("Inisialisasi Firestore Database Otomatis...");
           const batch = writeBatch(db);
-
           batch.set(doc(db, "pengaturan", "identitas_sekolah"), appConfig);
           batch.set(doc(db, "users", "peserta"), {
             username: "peserta",
@@ -1398,17 +1402,13 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
             role: "PESERTA",
             nama: "Petugas Piket Harian"
           });
-
           await batch.commit();
-          console.log("Auto-setup database selesai!");
         }
-      } catch (err) {
-        console.warn("Auto-setup database error:", err);
-      }
+      } catch (err) {}
     }
 
-    // REALTIME FIRESTORE SYNC BERSIH & CEPAT (DEDUPLICATED)
-    function triggerDebouncedRender() {
+    // REALTIME FIRESTORE SYNC (SINGLETON + DEBOUNCE + TOMBSTONE)
+    window.triggerDebouncedRender = function() {
       clearTimeout(renderDebounceTimer);
       renderDebounceTimer = setTimeout(() => {
         populateClassDropdowns();
@@ -1417,32 +1417,38 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         renderAttendanceManagementTable();
         updateDashboardStats();
         generateRekapView();
-      }, 50);
-    }
+      }, 50); // Meringankan beban CPU hingga 50ms
+    };
 
     function setupRealtimeListeners() {
       if (IS_PREVIEW || !db) return;
 
-      onSnapshot(collection(db, "siswa"), (snapshot) => {
+      // 1. Singleton Listener Siswa
+      if (unsubSiswa) unsubSiswa();
+      unsubSiswa = onSnapshot(collection(db, "siswa"), (snapshot) => {
         const arr = [];
         snapshot.forEach(d => {
           const item = d.data();
           item.nisn = String(item.nisn || d.id).trim();
-          arr.push(item);
+          // Filter Tombstone (Tolak data jika sedang dalam proses hapus)
+          if (!pendingDeleteSiswa.has(item.nisn)) {
+            arr.push(item);
+          }
         });
         listSiswa = arr;
         triggerDebouncedRender();
       });
 
-      onSnapshot(collection(db, "presensi"), (snapshot) => {
+      // 2. Singleton Listener Presensi
+      if (unsubPresensi) unsubPresensi();
+      unsubPresensi = onSnapshot(collection(db, "presensi"), (snapshot) => {
         const uniqueMap = new Map();
         snapshot.forEach(d => {
           const item = d.data();
           item.id = d.id;
-          item.nisn = String(item.nisn).trim();
-          const dedupeKey = `${item.nisn}_${item.tanggal}_${item.sesi}`;
-          if (!uniqueMap.has(dedupeKey)) {
-            uniqueMap.set(dedupeKey, item);
+          // Filter Tombstone
+          if (!pendingDeletePresensi.has(item.id)) {
+             uniqueMap.set(item.id, item); // Otomatis deduplikasi
           }
         });
         const arr = Array.from(uniqueMap.values());
@@ -1451,6 +1457,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         triggerDebouncedRender();
       });
 
+      // 3. Listener Pengaturan Instansi
       onSnapshot(doc(db, "pengaturan", "identitas_sekolah"), (d) => {
         if (d.exists()) {
           appConfig = d.data();
@@ -1621,13 +1628,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
           navM?.classList.remove('text-blue-600', 'font-bold');
         }
       });
-
-      if (viewKey === 'dataSiswa') renderStudentsTable();
-      if (viewKey === 'kelolaAbsensi') renderAttendanceManagementTable();
-      if (viewKey === 'cetakQr') renderIdCardsForPrint();
-      if (viewKey === 'downloadQr') renderDownloadQrGrid();
-      if (viewKey === 'kalenderHeb') renderSemesterCalendar();
-      if (viewKey === 'rekapPdf') generateRekapView();
+      triggerDebouncedRender();
     };
 
     // ==========================================
@@ -1652,8 +1653,10 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         return;
       }
 
+      const fragment = document.createDocumentFragment();
       filtered.forEach(s => {
         const tr = document.createElement('tr');
+        tr.id = `row-siswa-${s.nisn}`;
         tr.innerHTML = `
           <td class="p-3 text-center">
             <input type="checkbox" value="${s.nisn}" class="student-row-checkbox w-4 h-4 text-blue-600 rounded cursor-pointer" onchange="updateSelectedStudentsCount()"/>
@@ -1670,8 +1673,9 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
             <button onclick="confirmDeleteStudent('${s.nisn}')" class="p-1.5 text-rose-500 hover:text-rose-700" title="Hapus"><i class="fa-solid fa-trash"></i></button>
           </td>
         `;
-        tbody.appendChild(tr);
+        fragment.appendChild(tr);
       });
+      tbody.appendChild(fragment);
     };
 
     window.toggleCheckAllStudents = function(masterCheckbox) {
@@ -1691,7 +1695,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       }
     };
 
-    // HAPUS SISWA OPTIMISTIS (0 ms)
+    // HAPUS SISWA OPTIMISTIS INSTAN (1-KLIK)
     window.deleteSelectedStudents = function() {
       const selected = Array.from(document.querySelectorAll('.student-row-checkbox:checked')).map(cb => String(cb.value).trim());
       if (selected.length === 0) return;
@@ -1700,14 +1704,14 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         "Hapus Siswa Terpilih",
         `Hapus ${selected.length} data siswa yang dipilih secara permanen?`,
         async () => {
-          // Optimistic UI Update
-          listSiswa = listSiswa.filter(s => !selected.includes(String(s.nisn).trim()));
-          renderStudentsTable();
-          populateClassDropdowns();
-          renderIdCardsForPrint();
-          renderDownloadQrGrid();
-          updateDashboardStats();
+          closeNoticeModal();
+          
+          // 1. Masukkan ke Tombstone & Hapus dari UI Seketika
+          selected.forEach(nisn => pendingDeleteSiswa.add(nisn));
+          listSiswa = listSiswa.filter(s => !pendingDeleteSiswa.has(String(s.nisn).trim()));
+          triggerDebouncedRender();
 
+          // 2. Hapus dari Firestore di Background
           if (!IS_PREVIEW && db) {
             try {
               const chunkSize = 400;
@@ -1724,6 +1728,29 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
           showNotice("Sukses", `${selected.length} data siswa berhasil dihapus!`, "success");
         }
       );
+    };
+
+    window.confirmDeleteStudent = function(nisn) {
+      const cleanNisn = String(nisn).trim();
+      const s = listSiswa.find(i => String(i.nisn) === cleanNisn);
+      showConfirm("Hapus Siswa", `Hapus data siswa ${s ? s.nama : cleanNisn}?`, async () => {
+        closeNoticeModal();
+
+        // 1. Masukkan ke Tombstone & Hapus dari UI Seketika
+        pendingDeleteSiswa.add(cleanNisn);
+        listSiswa = listSiswa.filter(i => !pendingDeleteSiswa.has(String(i.nisn).trim()));
+        triggerDebouncedRender();
+
+        // 2. Hapus dari Firestore di Background
+        if (!IS_PREVIEW && db) {
+          try {
+            await deleteDoc(doc(db, "siswa", cleanNisn));
+          } catch (e) {
+            console.error("Gagal hapus dokumen:", e);
+          }
+        }
+        showNotice("Terhapus", "Data siswa berhasil dihapus.", "info");
+      });
     };
 
     window.openStudentModal = function(mode = 'ADD', nisn = '') {
@@ -1779,53 +1806,28 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
 
       const studentData = { nisn, nama, jk, kelas, fotoUrl };
 
+      // Hapus status tombstone jika data yang sama dimasukkan lagi
+      pendingDeleteSiswa.delete(nisn);
+      if(mode === 'EDIT' && oldNisn !== nisn) pendingDeleteSiswa.delete(oldNisn);
+
       if (!IS_PREVIEW && db) {
         try {
           if (mode === 'EDIT' && oldNisn !== nisn) {
             await deleteDoc(doc(db, "siswa", oldNisn));
           }
           await setDoc(doc(db, "siswa", nisn), studentData);
-        } catch (err) {
-          console.error("Gagal simpan siswa:", err);
-        }
+        } catch (err) {}
       } else {
         const idx = listSiswa.findIndex(s => String(s.nisn) === (mode === 'EDIT' ? oldNisn : nisn));
         if (idx !== -1) listSiswa[idx] = studentData;
         else listSiswa.push(studentData);
-        renderStudentsTable();
+        triggerDebouncedRender();
       }
 
       btn.disabled = false;
       btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Data Siswa`;
       closeStudentModal();
       showNotice("Sukses", `Data siswa ${nama} berhasil disimpan!`, "success");
-    };
-
-    window.editStudent = function(nisn) {
-      openStudentModal('EDIT', nisn);
-    };
-
-    window.confirmDeleteStudent = function(nisn) {
-      const cleanNisn = String(nisn).trim();
-      const s = listSiswa.find(i => String(i.nisn) === cleanNisn);
-      showConfirm("Hapus Siswa", `Hapus data siswa ${s ? s.nama : cleanNisn}?`, async () => {
-        // Optimistic UI Update
-        listSiswa = listSiswa.filter(i => String(i.nisn) !== cleanNisn);
-        renderStudentsTable();
-        populateClassDropdowns();
-        renderIdCardsForPrint();
-        renderDownloadQrGrid();
-        updateDashboardStats();
-
-        if (!IS_PREVIEW && db) {
-          try {
-            await deleteDoc(doc(db, "siswa", cleanNisn));
-          } catch (e) {
-            console.error("Gagal hapus dokumen:", e);
-          }
-        }
-        showNotice("Terhapus", "Data siswa berhasil dihapus.", "info");
-      });
     };
 
     window.exportStudentsToExcel = function() {
@@ -1862,6 +1864,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
               const kelas = String(row[3] || 'Umum').trim();
               const fotoUrl = String(row[4] || "https://placehold.co/200x250/e2e8f0/64748b?text=Pas+Foto");
 
+              pendingDeleteSiswa.delete(nisn); // Clear tombstone if re-imported
               const sObj = { nisn, nama, jk, kelas, fotoUrl };
               if (batch) batch.set(doc(db, "siswa", nisn), sObj);
               count++;
@@ -1938,6 +1941,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         return;
       }
 
+      const fragment = document.createDocumentFragment();
       filtered.forEach(a => {
         const tr = document.createElement('tr');
         const badgeColor = a.sesi === 'Pagi' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100';
@@ -1957,8 +1961,9 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
             <button onclick="confirmDeleteAttendanceRecord('${a.id}')" class="p-1.5 text-rose-500 hover:text-rose-700" title="Hapus"><i class="fa-solid fa-trash"></i></button>
           </td>
         `;
-        tbody.appendChild(tr);
+        fragment.appendChild(tr);
       });
+      tbody.appendChild(fragment);
     };
 
     window.toggleCheckAllAttendance = function(masterCheckbox) {
@@ -1978,7 +1983,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       }
     };
 
-    // HAPUS PRESENSI OPTIMISTIS (0 ms)
+    // HAPUS PRESENSI OPTIMISTIS INSTAN (1-KLIK)
     window.deleteSelectedAttendance = function() {
       const selected = Array.from(document.querySelectorAll('.attendance-row-checkbox:checked')).map(cb => cb.value);
       if (selected.length === 0) return;
@@ -1987,13 +1992,14 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         "Hapus Presensi Terpilih",
         `Hapus ${selected.length} data presensi yang dicentang secara permanen?`,
         async () => {
-          // Optimistic UI Update
-          listAbsensi = listAbsensi.filter(a => !selected.includes(a.id));
-          renderAttendanceManagementTable();
-          renderTodayLogs();
-          updateDashboardStats();
-          generateRekapView();
+          closeNoticeModal();
 
+          // 1. Masukkan ke Tombstone & Hapus dari UI Seketika
+          selected.forEach(id => pendingDeletePresensi.add(id));
+          listAbsensi = listAbsensi.filter(a => !pendingDeletePresensi.has(a.id));
+          triggerDebouncedRender();
+
+          // 2. Hapus dari Firestore di Background
           if (!IS_PREVIEW && db) {
             try {
               const chunkSize = 400;
@@ -2012,13 +2018,32 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       );
     };
 
+    window.confirmDeleteAttendanceRecord = function(recordId) {
+      showConfirm("Hapus Catatan", "Hapus riwayat presensi ini?", async () => {
+        closeNoticeModal();
+
+        // 1. Masukkan ke Tombstone & Hapus dari UI Seketika
+        pendingDeletePresensi.add(recordId);
+        listAbsensi = listAbsensi.filter(a => !pendingDeletePresensi.has(a.id));
+        triggerDebouncedRender();
+
+        // 2. Hapus dari Firestore di Background
+        if (!IS_PREVIEW && db) {
+          try {
+            await deleteDoc(doc(db, "presensi", recordId));
+          } catch (e) {}
+        }
+        showNotice("Terhapus", "Presensi berhasil dihapus.", "info");
+      });
+    };
+
     window.resetAttendanceFilter = function() {
       const ym = getCurYearMonth();
       document.getElementById('filterAbsensiTglAwal').value = `${ym}-01`;
       document.getElementById('filterAbsensiTglAkhir').value = getTodayISO();
       document.getElementById('filterAbsensiKelas').value = 'ALL';
       document.getElementById('filterAbsensiSesi').value = 'ALL';
-      renderAttendanceManagementTable();
+      triggerDebouncedRender();
     };
 
     window.confirmDeleteFilteredAttendance = function() {
@@ -2039,16 +2064,15 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
 
       showConfirm(
         "Hapus Riwayat Terfilter",
-        `Ditemukan ${targets.length} catatan presensi pada rentang ${tglAwal} s/d ${tglAkhir}. Hapus permanen data ini dari database?`,
+        `Ditemukan ${targets.length} catatan presensi. Hapus permanen data ini dari database?`,
         async () => {
+          closeNoticeModal();
           const targetIds = targets.map(t => t.id);
           
           // Optimistic UI Update
-          listAbsensi = listAbsensi.filter(a => !targetIds.includes(a.id));
-          renderAttendanceManagementTable();
-          renderTodayLogs();
-          updateDashboardStats();
-          generateRekapView();
+          targetIds.forEach(id => pendingDeletePresensi.add(id));
+          listAbsensi = listAbsensi.filter(a => !pendingDeletePresensi.has(a.id));
+          triggerDebouncedRender();
 
           if (!IS_PREVIEW && db) {
             try {
@@ -2059,9 +2083,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
                 chunk.forEach(id => batch.delete(doc(db, "presensi", id)));
                 await batch.commit();
               }
-            } catch (err) {
-              console.error("Gagal hapus data presensi:", err);
-            }
+            } catch (err) {}
           }
           showNotice("Berhasil Dihapus", `${targetIds.length} catatan presensi berhasil dibersihkan!`, "success");
         }
@@ -2122,6 +2144,8 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const recordId = `PRESENSI_${nisn}_${tanggal}_${sesi}`;
       const rec = { id: recordId, tanggal, waktu, nisn, nama: s ? s.nama : nisn, kelas: s ? s.kelas : 'Umum', sesi, status };
 
+      pendingDeletePresensi.delete(recordId); // Clear tombstone just in case
+
       if (!IS_PREVIEW && db) {
         try {
           await setDoc(doc(db, "presensi", recordId), rec);
@@ -2130,8 +2154,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         const idx = listAbsensi.findIndex(i => i.id === recordId);
         if (idx !== -1) listAbsensi[idx] = rec;
         else listAbsensi.unshift(rec);
-        renderAttendanceManagementTable();
-        renderTodayLogs();
+        triggerDebouncedRender();
       }
 
       closeAttendanceModal();
@@ -2140,24 +2163,6 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
 
     window.editAttendanceRecord = function(recordId) {
       openAttendanceModal('EDIT', recordId);
-    };
-
-    window.confirmDeleteAttendanceRecord = function(recordId) {
-      showConfirm("Hapus Catatan", "Hapus riwayat presensi ini?", async () => {
-        // Optimistic UI Update
-        listAbsensi = listAbsensi.filter(a => a.id !== recordId);
-        renderAttendanceManagementTable();
-        renderTodayLogs();
-        updateDashboardStats();
-        generateRekapView();
-
-        if (!IS_PREVIEW && db) {
-          try {
-            await deleteDoc(doc(db, "presensi", recordId));
-          } catch (e) {}
-        }
-        showNotice("Terhapus", "Presensi berhasil dihapus.", "info");
-      });
     };
 
     // ==========================================
@@ -2182,6 +2187,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const cardsPerPage = 9;
       const totalPages = Math.ceil(filtered.length / cardsPerPage);
       let cardGlobalIndex = 0;
+      const fragment = document.createDocumentFragment();
 
       for (let p = 0; p < totalPages; p++) {
         const pageDiv = document.createElement('div');
@@ -2202,14 +2208,12 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
                 <p class="text-[5px] text-amber-600 font-bold italic tracking-wide">Disiplin • Karakter • Berprestasi</p>
               </div>
             </div>
-
             <div class="bg-[#09408f] py-0.5 px-2 flex items-center justify-between text-white shrink-0">
               <span class="text-[6.5px] font-black uppercase tracking-wider flex items-center gap-1">
                 <i class="fa-solid fa-id-badge text-[6.5px] text-amber-300"></i> KARTU ABSENSI DIGITAL
               </span>
               <span class="text-[5.5px] text-blue-200 uppercase tracking-widest font-mono font-bold">F4-ID</span>
             </div>
-
             <div class="px-2 pt-1.5 pb-0.5 flex items-center gap-2 shrink-0">
               <div class="w-[17mm] h-[22mm] rounded-md border-[1.5px] border-[#09408f] overflow-hidden shrink-0 bg-slate-100 flex items-center justify-center">
                 <img src="${siswa.fotoUrl}" class="w-full h-full object-cover" alt="Foto" crossorigin="anonymous"/>
@@ -2235,7 +2239,6 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
                 </div>
               </div>
             </div>
-
             <div class="flex flex-col items-center justify-center flex-1 py-1">
               <div class="p-1 bg-white border-[1.2px] border-[#09408f] rounded-lg shadow-sm">
                 <div id="${qrId}" class="flex items-center justify-center w-[74px] h-[74px]"></div>
@@ -2244,44 +2247,30 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
                 <i class="fa-solid fa-expand text-[5px]"></i> SCAN PAGI &amp; SIANG
               </div>
             </div>
-
             <div class="w-full bg-[#09408f] text-white py-0.5 px-1 text-center border-t-[1.5px] border-amber-400 shrink-0">
               <p class="text-[5.5px] italic text-amber-200 font-medium leading-tight">— Disiplin Membentuk Karakter &amp; Masa Depan —</p>
             </div>
           `;
-
           pageDiv.appendChild(cardDiv);
 
           setTimeout(() => {
             const qrEl = document.getElementById(qrId);
             if (qrEl && typeof QRCode !== 'undefined') {
               qrEl.innerHTML = '';
-              new QRCode(qrEl, {
-                text: String(siswa.nisn),
-                width: 74,
-                height: 74,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-              });
+              new QRCode(qrEl, { text: String(siswa.nisn), width: 74, height: 74, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
             }
           }, 50);
-
           cardGlobalIndex++;
         });
-
-        container.appendChild(pageDiv);
+        fragment.appendChild(pageDiv);
       }
+      container.appendChild(fragment);
     };
 
     window.printIdCards = function() {
       document.body.classList.add('printing-idcard');
-      setTimeout(() => {
-        window.print();
-      }, 300);
-      window.onafterprint = () => {
-        document.body.classList.remove('printing-idcard');
-      };
+      setTimeout(() => window.print(), 300);
+      window.onafterprint = () => document.body.classList.remove('printing-idcard');
     };
 
     window.downloadIdCardsPDF = async function() {
@@ -2291,26 +2280,17 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         showNotice("Gagal", "Tidak ada kartu untuk diunduh.", "warning");
         return;
       }
-
       showNotice("Menyiapkan PDF F4", "Memproses lembar kartu F4 (215 x 330 mm)...", "info");
 
       try {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({ unit: 'mm', format: [215, 330], orientation: 'portrait' });
-
         for (let i = 0; i < pages.length; i++) {
-          const page = pages[i];
-          const canvas = await html2canvas(page, {
-            scale: 2.5,
-            useCORS: true,
-            allowTaint: false,
-            backgroundColor: "#ffffff"
-          });
+          const canvas = await html2canvas(pages[i], { scale: 2.5, useCORS: true, backgroundColor: "#ffffff" });
           const imgData = canvas.toDataURL('image/jpeg', 0.95);
           if (i > 0) pdf.addPage([215, 330], 'portrait');
           pdf.addImage(imgData, 'JPEG', 0, 0, 215, 330);
         }
-
         pdf.save(`ID_Card_Presensi_F4_${getTodayISO()}.pdf`);
         closeNoticeModal();
         showNotice("Berhasil", "Kartu Siswa format F4 berhasil diunduh!", "success");
@@ -2338,6 +2318,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         return;
       }
 
+      const fragment = document.createDocumentFragment();
       filtered.forEach((siswa, idx) => {
         const card = document.createElement('div');
         card.className = "bg-white border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-between text-center shadow-sm space-y-2";
@@ -2355,22 +2336,16 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
             <i class="fa-solid fa-download"></i> Unduh PNG
           </button>
         `;
-        container.appendChild(card);
+        fragment.appendChild(card);
 
         setTimeout(() => {
           const el = document.getElementById(qrElId);
           if (el && typeof QRCode !== 'undefined') {
-            new QRCode(el, {
-              text: String(siswa.nisn),
-              width: 96,
-              height: 96,
-              colorDark: "#000000",
-              colorLight: "#ffffff",
-              correctLevel: QRCode.CorrectLevel.H
-            });
+            new QRCode(el, { text: String(siswa.nisn), width: 96, height: 96, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
           }
         }, 50);
       });
+      container.appendChild(fragment);
     };
 
     window.downloadSingleQrPng = function(nisn, nama, qrElId) {
@@ -2391,7 +2366,6 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       ctx.font = 'bold 14px Inter, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(nama, 125, 245);
-
       ctx.fillStyle = '#475569';
       ctx.font = '12px JetBrains Mono, monospace';
       ctx.fillText(`NISN: ${nisn}`, 125, 268);
@@ -2410,21 +2384,12 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         showNotice("Gagal", "Tidak ada siswa untuk diunduh.", "warning");
         return;
       }
-
       showNotice("Membuat Berkas ZIP", "Menyusun seluruh QR Code ke dalam arsip ZIP...", "info");
       const zip = new JSZip();
 
       targets.forEach(s => {
         const tempDiv = document.createElement('div');
-        new QRCode(tempDiv, {
-          text: String(s.nisn),
-          width: 200,
-          height: 200,
-          colorDark: "#000000",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.H
-        });
-
+        new QRCode(tempDiv, { text: String(s.nisn), width: 200, height: 200, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
         const img = tempDiv.querySelector('img') || tempDiv.querySelector('canvas');
         if (img) {
           const canvas = document.createElement('canvas');
@@ -2434,16 +2399,13 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, 250, 300);
           ctx.drawImage(img, 25, 20, 200, 200);
-
           ctx.fillStyle = '#0f172a';
           ctx.font = 'bold 14px sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText(s.nama, 125, 245);
-
           ctx.fillStyle = '#475569';
           ctx.font = '12px monospace';
           ctx.fillText(`NISN: ${s.nisn}`, 125, 268);
-
           const b64 = canvas.toDataURL('image/png').split(',')[1];
           zip.file(`QR_${s.nisn}_${s.nama.replace(/\s+/g, '_')}.png`, b64, { base64: true });
         }
@@ -2467,21 +2429,15 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const curYear = new Date().getFullYear();
       if (sem === 'ganjil') {
         return [
-          { monthIdx: 6, year: curYear, name: "Juli" },
-          { monthIdx: 7, year: curYear, name: "Agustus" },
-          { monthIdx: 8, year: curYear, name: "September" },
-          { monthIdx: 9, year: curYear, name: "Oktober" },
-          { monthIdx: 10, year: curYear, name: "November" },
-          { monthIdx: 11, year: curYear, name: "Desember" }
+          { monthIdx: 6, year: curYear, name: "Juli" }, { monthIdx: 7, year: curYear, name: "Agustus" },
+          { monthIdx: 8, year: curYear, name: "September" }, { monthIdx: 9, year: curYear, name: "Oktober" },
+          { monthIdx: 10, year: curYear, name: "November" }, { monthIdx: 11, year: curYear, name: "Desember" }
         ];
       } else {
         return [
-          { monthIdx: 0, year: curYear, name: "Januari" },
-          { monthIdx: 1, year: curYear, name: "Februari" },
-          { monthIdx: 2, year: curYear, name: "Maret" },
-          { monthIdx: 3, year: curYear, name: "April" },
-          { monthIdx: 4, year: curYear, name: "Mei" },
-          { monthIdx: 5, year: curYear, name: "Juni" }
+          { monthIdx: 0, year: curYear, name: "Januari" }, { monthIdx: 1, year: curYear, name: "Februari" },
+          { monthIdx: 2, year: curYear, name: "Maret" }, { monthIdx: 3, year: curYear, name: "April" },
+          { monthIdx: 4, year: curYear, name: "Mei" }, { monthIdx: 5, year: curYear, name: "Juni" }
         ];
       }
     }
@@ -2489,14 +2445,11 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
     function initDefaultCalendarHeb() {
       const semesterMonths = getSemesterMonths();
       const workdays = parseInt(appConfig.sistemHariSekolah || "5");
-
       semesterMonths.forEach(mObj => {
         const { monthIdx, year } = mObj;
         const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
         for (let day = 1; day <= daysInMonth; day++) {
-          const mStr = String(monthIdx + 1).padStart(2, '0');
-          const dStr = String(day).padStart(2, '0');
-          const dateKey = `${year}-${mStr}-${dStr}`;
+          const dateKey = `${year}-${String(monthIdx + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
           const dayOfWeek = new Date(year, monthIdx, day).getDay();
           if (kalenderHebData[dateKey] === undefined) {
             kalenderHebData[dateKey] = workdays === 6 ? (dayOfWeek !== 0) : (dayOfWeek !== 0 && dayOfWeek !== 6);
@@ -2510,10 +2463,9 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const container = document.getElementById('hebCalendarGrid');
       if (!container) return;
       container.innerHTML = '';
-
       const semesterMonths = getSemesterMonths();
-      let totalHeb = 0;
-      let totalLibur = 0;
+      let totalHeb = 0, totalLibur = 0;
+      const fragment = document.createDocumentFragment();
 
       semesterMonths.forEach(m => {
         const firstDay = new Date(m.year, m.monthIdx, 1).getDay();
@@ -2522,20 +2474,12 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         let daysHtml = '';
 
         for (let b = 0; b < firstDay; b++) daysHtml += `<div></div>`;
-
         for (let d = 1; d <= daysInMonth; d++) {
           const dateKey = `${m.year}-${String(m.monthIdx + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
           const isHeb = kalenderHebData[dateKey] === true;
-
-          if (isHeb) { monthHeb++; totalHeb++; }
-          else { totalLibur++; }
-
+          if (isHeb) { monthHeb++; totalHeb++; } else { totalLibur++; }
           const btnCls = isHeb ? 'bg-emerald-600 text-white font-bold' : 'bg-slate-100 text-slate-400 font-medium';
-          daysHtml += `
-            <button type="button" onclick="toggleDateHeb('${dateKey}')" class="h-7 w-full rounded text-[11px] flex items-center justify-center transition ${btnCls}">
-              ${d}
-            </button>
-          `;
+          daysHtml += `<button type="button" onclick="toggleDateHeb('${dateKey}')" class="h-7 w-full rounded text-[11px] flex items-center justify-center transition ${btnCls}">${d}</button>`;
         }
 
         const card = document.createElement('div');
@@ -2550,9 +2494,9 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
           </div>
           <div class="grid grid-cols-7 gap-1">${daysHtml}</div>
         `;
-        container.appendChild(card);
+        fragment.appendChild(card);
       });
-
+      container.appendChild(fragment);
       document.getElementById('hebTotalHariBadge').innerText = `${totalHeb} Hari`;
       document.getElementById('hebTotalSesiBadge').innerText = `${totalHeb * 2} Sesi`;
       document.getElementById('hebTotalLiburBadge').innerText = `${totalLibur} Hari`;
@@ -2564,9 +2508,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       generateRekapView();
     };
 
-    window.onHebSemesterChange = function() {
-      initDefaultCalendarHeb();
-    };
+    window.onHebSemesterChange = function() { initDefaultCalendarHeb(); };
 
     window.applyCalendarWeeklyPattern = function(workdays) {
       const semesterMonths = getSemesterMonths();
@@ -2580,14 +2522,12 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       });
       renderSemesterCalendar();
       generateRekapView();
-      showNotice("Sukses", `Pola ${workdays} hari sekolah berhasil diterapkan.`, "success");
+      showNotice("Sukses", `Pola ${workdays} hari sekolah diterapkan.`, "success");
     };
 
     window.saveKalenderHebToDatabase = async function() {
       const sem = document.getElementById('hebSelectSemester')?.value || 'ganjil';
-      const curYear = new Date().getFullYear();
-      const semKey = `${curYear}_${sem}`;
-
+      const semKey = `${new Date().getFullYear()}_${sem}`;
       if (!IS_PREVIEW && db) {
         try {
           await setDoc(doc(db, "kalender_heb", semKey), { semKey, kalenderData: kalenderHebData });
@@ -2603,7 +2543,6 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       let cur = new Date(startDateStr + 'T00:00:00');
       const end = new Date(endDateStr + 'T00:00:00');
       if (cur > end) return 1;
-
       let count = 0;
       while (cur <= end) {
         const k = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
@@ -2641,12 +2580,10 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const p = document.getElementById('rekapPeriode').value;
       const today = new Date();
       let start = new Date();
-
       if (p === 'harian') start = today;
       else if (p === 'mingguan') start.setDate(today.getDate() - 7);
       else if (p === 'bulanan') start.setMonth(today.getMonth() - 1);
       else if (p === 'semester') start.setMonth(today.getMonth() - 6);
-
       document.getElementById('rekapTglAwal').value = start.toISOString().split('T')[0];
       document.getElementById('rekapTglAkhir').value = today.toISOString().split('T')[0];
       generateRekapView();
@@ -2656,7 +2593,6 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const inputTgl = document.getElementById('rekapInputTglTtd')?.value || getTodayISO();
       const inputKota = document.getElementById('rekapInputKota')?.value || appConfig.kota || "Cianjur";
       const selPiket = document.getElementById('rekapSelectPetugasPiket')?.value || "AUTO";
-
       let piketKey = selPiket === "AUTO" ? getDayKey(inputTgl) : selPiket;
       const piketObj = appConfig.jadwalPiket[piketKey] || appConfig.jadwalPiket.senin;
 
@@ -2673,7 +2609,6 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const tglAkhir = document.getElementById('rekapTglAkhir')?.value;
       const kelas = document.getElementById('rekapKelas')?.value || 'ALL';
       const periode = document.getElementById('rekapPeriode')?.value || 'bulanan';
-
       if (!tglAwal || !tglAkhir) return;
 
       const isSingleDay = (tglAwal === tglAkhir);
@@ -2698,20 +2633,17 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         return;
       }
 
-      let grandPagi = 0;
-      let grandSiang = 0;
-      let grandPersen = 0;
+      let grandPagi = 0, grandSiang = 0, grandPersen = 0;
+      const fragment = document.createDocumentFragment();
 
       filtered.forEach((siswa, idx) => {
         const studentLogs = listAbsensi.filter(a => String(a.nisn) === String(siswa.nisn) && a.tanggal >= tglAwal && a.tanggal <= tglAkhir);
         const logPagi = studentLogs.filter(a => a.sesi === 'Pagi');
         const logSiang = studentLogs.filter(a => a.sesi === 'Siang');
-
+        
         const totalPagi = logPagi.length;
         const totalSiang = logSiang.length;
-        grandPagi += totalPagi;
-        grandSiang += totalSiang;
-
+        grandPagi += totalPagi; grandSiang += totalSiang;
         const persen = Math.min(100, Math.round(((totalPagi + totalSiang) / targetSesi) * 100));
         grandPersen += persen;
 
@@ -2730,7 +2662,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
           <td class="border border-slate-900 p-2 text-center">${dispSiang}</td>
           <td class="border border-slate-900 p-2 text-center font-bold ${persen >= 75 ? 'text-emerald-700' : 'text-amber-700'}">${persen}%</td>
         `;
-        tbody.appendChild(tr);
+        fragment.appendChild(tr);
       });
 
       const avg = filtered.length > 0 ? Math.round(grandPersen / filtered.length) : 0;
@@ -2742,7 +2674,8 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         <td class="border border-slate-900 p-2 text-center text-emerald-800 font-extrabold">${grandSiang} Hadir</td>
         <td class="border border-slate-900 p-2 text-center text-emerald-800 font-black">${avg}%</td>
       `;
-      tbody.appendChild(trTotal);
+      fragment.appendChild(trTotal);
+      tbody.appendChild(fragment);
     };
 
     window.exportRekapToExcel = function() {
@@ -2752,10 +2685,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const filtered = kelas === 'ALL' ? listSiswa : listSiswa.filter(s => s.kelas === kelas);
 
       const rows = [
-        ["LAPORAN REKAPITULASI PRESENSI SISWA"],
-        [appConfig.namaSekolah],
-        [`Periode: ${tglAwal} s/d ${tglAkhir} | Kelas: ${kelas}`],
-        [],
+        ["LAPORAN REKAPITULASI PRESENSI SISWA"], [appConfig.namaSekolah], [`Periode: ${tglAwal} s/d ${tglAkhir} | Kelas: ${kelas}`], [],
         ["NO", "NISN", "NAMA SISWA", "KELAS", "HADIR PAGI", "HADIR SIANG", "TOTAL HADIR", "PERSENTASE"]
       ];
 
@@ -2776,135 +2706,29 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const target = document.getElementById('rekapSheetWrapper');
       if (!target) return;
       const frame = document.createElement('iframe');
-      frame.style.position = 'fixed';
-      frame.style.width = '0';
-      frame.style.height = '0';
+      frame.style.position = 'fixed'; frame.style.width = '0'; frame.style.height = '0';
       document.body.appendChild(frame);
-
       const doc = frame.contentWindow.document;
       doc.open();
-      doc.write(`
-        <!DOCTYPE html><html><head><title>Cetak Laporan</title>
-        <style>
-          @page { size: A4 portrait; margin: 8mm; }
-          body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-          table { width: 100%; border-collapse: collapse; font-size: 11px; }
-          th, td { border: 1px solid #000; padding: 4px; }
-        </style></head><body>${target.innerHTML}</body></html>
-      `);
+      doc.write(`<!DOCTYPE html><html><head><title>Cetak Laporan</title><style>@page { size: A4 portrait; margin: 8mm; } body { font-family: Arial, sans-serif; margin: 0; padding: 0; } table { width: 100%; border-collapse: collapse; font-size: 11px; } th, td { border: 1px solid #000; padding: 4px; }</style></head><body>${target.innerHTML}</body></html>`);
       doc.close();
-
-      setTimeout(() => {
-        frame.contentWindow.focus();
-        frame.contentWindow.print();
-        setTimeout(() => document.body.removeChild(frame), 1000);
-      }, 300);
+      setTimeout(() => { frame.contentWindow.focus(); frame.contentWindow.print(); setTimeout(() => document.body.removeChild(frame), 1000); }, 300);
     };
 
     window.downloadRekapPDF = function() {
       const element = document.getElementById('rekapSheetWrapper');
       const clone = element.cloneNode(true);
-      clone.style.padding = '0';
-      clone.style.boxShadow = 'none';
-      clone.style.width = '194mm';
-
-      const opt = {
-        margin: 8,
-        filename: `Laporan_Rekap_Presensi_${getTodayISO()}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2.5, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
+      clone.style.padding = '0'; clone.style.boxShadow = 'none'; clone.style.width = '194mm';
+      const opt = { margin: 8, filename: `Laporan_Rekap_Presensi_${getTodayISO()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2.5, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
       html2pdf().set(opt).from(clone).save();
     };
 
     // ==========================================
     // MODUL 7: PENGATURAN & PEMELIHARAAN TERPISAH
     // ==========================================
-    window.previewSchoolLogo = async function(e) {
-      const file = e.target.files && e.target.files[0];
-      if (file) {
-        const b64 = await compressImageFile(file, 200, 0.85);
-        document.getElementById('cfgLogoPreview').src = b64;
-      }
-    };
-
-    window.saveSchoolIdentity = async function(e) {
-      e.preventDefault();
-      appConfig.namaSekolah = document.getElementById('cfgNamaSekolah').value.trim();
-      appConfig.npsn = document.getElementById('cfgNpsn').value.trim();
-      appConfig.kota = document.getElementById('cfgKota').value.trim();
-      appConfig.alamat = document.getElementById('cfgAlamat').value.trim();
-      appConfig.namaKepsek = document.getElementById('cfgNamaKepsek').value.trim();
-      appConfig.nipKepsek = document.getElementById('cfgNipKepsek').value.trim();
-      appConfig.logoUrl = document.getElementById('cfgLogoPreview').src;
-
-      if (!IS_PREVIEW && db) {
-        try {
-          await setDoc(doc(db, "pengaturan", "identitas_sekolah"), appConfig);
-        } catch (err) {}
-      }
-
-      applySchoolIdentityUI();
-      renderIdCardsForPrint();
-      applyWelcomeUI();
-      showNotice("Tersimpan", "Identitas instansi sekolah berhasil diperbarui!", "success");
-    };
-
-    window.saveJadwalPiket = async function(e) {
-      e.preventDefault();
-      appConfig.jadwalPiket.senin = { nama: document.getElementById('piketSeninNama').value.trim(), nip: document.getElementById('piketSeninNip').value.trim() };
-      appConfig.jadwalPiket.selasa = { nama: document.getElementById('piketSelasaNama').value.trim(), nip: document.getElementById('piketSelasaNip').value.trim() };
-      appConfig.jadwalPiket.rabu = { nama: document.getElementById('piketRabuNama').value.trim(), nip: document.getElementById('piketRabuNip').value.trim() };
-      appConfig.jadwalPiket.kamis = { nama: document.getElementById('piketKamisNama').value.trim(), nip: document.getElementById('piketKamisNip').value.trim() };
-      appConfig.jadwalPiket.jumat = { nama: document.getElementById('piketJumatNama').value.trim(), nip: document.getElementById('piketJumatNip').value.trim() };
-
-      if (!IS_PREVIEW && db) {
-        try {
-          await setDoc(doc(db, "pengaturan", "identitas_sekolah"), appConfig);
-        } catch (err) {}
-      }
-
-      updatePiketBannerToday();
-      updateSignatureDisplay();
-      showNotice("Tersimpan", "Jadwal Guru Piket berhasil diperbarui!", "success");
-    };
-
-    function updatePiketBannerToday() {
-      const todayKey = getDayKey(getTodayISO());
-      const piket = appConfig.jadwalPiket[todayKey] || appConfig.jadwalPiket.senin;
-      document.getElementById('badgeHariPiket').innerText = todayKey.toUpperCase();
-      document.getElementById('namaPiketHariIni').innerText = piket.nama || "Petugas Piket";
-      document.getElementById('nipPiketHariIni').innerText = piket.nip ? `NIP: ${piket.nip}` : "NIP: -";
-    }
-
-    function populateSettingsForm() {
-      document.getElementById('cfgNamaSekolah').value = appConfig.namaSekolah;
-      document.getElementById('cfgNpsn').value = appConfig.npsn;
-      document.getElementById('cfgKota').value = appConfig.kota;
-      document.getElementById('cfgAlamat').value = appConfig.alamat;
-      document.getElementById('cfgNamaKepsek').value = appConfig.namaKepsek;
-      document.getElementById('cfgNipKepsek').value = appConfig.nipKepsek;
-      document.getElementById('cfgLogoPreview').src = appConfig.logoUrl;
-
-      document.getElementById('piketSeninNama').value = appConfig.jadwalPiket.senin?.nama || '';
-      document.getElementById('piketSeninNip').value = appConfig.jadwalPiket.senin?.nip || '';
-      document.getElementById('piketSelasaNama').value = appConfig.jadwalPiket.selasa?.nama || '';
-      document.getElementById('piketSelasaNip').value = appConfig.jadwalPiket.selasa?.nip || '';
-      document.getElementById('piketRabuNama').value = appConfig.jadwalPiket.rabu?.nama || '';
-      document.getElementById('piketRabuNip').value = appConfig.jadwalPiket.rabu?.nip || '';
-      document.getElementById('piketKamisNama').value = appConfig.jadwalPiket.kamis?.nama || '';
-      document.getElementById('piketKamisNip').value = appConfig.jadwalPiket.kamis?.nip || '';
-      document.getElementById('piketJumatNama').value = appConfig.jadwalPiket.jumat?.nama || '';
-      document.getElementById('piketJumatNip').value = appConfig.jadwalPiket.jumat?.nip || '';
-    }
-
-    // PEMISAHAN TOMBOL 1: HANYA UNDUH CADANGAN EXCEL (TIDAK MENGHAPUS)
     window.downloadBackupExcelOnly = function() {
       const year = parseInt(document.getElementById('maintenanceYear').value) || 2026;
       const sem = document.getElementById('maintenanceSemester').value;
-
       let startIso = sem === 'ganjil' ? `${year}-07-01` : `${year}-01-01`;
       let endIso = sem === 'ganjil' ? `${year}-12-31` : `${year}-06-30`;
 
@@ -2913,31 +2737,23 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         showNotice("Data Kosong", `Tidak ditemukan log presensi pada Semester ${sem.toUpperCase()} ${year} untuk dicadangkan.`, "warning");
         return;
       }
-
       showNotice("Mencadangkan Data", "Menyiapkan berkas cadangan Excel...", "info");
       const rows = [
-        ["ARSIP CADANGAN PRESENSI SEMESTER"],
-        [appConfig.namaSekolah],
-        [`Periode: ${startIso} s/d ${endIso} (Semester ${sem.toUpperCase()} ${year})`],
-        [],
+        ["ARSIP CADANGAN PRESENSI SEMESTER"], [appConfig.namaSekolah], [`Periode: ${startIso} s/d ${endIso} (Semester ${sem.toUpperCase()} ${year})`], [],
         ["ID", "TANGGAL", "WAKTU", "NISN", "NAMA", "KELAS", "SESI", "STATUS"]
       ];
       targets.forEach(t => rows.push([t.id, t.tanggal, t.waktu, t.nisn, t.nama, t.kelas, t.sesi, t.status]));
-
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(rows);
       XLSX.utils.book_append_sheet(wb, ws, "ARSIP_PRESENSI");
       XLSX.writeFile(wb, `Cadangan_Presensi_${sem.toUpperCase()}_${year}.xlsx`);
-
       closeNoticeModal();
-      showNotice("Cadangan Berhasil", `${targets.length} catatan presensi berhasil diunduh ke Excel! Data di database tetap aman dan tidak dihapus.`, "success");
+      showNotice("Cadangan Berhasil", `${targets.length} catatan presensi berhasil diunduh ke Excel!`, "success");
     };
 
-    // PEMISAHAN TOMBOL 2: HANYA BERSIHKAN / RESET PRESENSI SEMESTER
     window.purgeSemesterAttendanceOnly = function() {
       const year = parseInt(document.getElementById('maintenanceYear').value) || 2026;
       const sem = document.getElementById('maintenanceSemester').value;
-
       let startIso = sem === 'ganjil' ? `${year}-07-01` : `${year}-01-01`;
       let endIso = sem === 'ganjil' ? `${year}-12-31` : `${year}-06-30`;
 
@@ -2947,35 +2763,26 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         return;
       }
 
-      showConfirm(
-        "Konfirmasi Pembersihan Semester",
-        `PERINGATAN: Anda akan menghapus ${targets.length} data presensi periode ${startIso} s/d ${endIso} secara permanen. Lanjutkan?`,
-        async () => {
-          const targetIds = targets.map(t => t.id);
+      showConfirm("Konfirmasi Pembersihan Semester", `PERINGATAN: Anda akan menghapus ${targets.length} data presensi periode ${startIso} s/d ${endIso} secara permanen. Lanjutkan?`, async () => {
+        closeNoticeModal();
+        const targetIds = targets.map(t => t.id);
+        targetIds.forEach(id => pendingDeletePresensi.add(id));
+        listAbsensi = listAbsensi.filter(a => !pendingDeletePresensi.has(a.id));
+        triggerDebouncedRender();
 
-          // Optimistic UI Update
-          listAbsensi = listAbsensi.filter(a => !targetIds.includes(a.id));
-          renderAttendanceManagementTable();
-          renderTodayLogs();
-          updateDashboardStats();
-          generateRekapView();
-
-          if (!IS_PREVIEW && db) {
-            try {
-              const chunkSize = 400;
-              for (let i = 0; i < targetIds.length; i += chunkSize) {
-                const chunk = targetIds.slice(i, i + chunkSize);
-                const batch = writeBatch(db);
-                chunk.forEach(id => batch.delete(doc(db, "presensi", id)));
-                await batch.commit();
-              }
-            } catch (err) {
-              console.error("Gagal menghapus data arsip:", err);
+        if (!IS_PREVIEW && db) {
+          try {
+            const chunkSize = 400;
+            for (let i = 0; i < targetIds.length; i += chunkSize) {
+              const chunk = targetIds.slice(i, i + chunkSize);
+              const batch = writeBatch(db);
+              chunk.forEach(id => batch.delete(doc(db, "presensi", id)));
+              await batch.commit();
             }
-          }
-          showNotice("Pembersihan Sukses", `${targetIds.length} data presensi semester lama berhasil dibersihkan!`, "success");
+          } catch (err) {}
         }
-      );
+        showNotice("Pembersihan Sukses", `${targetIds.length} data presensi semester lama berhasil dibersihkan!`, "success");
+      });
     };
 
     // ==========================================
@@ -3006,65 +2813,35 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       showNotice("Sesi Diubah", `Sesi dialihkan ke: ${manualSessionOverride.toUpperCase()}`, "info");
     };
 
-    // INISIALISASI KAMERA MULTI-TIER CEPAT & TANPA MACET
     window.startScanner = async function() {
       if (isScannerRunning) return;
       playBeep('success');
-
-      const config = {
-        fps: 10,
-        qrbox: { width: 220, height: 220 },
-        aspectRatio: 1.0
-      };
+      const config = { fps: 10, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 };
 
       try {
-        if (html5QrScanner) {
-          try { await html5QrScanner.stop(); } catch(e) {}
-        }
-
+        if (html5QrScanner) { try { await html5QrScanner.stop(); } catch(e) {} }
         html5QrScanner = new Html5Qrcode("reader");
 
-        // Tier 1: Hardware Enumeration (deviceId)
         let selectedCameraId = null;
         try {
           const devices = await Html5Qrcode.getCameras();
           if (devices && devices.length > 0) {
-            const backCam = devices.find(d => 
-              d.label.toLowerCase().includes('back') || 
-              d.label.toLowerCase().includes('rear') || 
-              d.label.toLowerCase().includes('environment')
-            );
+            const backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear') || d.label.toLowerCase().includes('environment'));
             selectedCameraId = backCam ? backCam.id : devices[0].id;
           }
         } catch (camErr) {}
 
         const cameraSource = selectedCameraId ? selectedCameraId : { facingMode: { ideal: cameraMode } };
-
-        await html5QrScanner.start(
-          cameraSource,
-          config,
-          onScanSuccess,
-          () => {}
-        );
-
-        isScannerRunning = true;
-        isProcessingScan = false;
+        await html5QrScanner.start(cameraSource, config, onScanSuccess, () => {});
+        isScannerRunning = true; isProcessingScan = false;
         document.getElementById('btnStartScanner').classList.add('hidden');
         document.getElementById('btnStopScanner').classList.remove('hidden');
         document.getElementById('btnSwitchCamera').classList.remove('hidden');
         document.getElementById('scannerOverlay').classList.add('hidden');
-
       } catch (err) {
-        // Tier 2: Fallback ke Default facingMode
         try {
-          await html5QrScanner.start(
-            { facingMode: cameraMode },
-            config,
-            onScanSuccess,
-            () => {}
-          );
-          isScannerRunning = true;
-          isProcessingScan = false;
+          await html5QrScanner.start({ facingMode: cameraMode }, config, onScanSuccess, () => {});
+          isScannerRunning = true; isProcessingScan = false;
           document.getElementById('btnStartScanner').classList.add('hidden');
           document.getElementById('btnStopScanner').classList.remove('hidden');
           document.getElementById('btnSwitchCamera').classList.remove('hidden');
@@ -3077,11 +2854,8 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
 
     window.stopScanner = async function() {
       if (!isScannerRunning || !html5QrScanner) return;
-      try {
-        await html5QrScanner.stop();
-      } catch (e) {}
-      isScannerRunning = false;
-      isProcessingScan = false;
+      try { await html5QrScanner.stop(); } catch (e) {}
+      isScannerRunning = false; isProcessingScan = false;
       document.getElementById('btnStartScanner').classList.remove('hidden');
       document.getElementById('btnStopScanner').classList.add('hidden');
       document.getElementById('btnSwitchCamera').classList.add('hidden');
@@ -3090,15 +2864,12 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
 
     window.switchCamera = function() {
       cameraMode = cameraMode === "environment" ? "user" : "environment";
-      stopScanner().then(() => {
-        setTimeout(() => startScanner(), 300);
-      });
+      stopScanner().then(() => { setTimeout(() => startScanner(), 300); });
     };
 
-    // ON SCAN SUCCESS DENGAN SCANNING MUTEX & COOLDOWN (ANTI-GANDA)
     async function onScanSuccess(decodedText) {
       if (!decodedText || isProcessingScan) return;
-      isProcessingScan = true; // Kunci seketika
+      isProcessingScan = true; // SCAN MUTEX LOCK (Kunci seketika)
 
       const nisnScanned = String(decodedText).trim();
       const session = detectSessionAuto();
@@ -3112,7 +2883,8 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
         return;
       }
 
-      const already = listAbsensi.find(a => String(a.nisn).trim() === nisnScanned && a.tanggal === today && a.sesi === session);
+      const recordId = `PRESENSI_${nisnScanned}_${today}_${session}`;
+      const already = listAbsensi.find(a => a.id === recordId);
       if (already) {
         playBeep('error');
         showNotice("Sudah Presensi", `${siswa.nama} sudah presensi Sesi ${session} hari ini pada jam ${already.waktu} WIB.`, "warning");
@@ -3125,20 +2897,9 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
       const statusText = calculateAttendanceStatus(session, now);
 
-      // ID DETERMINISTIK MUTLAK
-      const recordId = `PRESENSI_${nisnScanned}_${today}_${session}`;
-      const record = {
-        id: recordId,
-        tanggal: today,
-        waktu: timeStr,
-        nisn: siswa.nisn,
-        nama: siswa.nama,
-        kelas: siswa.kelas,
-        sesi: session,
-        status: statusText
-      };
-
-      // Optimistic UI Update untuk Tampilan Kiosk Instan
+      const record = { id: recordId, tanggal: today, waktu: timeStr, nisn: siswa.nisn, nama: siswa.nama, kelas: siswa.kelas, sesi: session, status: statusText };
+      pendingDeletePresensi.delete(recordId); // Clear tombstone if re-scanned
+      
       listAbsensi = listAbsensi.filter(a => a.id !== recordId);
       listAbsensi.unshift(record);
       renderTodayLogs();
@@ -3150,23 +2911,14 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       document.getElementById('scanSiswaFoto').src = siswa.fotoUrl;
 
       if (!IS_PREVIEW && db) {
-        try {
-          await setDoc(doc(db, "presensi", recordId), record);
-        } catch (e) {
-          console.error("Gagal simpan presensi Firestore:", e);
-        }
+        try { await setDoc(doc(db, "presensi", recordId), record); } catch (e) {}
       }
-
-      // Jeda Cooldown 3 detik sebelum kartu berikutnya
-      setTimeout(() => {
-        isProcessingScan = false;
-      }, 3000);
+      setTimeout(() => { isProcessingScan = false; }, 3000); // 3-second cooldown
     }
 
     function updateDashboardStats() {
       const today = getTodayISO();
       const records = listAbsensi.filter(a => a.tanggal === today);
-
       const uniquePagi = new Set(records.filter(a => a.sesi === 'Pagi').map(a => String(a.nisn).trim())).size;
       const uniqueSiang = new Set(records.filter(a => a.sesi === 'Siang').map(a => String(a.nisn).trim())).size;
       const totalSiswa = listSiswa.length;
@@ -3177,34 +2929,17 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       document.getElementById('statHadirPagi').innerText = uniquePagi;
       document.getElementById('statHadirSiang').innerText = uniqueSiang;
       document.getElementById('statBelum').innerText = belum;
-
       updateChart(uniquePagi, uniqueSiang, belum);
     }
 
     function updateChart(pagi, siang, belum) {
       const ctx = document.getElementById('attendanceChart');
       if (!ctx) return;
-
       if (!attendanceChartInstance) {
         attendanceChartInstance = new Chart(ctx, {
           type: 'bar',
-          data: {
-            labels: ['Hadir Pagi (06-07)', 'Hadir Siang (13:45-15)', 'Belum Hadir'],
-            datasets: [{
-              data: [pagi, siang, belum],
-              backgroundColor: ['#2563eb', '#10b981', '#f59e0b'],
-              borderRadius: 6
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-              y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-              x: { grid: { display: false } }
-            }
-          }
+          data: { labels: ['Hadir Pagi (06-07)', 'Hadir Siang (13:45-15)', 'Belum Hadir'], datasets: [{ data: [pagi, siang, belum], backgroundColor: ['#2563eb', '#10b981', '#f59e0b'], borderRadius: 6 }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
         });
       } else {
         attendanceChartInstance.data.datasets[0].data = [pagi, siang, belum];
@@ -3216,45 +2951,32 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       const tbody = document.getElementById('todayLogTbody');
       if (!tbody) return;
       tbody.innerHTML = '';
-
       const today = getTodayISO();
       const logs = listAbsensi.filter(a => a.tanggal === today);
       document.getElementById('todayLogCount').innerText = `${logs.length} Presensi Terdata`;
-
       if (logs.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada data presensi hari ini.</td></tr>`;
         return;
       }
-
+      const fragment = document.createDocumentFragment();
       logs.forEach(l => {
         const tr = document.createElement('tr');
         const badgeColor = l.sesi === 'Pagi' ? 'text-blue-700 bg-blue-50 border-blue-100' : 'text-emerald-700 bg-emerald-50 border-emerald-100';
-        tr.innerHTML = `
-          <td class="p-2.5 font-mono text-slate-500">${l.waktu}</td>
-          <td class="p-2.5 font-bold text-slate-900">${l.nama}</td>
-          <td class="p-2.5 text-slate-600">${l.kelas}</td>
-          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">${l.sesi}</span></td>
-          <td class="p-2.5 text-slate-700">${l.status}</td>
-        `;
-        tbody.appendChild(tr);
+        tr.innerHTML = `<td class="p-2.5 font-mono text-slate-500">${l.waktu}</td><td class="p-2.5 font-bold text-slate-900">${l.nama}</td><td class="p-2.5 text-slate-600">${l.kelas}</td><td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">${l.sesi}</span></td><td class="p-2.5 text-slate-700">${l.status}</td>`;
+        fragment.appendChild(tr);
       });
+      tbody.appendChild(fragment);
     }
 
     function populateClassDropdowns() {
       const classes = Array.from(new Set(listSiswa.map(s => s.kelas))).filter(Boolean).sort();
       const dropdowns = ['filterStudentKelas', 'filterAbsensiKelas', 'filterCetakKelas', 'filterQrKelas', 'rekapKelas'];
-
       dropdowns.forEach(id => {
         const sel = document.getElementById(id);
         if (!sel) return;
         const cur = sel.value;
         sel.innerHTML = '<option value="ALL">Semua Kelas</option>';
-        classes.forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c;
-          opt.innerText = c;
-          sel.appendChild(opt);
-        });
+        classes.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; sel.appendChild(opt); });
         if (cur && classes.includes(cur)) sel.value = cur;
       });
 
@@ -3262,17 +2984,12 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       if (cetakSiswaSel) {
         const curS = cetakSiswaSel.value || 'ALL';
         cetakSiswaSel.innerHTML = '<option value="ALL">Semua Siswa</option>';
-        listSiswa.forEach(s => {
-          const opt = document.createElement('option');
-          opt.value = s.nisn;
-          opt.innerText = `${s.nisn} - ${s.nama}`;
-          cetakSiswaSel.appendChild(opt);
-        });
+        listSiswa.forEach(s => { const opt = document.createElement('option'); opt.value = s.nisn; opt.innerText = `${s.nisn} - ${s.nama}`; cetakSiswaSel.appendChild(opt); });
         cetakSiswaSel.value = curS;
       }
     }
 
-    // CLOCK & PWA SERVICE WORKER DYNAMIC BLOB
+    // CLOCK & PWA SERVICE WORKER
     function startClock() {
       setInterval(() => {
         const now = new Date();
@@ -3282,19 +2999,10 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
     }
 
     function initPWA() {
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        document.getElementById('btnInstallPwa')?.classList.remove('hidden');
-      });
-
+      window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('btnInstallPwa')?.classList.remove('hidden'); });
       if ('serviceWorker' in navigator) {
         try {
-          const swCode = `
-            self.addEventListener('install', e => self.skipWaiting());
-            self.addEventListener('activate', e => self.clients.claim());
-            self.addEventListener('fetch', e => {});
-          `;
+          const swCode = `self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => self.clients.claim()); self.addEventListener('fetch', e => {});`;
           const blob = new Blob([swCode], { type: 'text/javascript' });
           navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
         } catch (e) {}
@@ -3302,13 +3010,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
     }
 
     window.triggerPwaInstall = function() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-          deferredPrompt = null;
-          document.getElementById('btnInstallPwa')?.classList.add('hidden');
-        });
-      }
+      if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById('btnInstallPwa')?.classList.add('hidden'); }); }
     };
 
     // INITIALIZATION ON LOAD
@@ -3322,12 +3024,7 @@ appId: "1:696200452974:web:c4ca3756e13c7204e43f7f"
       applyWelcomeUI();
       populateClassDropdowns();
 
-      updateDashboardStats();
-      renderTodayLogs();
-      renderStudentsTable();
-      renderIdCardsForPrint();
-      renderDownloadQrGrid();
-      generateRekapView();
+      triggerDebouncedRender();
 
       if (!IS_PREVIEW && db) {
         await autoSetupDatabase();
